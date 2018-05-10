@@ -1,0 +1,12 @@
+**/*~
+
+/resource/templates/templates_c/
+/storage/logs/
+
+.classpath
+.project
+.settings
+.idea
+.metadata
+*.iml
+*.ipr

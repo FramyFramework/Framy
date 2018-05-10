@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MrFibunacci/Framy.git"
+    "url": "git+https://github.com/FramyFramework/Framy.git"
   },
   "author": "mrfibunacci",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MrFibunacci/Framy/issues"
+    "url": "https://github.com/FramyFramework/Framy/issues"
   },
-  "homepage": "https://github.com/MrFibunacci/Framy#readme"
+  "homepage": "https://github.com/FramyFramework"
 }
