@@ -28,7 +28,7 @@
             $blueprint = new Blueprint($name);
             call_user_func($call, $blueprint);
 
-            dd(Builder::createTable($blueprint));
+            Builder::createTable($blueprint); // exec this in medoo
         }
 
         static public function drop(string $name)
@@ -45,6 +45,7 @@
         {
             //TODO
         }
+
         static public function hasColumn(string $name)
         {
             //TODO

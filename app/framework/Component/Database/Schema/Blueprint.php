@@ -67,13 +67,25 @@
 
         /**
          * BOOLEAN equivalent column.
+         *
+         * @param string $name
          */
-        public function boolean(){}
+        public function boolean($name)
+        {
+            $tempColumn = new Column($name, 'BOOLEAN');
+            $this->columns[] = $tempColumn;
+        }
 
         /**
          * BIGINT equivalent column.
+         *
+         * @param string $name
          */
-        public function bigInteger(){}
+        public function bigInteger($name)
+        {
+            $tempColumn = new Column($name, 'BIGINT');
+            $this->columns[] = $tempColumn;
+        }
 
         /**
          * Auto-incrementing UNSIGNED INTEGER (primary key) equivalent column.
@@ -91,9 +103,17 @@
 
         /**
          * Auto-incrementing UNSIGNED BIGINT (primary key) equivalent column.
-         * @param
+         *
+         * @param string $name
          */
-        public function bigIncrements(){}
+        public function bigIncrements($name = 'id')
+        {
+            $tempColumn = new Column($name, 'BIGINT');
+            $tempColumn->isAutoIncrement = true;
+            $tempColumn->isPrimaryKey    = true;
+            $tempColumn->isUnsigned      = true;
+            $this->columns[] = $tempColumn;
+        }
 
         /**
          * VARCHAR equivalent column with a optional length.
@@ -161,18 +181,36 @@
 
         /**
          * YEAR equivalent column.
+         *
+         * @param string $name
          */
-        public function year(){}
+        public function year($name)
+        {
+            $tempColumn = new Column($name, 'YEAR');
+            $this->columns[] = $tempColumn;
+        }
 
         /**
          * DATE equivalent column.
+         *
+         * @param string $name
          */
-        public function date(){}
+        public function date($name)
+        {
+            $tempColumn = new Column($name, 'DATE');
+            $this->columns[] = $tempColumn;
+        }
 
         /**
          * DATETIME equivalent column.
+         *
+         * @param string $name
          */
-        public function dateTime(){}
+        public function dateTime($name)
+        {
+            $tempColumn = new Column($name, 'DATETIME');
+            $this->columns[] = $tempColumn;
+        }
 
         /**
          * DATETIME (with timezone) equivalent column.
@@ -181,11 +219,23 @@
 
         /**
          * TIME equivalent column.
+         *
+         * @param string $name
          */
-        public function time(){}
+        public function time($name)
+        {
+            $tempColumn = new Column($name, 'TIME');
+            $this->columns[] = $tempColumn;
+        }
 
         /**
          * BLOB equivalent column.
+         *
+         * @param string $name
          */
-        public function binary($data){}
+        public function binary($name)
+        {
+            $tempColumn = new Column($name, 'BLOB ');
+            $this->columns[] = $tempColumn;
+        }
     }

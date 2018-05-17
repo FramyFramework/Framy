@@ -44,7 +44,7 @@
                     $query .= " PRIMARY KEY";
 
                 if(count($table->getColumns())-1 != $key)
-                    $query .= ",";
+                    $query .= ", ";
             }
             $query .= ");";
 
