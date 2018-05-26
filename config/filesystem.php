@@ -53,6 +53,10 @@
 
             'controller' => [
                 'root' => pathTo("/app/custom/Http/Controller/")
+            ],
+
+            'migration' => [
+                'root' => pathTo("/app/custom/Database/migrations/")
             ]
         ]
     ];

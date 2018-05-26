@@ -29,7 +29,8 @@
                 throw new StorageException(StorageException::DISK_NOT_FOUND);
             }
 
-            if($this->isNull($this->disk['driver'])) $this->disk['driver'] = Config::getInstance()->get("default", "filesystem");
+            if($this->isNull($this->disk['driver']))
+                $this->disk['driver'] = Config::getInstance()->get("default", "filesystem");
 
             if($this->disk['driver'] == 'local') {
                 $this->Driver = new LocalStorageDriver($this->disk);

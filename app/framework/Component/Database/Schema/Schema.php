@@ -28,7 +28,7 @@
             $blueprint = new Blueprint($name);
             call_user_func($call, $blueprint);
 
-            Builder::createTable($blueprint); // exec this in medoo
+            echo Builder::createTable($blueprint); // exec this in medoo
         }
 
         static public function drop(string $name)
