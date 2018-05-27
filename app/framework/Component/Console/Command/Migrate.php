@@ -10,6 +10,8 @@
 
     use app\framework\Component\Console\Input\InputInterface;
     use app\framework\Component\Console\Output\ConsoleOutput;
+    use app\framework\Component\Database\Migrations\Migration;
+    use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
     use app\framework\Component\Storage\Directory\Directory;
     use app\framework\Component\Storage\Storage;
 
@@ -28,15 +30,24 @@
         {
             // get all migrations
             // run up() methods
-            $dir = new Directory('', new Storage('migration'));
+            $classes = [];
+            $namespace = $this->namespace;
 
-            foreach($dir->filter('*.php') as $file){
-                require_once $dir->getAbsolutePath()."/".$file->getKey();
+            $path = str_replace("\\","/", $namespace);
+            $filesInNamespace = new ArrayObject(scandir(ROOT_PATH."/".$path."/"));
+            $filesInNamespace->removeFirst()->removeFirst();
 
-                $class = $this->namespace.basename($file->getKey(), '.php');
-                var_dump($class);
-                var_dump(class_exists($class));
+            for ($i = 0; $i <= $filesInNamespace->count()-1; $i++)
+                $filesInNamespace->key($i, explode(".php", $filesInNamespace->key($i))[0]);
+
+            foreach ($filesInNamespace->val() as $value) {
+                $class = $namespace.$value;
+                if(class_exists($class) && is_subclass_of($class,'app\framework\Component\Database\Migrations\Migration'))
+                    $classes[] = new $class();
             }
-            //dd(get_declared_classes());
+
+            foreach ($classes as $class) {
+                $class->up();
+            }
         }
     }

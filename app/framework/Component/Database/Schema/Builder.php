@@ -18,13 +18,13 @@
     {
         public static function createTable(Blueprint $table): string
         {
-            $query = "CREATE TABLE ".$table->getTable();
+            $query = "CREATE TABLE `".$table->getTable()."`";
 
             // go throu columns
-            $query .= "(";
+            $query .= " (";
             foreach ($table->getColumns() as $key => $Column)
             {
-                $query .= $Column->name." ";
+                $query .= "`".$Column->name."` ";
 
                 $query .= $Column->type;
 
@@ -53,6 +53,6 @@
 
         public static function dropTable(string $name): string
         {
-            return "DROP TABLE ".$name;
+            return "DROP TABLE `".$name."`;";
         }
     }

@@ -1,5 +1,5 @@
 <?php
-    namespace app\custom\Database\migration;
+    namespace app\custom\Database\migrations;
 
     use app\framework\Component\Database\Migrations\Migration;
     use app\framework\Component\Database\Schema\Blueprint;
