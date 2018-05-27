@@ -28,11 +28,17 @@
     use app\framework\Component\Console\Output\ConsoleOutput;
     use app\framework\Component\Console\Output\Formatter\OutputFormatter;
     use app\framework\Component\Console\Output\OutputInterface;
-    use app\framework\Component\Database\Migrations\Migration;
+    use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
+    use app\framework\Component\StdLib\StdObject\StdObjectWrapper;
+    use app\framework\Component\Storage\Directory\Directory;
+    use app\framework\Component\Storage\Storage;
 
     class Kernel
     {
-        //private $commands = array();
+        private $defaultNamespaces = [
+            'app\framework\Component\Console\Command\\'
+        ];
+
         private $commandLoader;
         private $singleCommand;
         private $defaultCommand;
@@ -454,7 +460,32 @@
          */
         private function getDefaultCommands()
         {
-            return [new HelpCommand(), new ListCommand(), new FramyVersionCommand(), new NewCommand(), new NewController(), new NewMigration(), new Migrate()];
+            $classes = [];
+            $excludeClass = "app\\framework\Component\Console\Command\Command";
+
+            // Go through all registered namespaces and get all classes inside.
+            // Create instance of classes and put it in array if
+            // its not the Command class and its an instance of it.
+            foreach($this->defaultNamespaces as $namespace) {
+                $path = str_replace("\\","/", $namespace);
+                $filesInNamespace = new ArrayObject(scandir(ROOT_PATH."/".$path."/"));
+                $filesInNamespace->removeFirst()->removeFirst();
+
+                for ($i = 0; $i <= $filesInNamespace->count()-1; $i++)
+                    $filesInNamespace->key($i, explode(".php", $filesInNamespace->key($i))[0]);
+
+                foreach ($filesInNamespace->val() as $value) {
+                    $class = $namespace.$value;
+                    if(
+                        class_exists($class)
+                        && $class != $excludeClass
+                        && is_subclass_of($class, $excludeClass)
+                    )
+                        $classes[] = new $class();
+                }
+            }
+
+            return $classes;
         }
 
         /**
