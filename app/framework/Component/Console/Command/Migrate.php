@@ -16,7 +16,7 @@
 
     class Migrate extends Command
     {
-        private $namepace = "app\\custom\\Database\\migrations\\";
+        private $namespace = "app\\custom\\Database\\migrations\\";
 
         protected function configure()
         {
@@ -33,7 +33,7 @@
             foreach($dir->filter('*.php') as $file){
                 require_once $dir->getAbsolutePath()."/".$file->getKey();
 
-                $class = $this->namepace.basename($file->getKey(), '.php');
+                $class = $this->namespace.basename($file->getKey(), '.php');
                 var_dump($class);
                 var_dump(class_exists($class));
             }
