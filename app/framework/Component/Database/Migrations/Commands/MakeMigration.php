@@ -16,7 +16,7 @@
     use app\framework\Component\Storage\File\File;
     use app\framework\Component\Storage\Storage;
 
-    class NewMigration extends Command
+    class MakeMigration extends Command
     {
         private $template = <<<'EOD'
 <?php
@@ -38,7 +38,7 @@
             Schema::create("§NAME§", function(Blueprint $table) {
                 $table->increments();
                 $table->timestamps();
-            });
+            }, "§connection§");
         }
 
         /**
@@ -48,30 +48,33 @@
          */
         public function down()
         {
-            Schema::drop("§NAME§");
+            Schema::drop("§NAME§", "§connection§");
         }
     }
 EOD;
 
         protected function configure()
         {
-            $this->setName("new-migrations")
+            $this->setName("make:migration")
                 ->setDefinition(new InputDefinition([
-                    new InputArgument("name", InputArgument::REQUIRED, "Name of migrations to create.")
+                    new InputArgument("name", InputArgument::REQUIRED, "Name of migrations to create."),
+                    new InputArgument("connection", InputArgument::REQUIRED, "What connection to use")
                 ]))
-                ->setDescription("Creates a new migrations");
+                ->setDescription("Creates a new migration");
         }
 
         protected function execute(InputInterface $input, ConsoleOutput $output)
         {
             $newMigrationName = $input->getArgument("name");
-            $output->writeln("<info>creating migrations: ".$newMigrationName."</info>", ConsoleOutput::OUTPUT_PLAIN);
+            $connection       = $input->getArgument("connection");
+            $output->writeln("<info>creating migration: ".$newMigrationName."</info>", ConsoleOutput::OUTPUT_PLAIN);
 
             try {
                 $File = new File($newMigrationName.".php", new Storage("migrations"));
 
                 if(fopen($File->getAbsolutePath(), "w")) {
                     $tempDefaultCommand = str_replace("§NAME§", $newMigrationName, $this->template);
+                    $tempDefaultCommand = str_replace("§connection§", $connection, $tempDefaultCommand);
                     file_put_contents($File->getAbsolutePath(), $tempDefaultCommand);
 
                     $output->writeln("<info>migrations: ".$newMigrationName." was successfully created</info>");

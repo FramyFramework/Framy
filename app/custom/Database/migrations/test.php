@@ -14,10 +14,10 @@
          */
         public function up()
         {
-            Schema::create("da", function(Blueprint $table) {
+            Schema::create("test", function(Blueprint $table) {
                 $table->increments();
                 $table->timestamps();
-            });
+            }, "mysql");
         }
 
         /**
@@ -27,6 +27,6 @@
          */
         public function down()
         {
-            Schema::drop("da");
+            Schema::drop("test", "mysql");
         }
     }

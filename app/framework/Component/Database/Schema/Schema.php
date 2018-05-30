@@ -45,7 +45,7 @@
         static public function drop(string $name, string $connection = null)
         {
             self::init($connection);
-            
+
             Builder::dropTable($name);
         }
 
@@ -69,8 +69,5 @@
         {
             if(is_null(self::$Medoo))
                 self::$Medoo = new Medoo($connection);
-
-            // TODO: Remove later
-            self::$Medoo->debug();
         }
     }
