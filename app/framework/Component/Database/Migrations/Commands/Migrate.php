@@ -6,14 +6,12 @@
  * @Author  Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Console\Command;
+    namespace app\framework\Component\Database\Migrations\Commands;
 
+    use app\framework\Component\Console\Command\Command;
     use app\framework\Component\Console\Input\InputInterface;
     use app\framework\Component\Console\Output\ConsoleOutput;
-    use app\framework\Component\Database\Migrations\Migration;
     use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-    use app\framework\Component\Storage\Directory\Directory;
-    use app\framework\Component\Storage\Storage;
 
     class Migrate extends Command
     {
@@ -22,7 +20,7 @@
         protected function configure()
         {
             $this->setName("migrate")
-                ->setDescription("");
+                ->setDescription("Migrate your database.");
         }
 
         protected function execute(InputInterface $input, ConsoleOutput $output)

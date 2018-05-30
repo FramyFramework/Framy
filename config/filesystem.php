@@ -55,7 +55,7 @@
                 'root' => pathTo("/app/custom/Http/Controller/")
             ],
 
-            'migration' => [
+            'migrations' => [
                 'root' => pathTo("/app/custom/Database/migrations/")
             ]
         ]

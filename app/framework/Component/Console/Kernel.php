@@ -36,7 +36,8 @@
     class Kernel
     {
         private $defaultNamespaces = [
-            'app\framework\Component\Console\Command\\'
+            'app\\framework\\Component\\Console\\Command\\',
+            'app\\framework\\Component\\Database\\Migrations\\Commands\\'
         ];
 
         private $commandLoader;
@@ -461,7 +462,7 @@
         private function getDefaultCommands()
         {
             $classes = [];
-            $excludeClass = "app\\framework\Component\Console\Command\Command";
+            $excludeClass = "app\\framework\\Component\\Console\\Command\\Command";
 
             // Go through all registered namespaces and get all classes inside.
             // Create instance of classes and put it in array if

@@ -16,11 +16,17 @@
      */
     class Builder
     {
+        /**
+         * Builds based on thr Blueprint the sql query.
+         *
+         * @param Blueprint $table
+         * @return string
+         */
         public static function createTable(Blueprint $table): string
         {
             $query = "CREATE TABLE `".$table->getTable()."`";
 
-            // go throu columns
+            // go through columns
             $query .= " (";
             foreach ($table->getColumns() as $key => $Column)
             {
@@ -51,6 +57,10 @@
             return $query;
         }
 
+        /**
+         * @param string $name
+         * @return string
+         */
         public static function dropTable(string $name): string
         {
             return "DROP TABLE `".$name."`;";
