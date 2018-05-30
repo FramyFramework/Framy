@@ -1,9 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Marco
- * Date: 26.05.2018
- * Time: 15:11
+ * Framy Framework
+ *
+ * @copyright Copyright Framy
+ * @Author  Marco Bier <mrfibunacci@gmail.com>
  */
 
     namespace app\framework\Component\Console\Command;
@@ -14,7 +14,6 @@
     use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
     use app\framework\Component\Storage\Directory\Directory;
     use app\framework\Component\Storage\Storage;
-
 
     class Migrate extends Command
     {
