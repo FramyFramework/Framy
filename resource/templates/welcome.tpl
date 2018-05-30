@@ -76,7 +76,7 @@ This is absolutely not stolen from Laravel... *cough* *cough*
         <div class="links">
             <a href="https://framyframework.github.io/FramyDocumentation/">Documentation</a>
             <a href="https://framyframework.github.io/FramyAPI/">API</a>
-            <a href="https://github.com/MrFibunacci/framyframework">GitHub</a>
+            <a href="https://github.com/FramyFramework">GitHub</a>
         </div>
     </div>
 </div>
