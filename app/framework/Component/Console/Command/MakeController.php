@@ -15,7 +15,7 @@
     use app\framework\Component\Storage\File\File;
     use app\framework\Component\Storage\Storage;
 
-    class NewController extends Command
+    class MakeController extends Command
     {
         private $controllerTemplate =
             <<<'EOD'
@@ -30,7 +30,7 @@
 EOD;
         protected function configure()
         {
-            $this->setName("new-controller")
+            $this->setName("make:controller")
                 ->setDescription("Adds an new Controller")
                 ->setDefinition(new InputDefinition([
                     new InputArgument("name", InputArgument::REQUIRED, "The name of the Controller")

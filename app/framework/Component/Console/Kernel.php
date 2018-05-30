@@ -12,8 +12,8 @@
     use app\framework\Component\Console\Command\FramyVersionCommand;
     use app\framework\Component\Console\Command\ListCommand;
     use app\framework\Component\Console\Command\Migrate;
-    use app\framework\Component\Console\Command\NewCommand;
-    use app\framework\Component\Console\Command\NewController;
+    use app\framework\Component\Console\Command\MakeCommand;
+    use app\framework\Component\Console\Command\MakeController;
     use app\framework\Component\Console\Command\NewMigration;
     use app\framework\Component\Console\CommandLoader\CommandLoader;
     use app\framework\Component\Console\Command\HelpCommand;

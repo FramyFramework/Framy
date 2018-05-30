@@ -15,7 +15,7 @@
     use app\framework\Component\Storage\File\File;
     use app\framework\Component\Storage\Storage;
 
-    class NewCommand extends Command
+    class MakeCommand extends Command
     {
         private $commandTemplate =
 <<<'EOD'
@@ -45,7 +45,7 @@ EOD;
 
         protected function configure()
         {
-            $this->setName("new-command")
+            $this->setName("make:command")
                 ->setDefinition($this->createDefinition())
                 ->setDescription("Create a new command")
                 ->setHelp("Little helper to crate custom commands");
@@ -58,7 +58,7 @@ EOD;
             $File = new File($newCommandName.".php", new Storage("commands"));
             fopen($File->getAbsolutePath(), "w");
 
-            $tempDefaultCommand = str_replace("§NAME§", $newCommandName, $this->$commandTemplate);
+            $tempDefaultCommand = str_replace("§NAME§", $newCommandName, $this->commandTemplate);
             $tempDefaultCommand = str_replace("§DESCRIPTION§", $input->getArgument("description"), $tempDefaultCommand);
             $tempDefaultCommand = str_replace("§HELPER§", $input->getArgument("helper"), $tempDefaultCommand);
 
