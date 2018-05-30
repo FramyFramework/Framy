@@ -21,4 +21,4 @@ Framy is an web application framework. Made to make web developing easier.
 
 ## Learning Framy
 
-You can find the Documentary and API [here](http://framyframework.github.io/FramyDocumentaion/)
+You can find the Documentary and API [here](https://framyframework.github.io/FramyDocumentation/)
