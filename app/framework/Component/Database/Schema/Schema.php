@@ -7,6 +7,7 @@
  */
 
     namespace app\framework\Component\Database\Schema;
+    use app\framework\Component\Database\Medoo;
 
     /**
      * Schema builder.
@@ -18,6 +19,11 @@
     class Schema
     {
         /**
+         * @var Medoo
+         */
+        private static $Medoo;
+
+        /**
          * Create a table based on Blueprint.
          *
          * @param string $name
@@ -25,10 +31,12 @@
          */
         static public function create(string $name, callable $call)
         {
+            self::init();
+
             $blueprint = new Blueprint($name);
             call_user_func($call, $blueprint);
 
-            echo Builder::createTable($blueprint); // exec this in medoo
+            self::$Medoo->query(Builder::createTable($blueprint));
         }
 
         static public function drop(string $name)
@@ -49,5 +57,14 @@
         static public function hasColumn(string $name)
         {
             //TODO
+        }
+
+        private static function init()
+        {
+            if(is_null(self::$Medoo))
+                self::$Medoo = new Medoo();
+
+            // TODO: Remove later
+            self::$Medoo->debug();
         }
     }

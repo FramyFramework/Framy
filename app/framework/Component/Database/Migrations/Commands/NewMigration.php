@@ -6,8 +6,9 @@
  * @Author  Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Console\Command;
+    namespace app\framework\Component\Database\Migrations\Commands;
 
+    use app\framework\Component\Console\Command\Command;
     use app\framework\Component\Console\Input\InputArgument;
     use app\framework\Component\Console\Input\InputDefinition;
     use app\framework\Component\Console\Input\InputInterface;
