@@ -23,8 +23,9 @@
         function __construct($diskName)
         {
             if($this->isDisk($diskName)) {
-                //$this->disk = StdLibTrait::getConfig("app")['disks'][$diskName];
-                $this->disk = Config::getInstance()->get("disks", "filesystem")[$diskName];
+                $this->disk = $this->validateDisk(
+                    Config::getInstance()->get("disks", "filesystem")[$diskName]
+                );
             } else {
                 throw new StorageException(StorageException::DISK_NOT_FOUND);
             }
@@ -73,5 +74,16 @@
         public function getPath()
         {
             return $this->disk['root'];
+        }
+
+        private function validateDisk($conf)
+        {
+            if(!array_key_exists('driver', $conf))
+                $conf['driver'] = null;
+
+            if(!array_key_exists('root', $conf))
+                $conf['root'] = null;
+
+            return $conf;
         }
     }
