@@ -1,6 +1,6 @@
 
 <p align="center">
-    <a href="https://scrutinizer-ci.com/g/FramyFramework/Framy/badges/quality-score.png?b=master"><img src="https://scrutinizer-ci.com/g/MrFibunacci/Framy/badges/quality-score.png?b=v0" alt="Code Quality"></a>
+    <a href="https://scrutinizer-ci.com/g/FramyFramework/Framy/badges/quality-score.png?b=master" alt="Code Quality"></a>
     <a href="https://codeclimate.com/github/FramyFramework/Framy/maintainability"><img src="https://api.codeclimate.com/v1/badges/a50384049347d1ab7bf7/maintainability" /></a>
 </p>
 
