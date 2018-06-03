@@ -22,7 +22,7 @@
      *
      * @package app\framework\Component\http\Model
      */
-    class Model //implements \ArrayAccess, \JsonSerializable
+    class Model
     {
         use StorageTrait,StdLibTrait,EventManagerTrait,CookieTrait;
 
