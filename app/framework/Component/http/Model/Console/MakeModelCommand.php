@@ -20,11 +20,11 @@
     {
         private $template = <<<'EOD'
 <?php
-    namespace app\custom\Models
+    namespace app\custom\Models;
     
     use app\framework\Component\http\Model\Model;
     
-    class §name§ extends Model
+    class §NAME§ extends Model
     {
         
     }
@@ -46,6 +46,9 @@ EOD;
             $template      = str_replace("§NAME§", $migrationName, $this->template);
 
             $File = new File($migrationName.".php", new Storage("model"));
-            $File->setContents($template);
+            //$File->setContents($template);
+            file_put_contents($File->getAbsolutePath(), $template);
+
+            $output->writeln("<info>Model created successfully.</info>");
         }
     }
