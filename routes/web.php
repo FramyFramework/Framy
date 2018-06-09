@@ -13,7 +13,7 @@
 
     $klein = new Klein();
 
-    $klein->respond("GET", "/", function(){
+    $klein->get("/", function(){
         view("welcome");
     });
 
