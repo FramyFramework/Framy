@@ -8,6 +8,7 @@
 
     namespace app\framework\Component\Exception;
 
+    use app\framework\Component\Config\Config;
     use app\framework\Component\StdLib\SingletonTrait;
 
     class Handler
@@ -16,13 +17,15 @@
 
         public function handler(\Exception $e)
         {
-            view("exception", [
-                'filename' => $e->getFile(),
-                'lineNumber' => $e->getLine(),
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            if(Config::getInstance()->get("debug", "app")) {
+                view("exception", [
+                    'filename' => $e->getFile(),
+                    'lineNumber' => $e->getLine(),
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
 
-            die();
+                die();
+            }
         }
     }
