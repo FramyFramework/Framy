@@ -194,7 +194,7 @@
             try {
                 $arr = array_rand($this->val(), $num);
             } catch (\ErrorException $e) {
-                throw new ArrayObjectException($e->getMessage());
+                handle(new ArrayObjectException($e->getMessage()));
             }
 
             if (!$this->isArray($arr)) {

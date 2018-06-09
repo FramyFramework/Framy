@@ -16,6 +16,7 @@
 
         'paths' => [
             "disk:view",
+            pathTo("app/framework/Component/Exception/")
         ],
 
         /*

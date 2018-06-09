@@ -105,8 +105,6 @@
          *                                              http://www.php.net/manual/en/datetime.formats.php
          * @param null|string $timezone Timezone in which you want to set the date. Here is a list of valid
          *                                              timezones: http://php.net/manual/en/timezones.php
-         *
-         * @throws DateTimeObjectException
          */
         public function __construct($time = "now", $timezone = null)
         {
@@ -132,7 +130,7 @@
                 // get UTC offset and correct the date to UTC by calculating the offset
                 $this->timestamp = $this->getDateObject()->getTimestamp();
             } catch (\Exception $e){
-                throw new DateTimeObjectException($e->getMessage());
+                handle(new DateTimeObjectException($e->getMessage()));
             }
         }
 
@@ -159,7 +157,6 @@
          *                                       visit: http://php.net/manual/en/timezones.php
          *
          * @return $this
-         * @throws DateTimeObjectException
          */
         public function setTimezone($timezone)
         {
@@ -170,7 +167,7 @@
 
                 $this->getDateObject()->setTimezone($timezone);
             } catch(\Exception $e) {
-                throw new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_TIMEZONE, [$timezone]);
+                handle(new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_TIMEZONE, [$timezone]));
             }
 
             return $this;
@@ -413,14 +410,13 @@
          * @param string $format A valid date format.
          *
          * @return string A string containing the date in the given $format.
-         * @throws DateTimeObjectException
          */
         public function format($format)
         {
             try {
                 return $this->getDateObject()->format($format);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_DATE_FORMAT, [$format]);
+                handle(new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_DATE_FORMAT, [$format]));
             }
         }
 
@@ -446,7 +442,6 @@
          * This function parses the format provided by Config and sets the default formatting for getting date information
          * like day, month, year, etc..
          *
-         * @throws DateTimeObjectException
          */
         private function parseDateTimeFormat()
         {
@@ -469,7 +464,7 @@
                 }
                 $this->dateTimeFormat = new ArrayObject($this->dateTimeFormat);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_DATE_FORMAT, [$this->format]);
+                handle(new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_DATE_FORMAT, [$this->format]));
             }
         }
 
@@ -481,7 +476,6 @@
          *                              http://www.php.net/manual/en/timezones.php
          *
          * @return \DateTimeZone
-         * @throws DateTimeObjectException
          */
         private function createTimezone($timezone = null)
         {
@@ -502,7 +496,7 @@
                     return new \DateTimeZone($timezone);
                 }
             } catch(\Exception $e){
-                throw new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_TIMEZONE, [$timezone]);
+                handle(new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_TIMEZONE, [$timezone]));
             }
         }
 
