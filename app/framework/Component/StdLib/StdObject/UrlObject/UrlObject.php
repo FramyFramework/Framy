@@ -52,7 +52,7 @@
 
                 $this->validateUrl();
             } catch (\Exception $e) {
-                throw new UrlObjectException(UrlObjectException::MSG_INVALID_URL, [$value]);
+                handle(new UrlObjectException(UrlObjectException::MSG_INVALID_URL, [$value]));
             }
         }
 

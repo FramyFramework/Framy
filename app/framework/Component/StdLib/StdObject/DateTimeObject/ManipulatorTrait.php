@@ -24,7 +24,6 @@
          *                       or as a date string (example: '1 day', '2 months', '3 year', '2 days + 10 minutes').
          *
          * @return $this
-         * @throws DateTimeObjectException
          */
         public function add($amount)
         {
@@ -32,7 +31,7 @@
                 $interval = $this->parseDateInterval($amount);
                 $this->getDateObject()->add($interval);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException($e->getMessage());
+                handle(new DateTimeObjectException($e->getMessage()));
             }
 
 
@@ -46,7 +45,6 @@
          * @param int $month
          * @param int $day
          *
-         * @throws DateTimeObjectException
          * @return $this
          */
         public function setDate($year, $month, $day)
@@ -54,7 +52,7 @@
             try {
                 $this->getDateObject()->setDate($year, $month, $day);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException($e->getMessage());
+                handle(new DateTimeObjectException($e->getMessage()));
             }
 
             return $this;
@@ -67,7 +65,6 @@
          * @param int $minute
          * @param int $second
          *
-         * @throws DateTimeObjectException
          * @return $this
          */
         public function setTime($hour, $minute, $second = 0)
@@ -75,7 +72,7 @@
             try {
                 $this->getDateObject()->setTime($hour, $minute, $second);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException($e->getMessage());
+                handle(new DateTimeObjectException($e->getMessage()));
             }
 
             return $this;
@@ -86,7 +83,6 @@
          *
          * @param int $timestamp UNIX timestamp.
          *
-         * @throws DateTimeObjectException
          * @return $this
          */
         public function setTimestamp($timestamp)
@@ -94,7 +90,7 @@
             try {
                 $this->getDateObject()->setTimestamp($timestamp);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException($e->getMessage());
+                handle(new DateTimeObjectException($e->getMessage()));
             }
 
             return $this;
@@ -107,7 +103,6 @@
          *                       or as a date string (example: '1 day', '2 months', '3 year', '2 days + 10 minutes').
          *
          * @return $this
-         * @throws DateTimeObjectException
          */
         public function sub($amount)
         {
@@ -115,7 +110,7 @@
                 $interval = $this->parseDateInterval($amount);
                 $this->getDateObject()->sub($interval);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException($e->getMessage());
+                handle(new DateTimeObjectException($e->getMessage()));
             }
 
             return $this;
@@ -130,7 +125,6 @@
          *                                       or a valid timezone string. For timezone string formats
          *                                       visit: http://php.net/manual/en/timezones.php
          *
-         * @throws DateTimeObjectException
          * @return $this
          */
         public function offsetToTimezone($timezone)
@@ -138,7 +132,7 @@
             try {
                 $this->setTimezone($timezone);
             } catch (\Exception $e) {
-                throw new DateTimeObjectException($e->getMessage());
+                handle(new DateTimeObjectException($e->getMessage()));
             }
 
             return $this;
@@ -148,7 +142,6 @@
          * @param $interval
          *
          * @return \DateInterval
-         * @throws DateTimeObjectException
          */
         private function parseDateInterval($interval)
         {
@@ -162,7 +155,7 @@
                     }
                 }
             } catch (\Exception $e) {
-                throw new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_DATE_INTERVAL, [$interval]);
+                handle(new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_DATE_INTERVAL, [$interval])) ;
             }
 
             return $interval;

@@ -9,6 +9,18 @@
         }
     }
 
+    if(! function_exists("pathTo")) {
+        /**
+         * Easy function to get the path to the project + if you want an directory in it.
+         *
+         * @param null $path
+         * @return bool|string
+         */
+        function pathTo($path = null) {
+            return realpath(dirname(__FILE__)."/../".$path);
+        }
+    }
+
     if(! function_exists("view")) {
         /**
          * Get the evaluated view contents for the given view.
@@ -52,18 +64,6 @@
         }
     }
 
-    if(! function_exists("pathTo")) {
-        /**
-         * Easy function to get the path to the project + if you want an directory in it.
-         *
-         * @param null $path
-         * @return bool|string
-         */
-        function pathTo($path = null) {
-            return realpath(dirname(__FILE__)."/../".$path);
-        }
-    }
-
     if(! function_exists("getStringBetween")) {
         /**
          * This is a handy little function to strip out a string between
@@ -82,5 +82,11 @@
             $ini += strlen($start);
             $len = strpos($string, $end, $ini) - $ini;
             return substr($string, $ini, $len);
+        }
+    }
+
+    if(! function_exists("handle")) {
+        function handle(\Exception $e) {
+            \app\framework\Component\Exception\Handler::getInstance()->handler($e);
         }
     }

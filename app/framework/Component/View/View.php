@@ -60,7 +60,7 @@
             // add view paths
             $i = 0;
             foreach($View as $key => $value){
-                if($key === "path"){
+                if($key === "paths"){
                     if($i <= 0)
                         $this->TemplateEngine->setTemplateDir($value);
                     else
@@ -95,7 +95,7 @@
                     return $this->TemplateEngine->fetch(self::validateViewName($expView[1]));
                 }
             } catch(\Exception $e) {
-                echo $e->getMessage();
+                handle($e);
             }
         }
 

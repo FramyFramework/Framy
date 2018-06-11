@@ -29,7 +29,7 @@
             try {
                 $this->disk = new Disk($diskName);
             } catch (StorageException $e) {
-                echo $e->getMessage();
+                handle($e);
             }
         }
 

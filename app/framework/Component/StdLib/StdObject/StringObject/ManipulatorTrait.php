@@ -317,7 +317,6 @@
          * @param string|array $search String, or array of strings, that will replaced.
          * @param string|array $replace String, or array of strings, with whom $search occurrences will be replaced.
          *
-         * @throws StringObjectException
          * @return $this
          */
         public function replace($search, $replace)
@@ -326,7 +325,7 @@
                 $value = str_ireplace($search, $replace, $this->val(), $count);
                 $this->val($value);
             } catch (\ErrorException $e) {
-                throw new StringObjectException($e->getMessage());
+                handle(new StringObjectException($e->getMessage()));
             }
 
             return $this;
@@ -449,7 +448,6 @@
          * @param string|null $flags Default flags are set to ENT_COMPAT | ENT_HTML401
          * @param string      $encoding Which encoding will be used in the conversion. Default is UTF-8.
          *
-         * @throws StringObjectException
          * @return $this
          */
         public function htmlEntityEncode($flags = null, $encoding = 'UTF-8')
@@ -461,7 +459,7 @@
                     $this->val(htmlentities($this->val(), $flags, $encoding));
                 }
             } catch (\ErrorException $e) {
-                throw new StringObjectException($e->getMessage());
+                handle(new StringObjectException($e->getMessage()));
             }
 
 
