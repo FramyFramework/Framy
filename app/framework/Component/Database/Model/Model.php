@@ -6,19 +6,22 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\http\Model;
+    namespace app\framework\Component\Database\Model;
+
+    use app\framework\Component\Database\Connection\Connection;
+    use app\framework\Component\Database\Connection\ConnectionFactory;
 
     /**
      *
      *
-     * @package app\framework\Component\http\Model
+     * @package app\framework\Component\Database\Model
      */
     abstract class Model
     {
         /**
          * The connection name for the model.
          *
-         * @var string
+         * @var $connection
          */
         protected $connection;
 

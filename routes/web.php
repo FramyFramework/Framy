@@ -14,7 +14,11 @@
     $klein = new Klein();
 
     $klein->respond("GET", "/", function(){
-        view("welcome");
+        $fac = new \app\framework\Component\Database\Connection\ConnectionFactory();
+        $conn = $fac->make("mysql");
+        echo "<pre>";
+        var_dump($conn);
+        echo "</pre>";
     });
 
     // add more routes here ...

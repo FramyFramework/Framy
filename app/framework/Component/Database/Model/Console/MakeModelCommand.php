@@ -6,7 +6,7 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\http\Model\Console;
+    namespace app\framework\Component\Database\Model\Console;
 
     use app\framework\Component\Console\Command\Command;
     use app\framework\Component\Console\Input\InputArgument;
