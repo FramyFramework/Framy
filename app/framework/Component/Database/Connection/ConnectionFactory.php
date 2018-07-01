@@ -34,19 +34,20 @@
          * @param $name String Name of the connection. If null use default.
          * @return Connection
          */
-        public function make(string $name = null): Connection
+        public function make(string $name = ''): Connection
         {
             $connByConfig = Config::getInstance()->get("connections");
-            if(sizeof($connByConfig ) == 1 && $name == null) {
+            if(sizeof($connByConfig ) == 1 && $name == '') {
                 reset($connByConfig);
                 $config = $this->parseConfig($connByConfig, key($connByConfig));
+                $name = key($connByConfig);
             } else {
                 $config = $this->parseConfig($connByConfig, $name);
             }
 
             //$config = $this->parseConfig(Config::getInstance()->get("connections", "database"), $name);
 
-            return $this->createSingleConnection($config);
+            return $this->createSingleConnection($config, $name);
         }
 
         /**
@@ -78,13 +79,14 @@
          * Create a single database connection instance.
          *
          * @param  array  $config
+         * @param string $name
          * @return Connection
          */
-        private function createSingleConnection(array $config): Connection
+        private function createSingleConnection(array $config, string $name = ''): Connection
         {
             $Pdo = $this->createPdoInstance($config);
 
-            return $this->createConnection($Pdo, $config['database'], $config);
+            return $this->createConnection($Pdo, $config['database'], $name, $config);
         }
 
         /**
@@ -135,11 +137,12 @@
         /**
          * @param PDO $Pdo
          * @param string $database
+         * @param string $name
          * @param array $config
          * @return Connection
          */
-        private function createConnection(PDO $Pdo, $database = "", array $config = [])
+        private function createConnection(PDO $Pdo, $database = "", string $name = '', array $config = [])
         {
-            return new Connection($Pdo, $database, $config);
+            return new Connection($Pdo, $database, $name, $config);
         }
     }

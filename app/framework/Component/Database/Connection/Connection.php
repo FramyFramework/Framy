@@ -27,6 +27,12 @@
         protected $pdo;
 
         /**
+         * The name of the connection.
+         * @var string
+         */
+        protected $name;
+
+        /**
          * The name of the connected database.
          *
          * @var string
@@ -54,9 +60,11 @@
          */
         protected $loggingQueries = false;
 
-        public function __construct(Pdo $pdo, string $database = '', array $conf = [])
+        public function __construct(Pdo $pdo, string $database = '', string $name = '', array $conf = [])
         {
             $this->pdo = $pdo;
+
+            $this->name = $name;
 
             // first we will setup the default properties.
             // We will keep track of the database name
@@ -68,10 +76,15 @@
 
         public function getName()
         {
-            return $this->database;
+            return $this->name;
         }
 
-        public function select()
+        public function getDriver()
+        {
+            return $this->config['driver'];
+        }
+
+        public function select(string $query)
         {}
 
         /**
@@ -86,7 +99,6 @@
 
             //TODO: do more execution stuff
             $this->pdo->query($query);
-
 
             $this->logQuery($query, $stopwatch->stop('queryRun'));
         }

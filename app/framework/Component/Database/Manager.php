@@ -8,7 +8,9 @@
 
     namespace app\framework\Component\Database;
 
+    use app\framework\Component\Database\Connection\Connection;
     use app\framework\Component\Database\Connection\ConnectionFactory;
+    use app\framework\Component\Database\Query\Builder;
 
     /**
      * Class Manager
@@ -22,16 +24,27 @@
         private $connections = [];
 
         /**
+         * @var string $connectionToUse
+         */
+        private $connectionToUse;
+
+        /**
          * @var ConnectionFactory
          */
-        private $connectionFactory;
+        private $ConnectionFactory;
+
+        /**
+         * @var Builder
+         */
+        private $QueryBuilder;
 
         /**
          * Manager constructor.
          */
         public function __construct()
         {
-            $this->connectionFactory = new ConnectionFactory();
+            $this->ConnectionFactory = new ConnectionFactory();
+
         }
 
         /**
@@ -40,20 +53,49 @@
          */
         public function addConnection(string $name)
         {
-            $this->connections[$name] = $this->connectionFactory->make($name);
+            $this->connections[$name] = $this->ConnectionFactory->make($name);
+        }
+
+        public function getConnection(string $name = null)
+        {
+            if($name == null) {
+                reset($this->connections);
+                $Connection = $this->connections[key($this->connections)];
+            } else {
+                $Connection = $this->connections[$name];
+            }
+
+            if(isset($Connection)) {
+                return $Connection;
+            } else {
+                return false;
+            }
         }
 
         /**
          * Set up default connection.
          */
-        public function useDefaultConn()
+        public function addDefaultConn()
         {
-            $connection = $this->connectionFactory->make();
+            $connection = $this->ConnectionFactory->make();
             $this->connections[$connection->getName()] = $connection;
         }
 
-        public function table(string $name)
+        /**
+         * Specify what connection shall be used.
+         * @param string $name Leave empty to use default
+         * @return Manager
+         */
+        public function useConnection(string $name = null): Manager
         {
-            return $this->connections['mysql'];
+            if($name) {
+                $this->connectionToUse = $this->getConnection($name)->getName();
+            } else {
+                $this->connectionToUse = $this->getConnection()->getName();
+            }
+
+            $this->QueryBuilder = new Builder($this->connections[$this->connectionToUse]);
+
+            return $this;
         }
     }

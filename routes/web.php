@@ -13,16 +13,16 @@
 
     $klein = new Klein();
 
-    $klein->respond("GET", "/", function(){
+    $klein->get("/", function(){
         $DB = new app\framework\Component\Database\Manager();
-        $DB->useDefaultConn();
-        $DB->table('user')->run("SELECT * FROM `user`");
+        $DB->addDefaultConn();
+        $DB->useConnection();
 
-        $User = new app\custom\Models\User();
+        //$User = new app\custom\Models\User();
 
         echo "<pre>";
-        $User->name = "test";
-        print_r($User);
+        //$User->name = "test";
+        print_r($DB);
         echo "</pre>";
     });
 
