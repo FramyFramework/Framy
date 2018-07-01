@@ -8,6 +8,8 @@
 
     namespace app\framework\Component\Database\Connection;
 
+    use app\framework\Component\Stopwatch\Stopwatch;
+    use app\framework\Component\Stopwatch\StopwatchEvent;
     use PDO;
 
     /**
@@ -62,5 +64,49 @@
             $this->database = $database;
 
             $this->config = $conf;
+        }
+
+        public function getName()
+        {
+            return $this->database;
+        }
+
+        public function select()
+        {}
+
+        /**
+         * Run a SQL statement and log its execution context.
+         *
+         * @param string $query
+         */
+        protected function run(string $query)
+        {
+            $stopwatch = new Stopwatch();
+            $stopwatch->start('queryRun');
+
+            //TODO: do more execution stuff
+            $this->pdo->query($query);
+
+
+            $this->logQuery($query, $stopwatch->stop('queryRun'));
+        }
+
+        /**
+         * Log a query in the connection's query log.
+         *
+         * @param string $query
+         * @param StopwatchEvent $stopwatchEvent
+         */
+        public function logQuery(string $query, StopwatchEvent $stopwatchEvent)
+        {
+            //todo: fire event of query execution
+
+            if($this->loggingQueries) {
+                $logEntry['startTime']     = $stopwatchEvent->getStartTime();
+                $logEntry['query']         = $query;
+                $logEntry['executionTime'] = $stopwatchEvent->getDuration();
+
+                $this->queryLog[] = $logEntry;
+            }
         }
     }

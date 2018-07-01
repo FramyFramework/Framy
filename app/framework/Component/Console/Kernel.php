@@ -38,7 +38,7 @@
         private $defaultNamespaces = [
             'app\\framework\\Component\\Console\\Command\\',
             'app\\framework\\Component\\Database\\Migrations\\Commands\\',
-            'app\\framework\\Component\\http\\Model\\Console\\'
+            'app\\framework\\Component\\Database\\Model\\Console\\'
         ];
 
         private $commandLoader;

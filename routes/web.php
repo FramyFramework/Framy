@@ -14,10 +14,15 @@
     $klein = new Klein();
 
     $klein->respond("GET", "/", function(){
-        $fac = new \app\framework\Component\Database\Connection\ConnectionFactory();
-        $conn = $fac->make("mysql");
+        $DB = new app\framework\Component\Database\Manager();
+        $DB->useDefaultConn();
+        $DB->table('user')->run("SELECT * FROM `user`");
+
+        $User = new app\custom\Models\User();
+
         echo "<pre>";
-        var_dump($conn);
+        $User->name = "test";
+        print_r($User);
         echo "</pre>";
     });
 

@@ -8,7 +8,7 @@
 
     namespace app\framework\Component\Database\Model;
 
-    use app\framework\Component\Database\Connection\Connection;
+    use app\framework\Component\Config\Config;
     use app\framework\Component\Database\Connection\ConnectionFactory;
 
     /**
@@ -59,4 +59,31 @@
          * @var string
          */
         const UPDATED_AT = 'updated_at';
+
+        /**
+         * Model constructor.
+         */
+        public function __construct()
+        {
+            $ConnFactory = new ConnectionFactory();
+            $this->connection = $ConnFactory->make($this->connection);
+        }
+
+        /**
+         * to save the this model to the database
+         */
+        public function save()
+        {}
+
+        /**
+         * Get number of entries in table
+         */
+        public function count()
+        {}
+
+        /**
+         * selects entries of table and return array of Models filled with data.
+         */
+        public function get()
+        {}
     }

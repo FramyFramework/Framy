@@ -22,11 +22,12 @@
 <?php
     namespace app\custom\Models;
     
-    use app\framework\Component\http\Model\Model;
+    use app\framework\Component\Database\Model\Model;
     
     class §NAME§ extends Model
     {
-        
+        §CONNECTION§
+        §TABLE§
     }
 EOD;
 
@@ -35,7 +36,9 @@ EOD;
             $this->setName("make:model")
                 ->setDescription("Creating a new Model")
                 ->setDefinition(new InputDefinition([
-                    new InputArgument("name", InputArgument::REQUIRED, "Name of the Model")
+                    new InputArgument("name", InputArgument::REQUIRED, "Name of the Model"),
+                    new InputArgument("tableName", InputArgument::OPTIONAL, "Tell what table shall be used."),
+                    new InputArgument("connectionName", InputArgument::OPTIONAL, "Tell what connection shall be used.")
                 ]))
                 ->setHelp("Creating a new Model where it belongs");
         }
@@ -43,7 +46,20 @@ EOD;
         protected function execute(InputInterface $input, ConsoleOutput $output)
         {
             $migrationName = $input->getArgument("name");
-            $template      = str_replace("§NAME§", $migrationName, $this->template);
+            $tableName =  $input->getArgument("tableName");
+            $connectionName =  $input->getArgument("connectionName");
+
+            $template = str_replace("§NAME§", $migrationName, $this->template);
+
+            if(isset($connectionName))
+                $template = str_replace("§CONNECTION§", 'protected $connection = "'.$connectionName.'";', $template);
+            else
+                $template = str_replace("§CONNECTION§", '', $template);
+
+            if(isset($tableName))
+                $template = str_replace("§TABLE§", 'protected $table = "'.$tableName.'";', $template);
+            else
+                $template = str_replace("§TABLE§", '', $template);
 
             $File = new File($migrationName.".php", new Storage("model"));
             //$File->setContents($template);

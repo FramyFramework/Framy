@@ -16,6 +16,7 @@
         {
             Schema::create("user", function(Blueprint $table) {
                 $table->increments();
+                $table->string("name");
                 $table->timestamps();
             }, "mysql");
         }

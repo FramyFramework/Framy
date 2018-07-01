@@ -30,12 +30,21 @@
 
         /**
          * Establish a PDO connection based on the configuration.
-         * @param $name String Name of the connection
+         * Set up default connection or the one defined
+         * @param $name String Name of the connection. If null use default.
          * @return Connection
          */
-        public function make(string $name): Connection
+        public function make(string $name = null): Connection
         {
-            $config = $this->parseConfig(Config::getInstance()->get("connections", "database"), $name);
+            $connByConfig = Config::getInstance()->get("connections");
+            if(sizeof($connByConfig ) == 1 && $name == null) {
+                reset($connByConfig);
+                $config = $this->parseConfig($connByConfig, key($connByConfig));
+            } else {
+                $config = $this->parseConfig($connByConfig, $name);
+            }
+
+            //$config = $this->parseConfig(Config::getInstance()->get("connections", "database"), $name);
 
             return $this->createSingleConnection($config);
         }
