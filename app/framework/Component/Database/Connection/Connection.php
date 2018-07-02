@@ -85,22 +85,28 @@
         }
 
         public function select(string $query)
-        {}
+        {
+            return $this->run($query);
+        }
 
         /**
          * Run a SQL statement and log its execution context.
          *
          * @param string $query
+         * @return mixed
          */
         protected function run(string $query)
         {
             $stopwatch = new Stopwatch();
+            $result = null;
             $stopwatch->start('queryRun');
 
             //TODO: do more execution stuff
-            $this->pdo->query($query);
+            $result = $this->pdo->query($query);
+            $result = $result->fetch();
 
             $this->logQuery($query, $stopwatch->stop('queryRun'));
+            return $result;
         }
 
         /**

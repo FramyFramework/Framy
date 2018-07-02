@@ -14,15 +14,17 @@
     $klein = new Klein();
 
     $klein->get("/", function(){
+        echo "<pre>";
+
         $DB = new app\framework\Component\Database\Manager();
         $DB->addDefaultConn();
         $DB->useConnection();
+        print_r($DB->getConnection()->select("select * from user"));
 
         //$User = new app\custom\Models\User();
 
-        echo "<pre>";
         //$User->name = "test";
-        print_r($DB);
+        //print_r($DB);
         echo "</pre>";
     });
 
