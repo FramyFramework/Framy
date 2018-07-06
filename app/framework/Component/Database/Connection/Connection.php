@@ -8,9 +8,11 @@
 
     namespace app\framework\Component\Database\Connection;
 
+    use app\framework\Component\Database\Model\Model;
+    use PDO;
+    use PDOStatement;
     use app\framework\Component\Stopwatch\Stopwatch;
     use app\framework\Component\Stopwatch\StopwatchEvent;
-    use PDO;
 
     /**
      * Class Connection
@@ -102,8 +104,11 @@
             $stopwatch->start('queryRun');
 
             //TODO: do more execution stuff
-            $result = $this->pdo->query($query);
-            $result = $result->fetch();
+            if ($result = $this->pdo->query($query)) {
+                $result = $this->fetch($result);
+            }
+
+            //$result = $result->fetch(PDO::FETCH_ASSOC);
 
             $this->logQuery($query, $stopwatch->stop('queryRun'));
             return $result;
@@ -126,5 +131,26 @@
 
                 $this->queryLog[] = $logEntry;
             }
+        }
+
+        /**
+         * Fetch PDO Result and return and array of Models or a single one
+         * @param PDOStatement $statement
+         * @return Model[]|Model
+         */
+        public function fetch(PDOStatement $statement)
+        {
+            $result    = [];
+            $statement = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($statement as $key => $value) {
+                $result[$key] = new Model($this);
+                $result[$key]->fillData($value);
+            }
+
+            if(sizeof($result) == 1)
+                $result = $result[0];
+
+            return $result;
         }
     }

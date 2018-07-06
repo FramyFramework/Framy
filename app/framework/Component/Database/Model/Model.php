@@ -9,6 +9,7 @@
     namespace app\framework\Component\Database\Model;
 
     use app\framework\Component\Config\Config;
+    use app\framework\Component\Database\Connection\Connection;
     use app\framework\Component\Database\Connection\ConnectionFactory;
 
     /**
@@ -16,7 +17,7 @@
      *
      * @package app\framework\Component\Database\Model
      */
-    abstract class Model
+    class Model
     {
         /**
          * The connection name for the model.
@@ -62,11 +63,15 @@
 
         /**
          * Model constructor.
+         * @param Connection $connection
          */
-        public function __construct()
+        public function __construct(Connection $connection = null)
         {
             $ConnFactory = new ConnectionFactory();
-            $this->connection = $ConnFactory->make($this->connection);
+            if(is_null($connection))
+                $this->connection = $ConnFactory->make($this->connection);
+            else
+                $this->connection = $connection;
         }
 
         /**
@@ -86,4 +91,11 @@
          */
         public function get()
         {}
+
+        public function fillData(array $data)
+        {
+            foreach ($data as $key => $datum) {
+                $this->$key = $datum;
+            }
+        }
     }

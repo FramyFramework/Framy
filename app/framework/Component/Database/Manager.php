@@ -44,7 +44,6 @@
         public function __construct()
         {
             $this->ConnectionFactory = new ConnectionFactory();
-
         }
 
         /**

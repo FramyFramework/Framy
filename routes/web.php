@@ -19,7 +19,7 @@
         $DB = new app\framework\Component\Database\Manager();
         $DB->addDefaultConn();
         $DB->useConnection();
-        print_r($DB->getConnection()->select("select * from user"));
+        $data = $DB->getConnection()->select("select * from user");
 
         //$User = new app\custom\Models\User();
 
