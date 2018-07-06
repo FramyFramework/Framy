@@ -91,6 +91,15 @@
             return $this->run($query);
         }
 
+        public function update()
+        {}
+
+        public function insert()
+        {}
+
+        public function delete()
+        {}
+
         /**
          * Run a SQL statement and log its execution context.
          *

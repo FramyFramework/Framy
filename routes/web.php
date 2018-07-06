@@ -19,12 +19,9 @@
         $DB = new app\framework\Component\Database\Manager();
         $DB->addDefaultConn();
         $DB->useConnection();
-        $data = $DB->getConnection()->select("select * from user");
+        $data = $DB->getConnection()->select("select * from user where id=1");
 
-        //$User = new app\custom\Models\User();
-
-        //$User->name = "test";
-        //print_r($DB);
+        print_r($data);
         echo "</pre>";
     });
 
