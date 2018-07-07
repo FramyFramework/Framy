@@ -20,8 +20,10 @@
         $DB->addDefaultConn();
         $DB->useConnection();
         $data = $DB->getConnection()->select("select * from user where id=1");
-
         print_r($data);
+        $data = $DB->getConnection()->insert("insert into user (name) values ('another one')");
+        print_r($data);
+
         echo "</pre>";
     });
 

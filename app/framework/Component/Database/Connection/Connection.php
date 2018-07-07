@@ -9,6 +9,7 @@
     namespace app\framework\Component\Database\Connection;
 
     use app\framework\Component\Database\Model\Model;
+    use app\framework\Component\EventManager\EventManagerTrait;
     use PDO;
     use PDOStatement;
     use app\framework\Component\Stopwatch\Stopwatch;
@@ -22,6 +23,8 @@
      */
     class Connection
     {
+        use EventManagerTrait;
+
         /**
          * The active pdo connection
          * @var PDO
@@ -64,8 +67,7 @@
 
         public function __construct(Pdo $pdo, string $database = '', string $name = '', array $conf = [])
         {
-            $this->pdo = $pdo;
-
+            $this->pdo  = $pdo;
             $this->name = $name;
 
             // first we will setup the default properties.
@@ -74,6 +76,76 @@
             $this->database = $database;
 
             $this->config = $conf;
+        }
+
+        /**
+         * Get the connection query log.
+         *
+         * @return array
+         */
+        public function getQueryLog()
+        {
+            return $this->queryLog;
+        }
+
+        /**
+         * Clear the query log.
+         *
+         * @return void
+         */
+        public function flushQueryLog()
+        {
+            $this->queryLog = [];
+        }
+
+        /**
+         * Enable the query log on the connection.
+         *
+         * @return void
+         */
+        public function enableQueryLog()
+        {
+            $this->loggingQueries = true;
+        }
+
+        /**
+         * Disable the query log on the connection.
+         *
+         * @return void
+         */
+        public function disableQueryLog()
+        {
+            $this->loggingQueries = false;
+        }
+
+        /**
+         * Determine whether we're logging queries.
+         *
+         * @return bool
+         */
+        public function logging()
+        {
+            return $this->loggingQueries;
+        }
+
+        /**
+         * Get the name of the connected database.
+         *
+         * @return string
+         */
+        public function getDatabaseName()
+        {
+            return $this->database;
+        }
+
+        /**
+         * Set the name of the connected database.
+         *
+         * @param  string  $database
+         */
+        public function setDatabaseName($database)
+        {
+            $this->database = $database;
         }
 
         public function getName()
@@ -91,14 +163,20 @@
             return $this->run($query);
         }
 
-        public function update()
-        {}
+        public function update(string $query)
+        {
+            return $this->run($query);
+        }
 
-        public function insert()
-        {}
+        public function insert(string $query)
+        {
+            return $this->run($query);
+        }
 
-        public function delete()
-        {}
+        public function delete(string $query)
+        {
+            return $this->run($query);
+        }
 
         /**
          * Run a SQL statement and log its execution context.
@@ -109,7 +187,7 @@
         protected function run(string $query)
         {
             $stopwatch = new Stopwatch();
-            $result = null;
+            $result    = null;
             $stopwatch->start('queryRun');
 
             //TODO: do more execution stuff
@@ -131,7 +209,7 @@
          */
         public function logQuery(string $query, StopwatchEvent $stopwatchEvent)
         {
-            //todo: fire event of query execution
+            $this->eventManager()->fire("ff.database.query_execution");
 
             if($this->loggingQueries) {
                 $logEntry['startTime']     = $stopwatchEvent->getStartTime();
