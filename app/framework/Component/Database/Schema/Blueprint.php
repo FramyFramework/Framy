@@ -77,6 +77,70 @@
         }
 
         /**
+         * DECIMAL equivalent column with a precision (total digits) and scale (decimal digits).
+         * @param string $name
+         * @param int $precision
+         * @param int $scale
+         */
+        public function decimal(string $name, int $precision, int $scale)
+        {
+            $tempColumn = new Column($name, 'DECIMAL');
+            $tempColumn->length = $precision;
+            $tempColumn->scale = $scale;
+            $this->columns[] = $tempColumn;
+        }
+
+        /**
+         * DOUBLE equivalent column with a precision (total digits) and scale (decimal digits).
+         * @param string $name
+         * @param int $precision
+         * @param int $scale
+         */
+        public function double(string $name, int $precision, int $scale)
+        {
+            $tempColumn = new Column($name, 'DOUBLE');
+            $tempColumn->length = $precision;
+            $tempColumn->scale = $scale;
+            $this->columns[] = $tempColumn;
+        }
+
+        /**
+         * FLOAT equivalent column with a precision (total digits) and scale (decimal digits).
+         * @param string $name
+         * @param int $precision
+         * @param int $scale
+         */
+        public function float(string $name, int $precision, int $scale)
+        {
+            $tempColumn = new Column($name, 'FLOAT');
+            $tempColumn->length = $precision;
+            $tempColumn->scale = $scale;
+            $this->columns[] = $tempColumn;
+        }
+
+        /**
+         * INTEGER equivalent column.
+         *
+         * @param string $name
+         */
+        public function integer($name)
+        {
+            $tempColumn = new Column($name, 'INTEGER');
+            $this->columns[] = $tempColumn;
+        }
+
+        /**
+         * MEDIUMINT equivalent column.
+         *
+         * @param string $name
+         */
+        public function mediumInteger($name)
+        {
+            $tempColumn = new Column($name, 'MEDIUMINT');
+            $this->columns[] = $tempColumn;
+        }
+
+        /**
          * BIGINT equivalent column.
          *
          * @param string $name
