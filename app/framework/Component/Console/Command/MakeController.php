@@ -21,7 +21,7 @@
             <<<'EOD'
 <?php
     
-    namespace app\custom\Http\Controller\§NAME§;
+    namespace app\custom\Http\Controller;
     
     class §NAME§
     {
