@@ -47,12 +47,13 @@
         }
 
         /**
-         * Set up specific connection.
+         * Set up connection.
          * @param string $name
          */
-        public function addConnection(string $name)
+        public function addConnection(string $name = null)
         {
-            $this->connections[$name] = $this->ConnectionFactory->make($name);
+            $connection = $this->ConnectionFactory->make($name);
+            $this->connections[$connection->getName()] = $connection;
         }
 
         public function getConnection(string $name = null)
@@ -69,15 +70,6 @@
             } else {
                 return false;
             }
-        }
-
-        /**
-         * Set up default connection.
-         */
-        public function addDefaultConn()
-        {
-            $connection = $this->ConnectionFactory->make();
-            $this->connections[$connection->getName()] = $connection;
         }
 
         /**

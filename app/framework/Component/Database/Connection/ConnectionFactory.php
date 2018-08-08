@@ -34,10 +34,10 @@
          * @param $name String Name of the connection. If null use default.
          * @return Connection
          */
-        public function make(string $name = ''): Connection
+        public function make(string $name = null): Connection
         {
             $connByConfig = Config::getInstance()->get("connections");
-            if(sizeof($connByConfig ) == 1 && $name == '') {
+            if(sizeof($connByConfig ) == 1 && $name == null) {
                 reset($connByConfig);
                 $config = $this->parseConfig($connByConfig, key($connByConfig));
                 $name = key($connByConfig);
