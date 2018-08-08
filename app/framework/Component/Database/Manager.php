@@ -89,4 +89,21 @@
 
             return $this;
         }
+
+        /**
+         * To interact with the database using the QueryBuilder
+         *
+         * @param string $name
+         * @return Builder
+         */
+        public function table(string $name)
+        {
+            // use default connection
+            if($this->connectionToUse = null)
+                $this->useConnection();
+
+            $this->QueryBuilder->table($name);
+
+            return $this->QueryBuilder;
+        }
     }
