@@ -8,7 +8,6 @@
 
     namespace app\framework\Component\Database;
 
-    use app\framework\Component\Database\Connection\Connection;
     use app\framework\Component\Database\Connection\ConnectionFactory;
     use app\framework\Component\Database\Query\Builder;
 
@@ -90,19 +89,34 @@
             return $this;
         }
 
-        /**
+        /*
          * To interact with the database using the QueryBuilder
          *
          * @param string $name
          * @return Builder
-         */
+
         public function table(string $name)
         {
             // use default connection
-            if($this->connectionToUse = null)
+            if($this->connectionToUse == null)
                 $this->useConnection();
 
             $this->QueryBuilder->table($name);
+
+            return $this->QueryBuilder;
+        }*/
+
+        /**
+         * @param array $columns
+         * @return Builder
+         */
+        public function select($columns = ['*'])
+        {
+            // use default connection
+            if($this->connectionToUse == null)
+                $this->useConnection();
+
+            $this->QueryBuilder->select($columns);
 
             return $this->QueryBuilder;
         }

@@ -7,7 +7,10 @@
  */
 
     namespace app\framework\Component\Database\Query;
+
     use app\framework\Component\Database\Connection\Connection;
+    use app\framework\Component\Database\Model\Model;
+    use app\framework\Component\Database\Query\Grammars\Grammar;
 
     /**
      * Class Builder
@@ -22,7 +25,7 @@
          */
         private $connection;
 
-        private $driver;
+        private $grammar;
 
         private $table;
 
@@ -32,6 +35,21 @@
          * @var array
          */
         public $columns;
+
+        /**
+         * An aggregate function and column to be run.
+         *
+         * @var array
+         */
+        public $aggregate;
+
+        /**
+         * Indicates if the query returns distinct results.
+         *
+         * @var bool
+         */
+        public $distinct = false;
+
 
         /**
          * The table which the query is targeting.
@@ -83,9 +101,12 @@
         public function __construct(Connection $connection)
         {
             $this->connection = $connection;
-            $this->driver = $connection->getDriver();
+
+            $this->grammar = new Grammar();
+
         }
 
+        /* TODO: do we need this method?! */
         public function table(string $name)
         {
             $this->table = $name;
@@ -119,19 +140,26 @@
 
         /**
          * Add a basic where clause to the query.
+         * TODO: implement:
          *
-         * @param  string|array|\Closure  $column
+         * @param  string|array  $column
          * @param  string  $operator
          * @param  mixed   $value
          * @return $this
          */
         public function where($column, $operator = null, $value = null)
         {
+            // check if operator is valid
+            if($this->isOperatorValid($operator)) {
+
+            }
+
             return $this;
         }
 
         /**
          * Add an "order by" clause to the query.
+         * TODO: implement:
          *
          * @param  string  $column
          * @param  string  $direction
@@ -140,5 +168,44 @@
         public function orderBy($column, $direction = 'asc')
         {
             return $this;
+        }
+
+        /**
+         * Execute the query as a "select" statement.
+         *
+         * @return Model|null
+         */
+        public function get()
+        {
+            return $this->connection->select(
+                $this->toSql()
+            );
+        }
+
+        /**
+         * Check if the operator is in the list of valid operators.
+         * Returns true if it is.
+         *
+         * @param $operatorToCheck
+         * @return bool
+         */
+        private function isOperatorValid($operatorToCheck)
+        {
+            foreach ($this->operators as $operator) {
+                if($operatorToCheck === $operator)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Get the SQL representation of the query.
+         *
+         * @return string
+         */
+        private function toSql()
+        {
+            return $this->grammar->compileSelect($this);
         }
     }
