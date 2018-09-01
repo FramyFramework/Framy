@@ -32,7 +32,6 @@
          * @param bool|true $throw
          *
          * @return boolean|string
-         * @throws ValidationException
          */
         public function validate($value, $params = [], $throw = false)
         {
@@ -84,7 +83,7 @@
             // Remove all non-digit characters from the number
             if (($number = preg_replace('/\D+/', '', $value)) === '') {
                 if ($throw) {
-                    throw new ValidationException($message);
+                    handle(new ValidationException($message));
                 }
 
                 return $message;
@@ -100,7 +99,7 @@
 
             if (!isset($cards[$type])) {
                 if ($throw) {
-                    throw new ValidationException($message);
+                    handle(new ValidationException($message));
                 }
 
                 return $message;
@@ -112,7 +111,7 @@
             // Validate the card length by the card type
             if (!in_array($length, preg_split('/\D+/', $cards[$type]['length']))) {
                 if ($throw) {
-                    throw new ValidationException($message);
+                    handle(new ValidationException($message));
                 }
 
                 return $message;
@@ -121,7 +120,7 @@
             // Check card number prefix
             if (!preg_match('/^' . $cards[$type]['prefix'] . '/', $number)) {
                 if ($throw) {
-                    throw new ValidationException($message);
+                    handle(new ValidationException($message));
                 }
 
                 return $message;

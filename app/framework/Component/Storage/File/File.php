@@ -28,7 +28,6 @@
          * @param string  $key     File key
          * @param Storage $storage Storage to use
          *
-         * @throws \app\framework\Component\Storage\StorageException
          */
         function __construct($key, Storage $storage)
         {
@@ -37,7 +36,7 @@
 
             //make sure a file path is given
             if($this->storage->keyExists($this->key) && $this->getStorage()->isDirectory($this->key)){
-                throw new StorageException(StorageException::FILE_NOT_FOUND, [$key]);
+                handle(new StorageException(StorageException::FILE_NOT_FOUND, [$key]));
             }
         }
 

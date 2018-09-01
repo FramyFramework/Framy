@@ -14,7 +14,8 @@
      *
      * @package app\framework\Component\Validation
      */
-    interface ValidatorInterface {
+    interface ValidatorInterface
+    {
 
         /**
          * Get validator name, eg: email

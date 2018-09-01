@@ -81,7 +81,6 @@
          * @param  callable|null  $callback
          * @return string
          *
-         * @throws \Throwable
          */
         public function render(callable $callback = null)
         {

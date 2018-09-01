@@ -52,7 +52,7 @@
         {
 
             if (!$this->isString($eventName) || $this->str($eventName)->length() == 0) {
-                throw new EventManagerException(EventManagerException::INVALID_EVENT_NAME);
+                handle(new EventManagerException(EventManagerException::INVALID_EVENT_NAME));
             }
 
             if ($this->isNull($eventListener)) {

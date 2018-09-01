@@ -185,7 +185,6 @@
          *
          * @param string $key
          *
-         * @throws StorageException
          * @return int|bool The size of the file in bytes or false
          */
         public function getSize($key)
@@ -193,7 +192,7 @@
             if ($this->supportsSize()) {
                 return $this->getDriver()->getSize($key);
             }
-            throw new StorageException(StorageException::DRIVER_CAN_NOT_ACCESS_SIZE, [get_class($this->getDriver())]);
+            handle(new StorageException(StorageException::DRIVER_CAN_NOT_ACCESS_SIZE, [get_class($this->getDriver())]));
         }
 
         /**
@@ -202,7 +201,6 @@
          *
          * @param $key
          *
-         * @throws StorageException
          * @return mixed
          */
         public function getAbsolutePath($key = '')
@@ -210,11 +208,11 @@
             if ($this->supportsAbsolutePaths()) {
                 return $this->getDriver()->getAbsolutePath($key);
             }
-            throw new StorageException(StorageException::DRIVER_DOES_NOT_SUPPORT_ABSOLUTE_PATHS, [
+            handle(new StorageException(StorageException::DRIVER_DOES_NOT_SUPPORT_ABSOLUTE_PATHS, [
                     get_class($this->getDriver()
                     )
                 ]
-            );
+            ));
         }
 
         public function getRecentKey()

@@ -8,7 +8,7 @@
 
     namespace app\framework\Component\Validation\Validators;
 
-
+    use app\framework\Component\Validation\ValidationException;
     use app\framework\Component\Validation\ValidatorInterface;
 
     class Phone implements ValidatorInterface
@@ -31,7 +31,6 @@
          * @param bool|true $throw
          *
          * @return boolean|string
-         * @throws ValidationException
          */
         public function validate($value, $params = [], $throw = true)
         {
@@ -41,7 +40,7 @@
 
             $message = 'Value must be a valid phone number';
             if ($throw) {
-                throw new ValidationException($message);
+                handle(new ValidationException($message));
             }
 
             return $message;

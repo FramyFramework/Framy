@@ -10,6 +10,7 @@
 
     require("AbstractException.php");
 
-    class Exception extends AbstractException{
+    class Exception extends AbstractException
+    {
 
     }

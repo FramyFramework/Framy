@@ -23,7 +23,6 @@
         /**
          * Disk constructor.
          * @param null $diskName
-         * @throws StorageException
          */
         function __construct($diskName = null)
         {
@@ -37,7 +36,7 @@
                         Config::getInstance()->get("disks", "filesystem")[$diskName]
                     );
                 } else {
-                    throw new StorageException(StorageException::DISK_NOT_FOUND);
+                    handle(new StorageException(StorageException::DISK_NOT_FOUND));
                 }
             }
 

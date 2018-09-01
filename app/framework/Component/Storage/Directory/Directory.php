@@ -33,13 +33,12 @@
          *                                       If set to true, Directory will read all children items and list them as one-dimensional array.
          * @param null|string $filter            (Optional) Filter to use when reading directory items
          *
-         * @throws StorageException
          */
         public function __construct($key, Storage $storage, $recursive = false, $filter = null)
         {
             if(!$storage->supportsDirectories()){
                 $driver = get_class($storage->getDriver());
-                throw new StorageException(StorageException::DRIVER_CAN_NOT_WORK_WITH_DIRECTORIES, [$driver]);
+                handle(new StorageException(StorageException::DRIVER_CAN_NOT_WORK_WITH_DIRECTORIES, [$driver]));
             }
 
             $this->key = $key;
@@ -47,7 +46,7 @@
             $this->storage = $storage;
 
             if ($this->storage->keyExists($key) && !$this->storage->isDirectory($key)) {
-                throw new StorageException(StorageException::DIRECTORY_OBJECT_CAN_NOT_READ_FILE_PATHS, [$key]);
+                handle(new StorageException(StorageException::DIRECTORY_OBJECT_CAN_NOT_READ_FILE_PATHS, [$key]));
             }
 
             $this->parseFilter($filter);
