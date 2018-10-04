@@ -31,7 +31,7 @@
             if (isset($config['socket'])) {
                 $attr['unix_socket'] = $config['socket'];
             } else {
-                $attr['host'] = $config['server'];
+                $attr['host'] = $config['host'];
 
                 if (isset($config["port"]))
                     $attr['port'] = $config["port"];
@@ -47,7 +47,7 @@
 
             $attr = [
                 'driver' => Driver::PgSql,
-                'host' => $config['server'],
+                'host' => $config['host'],
                 'dbname' => $config['database']
             ];
 
@@ -64,7 +64,7 @@
 
             $attr = [
                 'driver' => Driver::DbLib,
-                'host' => $config['server'],
+                'host' => $config['host'],
                 'dbname' => $config['database']
             ];
 
@@ -106,7 +106,7 @@
             } else {
                 $attr = [
                     'driver' => 'dblib',
-                    'host' => $config['server'],
+                    'host' => $config['host'],
                     'dbname' => $config['database']
                 ];
             }
