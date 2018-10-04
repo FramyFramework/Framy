@@ -28,7 +28,7 @@
         {
             if(!$this->isNull($eventData)){
                 if(!$this->isArray($eventData) && !$this->isArrayObject($eventData)) {
-                    throw new EventManagerException(EventManagerException::MSG_INVALID_ARG, ['$eventData', 'array|ArrayObject']);
+                    handle(new EventManagerException(EventManagerException::MSG_INVALID_ARG, ['$eventData', 'array|ArrayObject']));
                 }
                 $this->eventData = $this->arr($eventData);
             } else {
@@ -145,8 +145,6 @@
         {
             $this->propagationStopped = true;
         }
-
-
 
         /**
          * (PHP 5 &gt;= 5.0.0)<br/>

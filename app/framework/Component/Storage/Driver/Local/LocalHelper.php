@@ -41,7 +41,6 @@
          *
          * @param string $directory Directory path to create
          *
-         * @throws \app\framework\Component\Storage\StorageException
          */
         protected function createDirectory($directory)
         {
@@ -50,7 +49,7 @@
             umask($umask);
 
             if (!$created) {
-                throw new StorageException(StorageException::DIRECTORY_COULD_NOT_BE_CREATED, [$directory]);
+                handle(new StorageException(StorageException::DIRECTORY_COULD_NOT_BE_CREATED, [$directory]));
             }
         }
 
@@ -58,14 +57,13 @@
          * To check if directory exists.
          *
          * @param $directory
-         * @param $create
-         * @throws StorageException If directory doesn't exist
+         * @param $create <br> StorageException If directory doesn't exist
          */
         public function ensureDirectoryExists($directory, $create)
         {
             if (!is_dir($directory)) {
                 if (!$create) {
-                    throw new StorageException(StorageException::DIRECTORY_DOES_NOT_EXIST, [$directory]);
+                    handle(new StorageException(StorageException::DIRECTORY_DOES_NOT_EXIST, [$directory]));
                 }
                 $this->createDirectory($directory);
             }

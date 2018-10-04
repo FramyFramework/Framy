@@ -8,8 +8,6 @@
 
     namespace app\framework\Component\Cookie;
 
-    use app\framework\Component\Cookie\Cookie;
-
     trait CookieTrait
     {
         protected function createCookie($cookieName, $cookieValue = null, $expire = null, $path = "/", $encrypt = false)

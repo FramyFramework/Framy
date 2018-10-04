@@ -29,7 +29,7 @@
 
             $message = 'Password must contain at least 8 characters, minimum one letter and one number';
             if ($throw) {
-                throw new ValidationException($message);
+                handle(new ValidationException($message));
             }
 
             return $message;

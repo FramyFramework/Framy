@@ -10,6 +10,7 @@
 
     use app\framework\Component\StdLib\Exception\AbstractException;
 
-    class ValidationException extends AbstractException {
+    class ValidationException extends AbstractException
+    {
 
     }

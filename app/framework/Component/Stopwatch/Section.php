@@ -134,13 +134,11 @@
          * @param string $name The event name
          *
          * @return StopwatchEvent The event
-         *
-         * @throws \LogicException When the event has not been started
          */
         public function stopEvent($name)
         {
             if (!$this->is($this->events[$name])) {
-                throw new \LogicException(sprintf('Event "%s" is not started.', $name));
+                handle(new \LogicException(sprintf('Event "%s" is not started.', $name)));
             }
             return $this->events[$name]->stop();
         }
@@ -165,13 +163,11 @@
          * @param string $name The event name
          *
          * @return StopwatchEvent The event
-         *
-         * @throws \LogicException When the event is not known
          */
         public function getEvent($name)
         {
             if (!$this->is($this->events[$name])) {
-                throw new \LogicException(sprintf('Event "%s" is not known.', $name));
+                handle(new \LogicException(sprintf('Event "%s" is not known.', $name)));
             }
             return $this->events[$name];
         }

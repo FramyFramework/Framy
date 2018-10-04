@@ -83,15 +83,15 @@
         public function priority($priority)
         {
             if (!$this->isNumber($priority)) {
-                throw new EventManagerException(EventManagerException::MSG_INVALID_ARG, [
+                handle(new EventManagerException(EventManagerException::MSG_INVALID_ARG, [
                         '$priority',
                         'integer'
                     ]
-                );
+                ));
             }
 
             if ($priority <= 100 || $priority >= 1000) {
-                throw new EventManagerException(EventManagerException::INVALID_PRIORITY_VALUE);
+                handle(new EventManagerException(EventManagerException::INVALID_PRIORITY_VALUE));
             }
             $this->priority = $priority;
 
@@ -111,11 +111,11 @@
         public function method($method)
         {
             if (!$this->isString($method) && !$this->isStringObject($method)) {
-                throw new EventManagerException(EventManagerException::MSG_INVALID_ARG, [
+                handle(new EventManagerException(EventManagerException::MSG_INVALID_ARG, [
                         '$method',
                         'string|StringObject'
                     ]
-                );
+                ));
             }
             $this->method = StdObjectWrapper::toString($method);
 

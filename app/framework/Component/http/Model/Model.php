@@ -71,7 +71,7 @@
                 }
                 return $this;
             } else {
-                throw new \Exception("There is no connection setup!");
+                handle(new \Exception("There is no connection setup!"));
             }
         }
 
@@ -83,7 +83,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function select($columns = null, $where = null, $table = null)
         {
@@ -92,7 +91,7 @@
             } elseif($this->is($table)){
                 return $this->DB->select($table, $columns, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -103,7 +102,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function insert($data, $table = null)
         {
@@ -112,7 +110,7 @@
             } elseif($this->is($table)){
                 return $this->DB->insert($table, $data);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -124,7 +122,6 @@
          * @param null $where
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function update($data, $table = null, $where = null)
         {
@@ -133,7 +130,7 @@
             } elseif($this->is($table)){
                 return $this->DB->update($table, $data, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -144,7 +141,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function delete($where, $table = null)
         {
@@ -153,7 +149,7 @@
             } elseif($this->is($table)){
                 return $this->DB->delete($table, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -167,7 +163,6 @@
          * @param null $where
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function replace($column, $search, $replace, $table = null, $where = null)
         {
@@ -176,7 +171,7 @@
             } elseif($this->is($table)){
                 return $this->DB->replace($table, $column, $search, $replace, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -188,7 +183,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function get($columns, $where, $table = null)
         {
@@ -197,7 +191,7 @@
             } elseif($this->is($table)){
                 return $this->DB->get($table, $columns, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -208,7 +202,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function has($where, $table = null)
         {
@@ -217,7 +210,7 @@
             } elseif($this->is($table)){
                 return $this->DB->has($table, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -227,7 +220,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function count($where, $table = null)
         {
@@ -236,7 +228,7 @@
             } elseif($this->is($table)){
                 return $this->DB->count($table, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -248,7 +240,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function max($column, $where, $table = null)
         {
@@ -257,7 +248,7 @@
             } elseif($this->is($table)){
                 return $this->DB->max($table, $column, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -269,7 +260,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function min($column, $where, $table = null)
         {
@@ -278,7 +268,7 @@
             } elseif($this->is($table)){
                 return $this->DB->min($table, $column, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -290,7 +280,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function avg($column, $where, $table = null)
         {
@@ -299,7 +288,7 @@
             } elseif($this->is($table)){
                 return $this->DB->avg($table, $column, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
 
@@ -311,7 +300,6 @@
          * @param null $table
          *
          * @return mixed
-         * @throws \Exception
          */
         protected function sum($column, $where, $table = null)
         {
@@ -320,7 +308,7 @@
             } elseif($this->is($table)){
                 return $this->DB->sum($table, $column, $where);
             } else {
-                throw new \Exception("You need to specify an table");
+                handle(new \Exception("You need to specify an table"));
             }
         }
     }
