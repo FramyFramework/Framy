@@ -45,8 +45,6 @@
                 $config = $this->parseConfig($connByConfig, $name);
             }
 
-            //$config = $this->parseConfig(Config::getInstance()->get("connections", "database"), $name);
-
             return $this->createSingleConnection($config, $name);
         }
 
@@ -125,13 +123,10 @@
             }
 
             try {
-                $Pdo = new PDO($dsn, $config['username'], $config['password']);
+                return new PDO($dsn, $config['username'], $config['password']);
             } catch (PDOException $e) {
-                var_dump($e->getMessage());
-                // TODO: handle exception
+                handle($e);
             }
-
-            return $Pdo;
         }
 
         /**
