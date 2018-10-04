@@ -21,7 +21,7 @@
 <<<'EOD'
 <?php
     
-    namespace app\custom\Commands\§NAME§;
+    namespace app\custom\Commands;
     
     use app\framework\Component\Console\Command\Command;
     use app\framework\Component\Console\Input\InputInterface;

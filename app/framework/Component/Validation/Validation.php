@@ -44,7 +44,6 @@
         * @param bool|true    $throw
         *
         * @return bool
-        * @throws ValidationException
         */
         public function validate($data, $validators, $throw = true)
         {
@@ -59,7 +58,7 @@
                 ];
 
                 if (!array_key_exists($validator[0], $this->validators)) {
-                    throw new ValidationException('Validator %s does not exist!', $validator[0]);
+                    handle(new ValidationException('Validator %s does not exist!', $validator[0]));
                 }
                 $res = $this->validators[$validator[0]]->validate(...$functionParams);
 

@@ -36,7 +36,7 @@
         protected $path;
 
         /**
-         * An funcking instance of the goddam templateEngine
+         * An fucking instance of the goddamn templateEngine
          *
          * @var
          */
@@ -60,7 +60,7 @@
             // add view paths
             $i = 0;
             foreach($View as $key => $value){
-                if($key === "path"){
+                if($key === "paths"){
                     if($i <= 0)
                         $this->TemplateEngine->setTemplateDir($value);
                     else
@@ -78,31 +78,29 @@
         /**
          * Get the string contents of the view.
          *
-         * @param  callable|null  $callback
          * @return string
          *
-         * @throws \Throwable
          */
-        public function render(callable $callback = null)
+        public function render()
         {
             try {
                 $this->assignData($this->data);
 
                 $expView = explode(":", $this->view);
-                if($expView[1] == null) {
+                if(!array_key_exists(1, $expView)) {
                     $this->TemplateEngine->display($this->view);
                 } elseif($expView[0] == "fetch") {
                     return $this->TemplateEngine->fetch(self::validateViewName($expView[1]));
                 }
             } catch(\Exception $e) {
-                echo $e->getMessage();
+                handle($e);
             }
         }
 
         private function assignData($data)
         {
             foreach ($data as $valueName => $dataSet) {
-                if(explode(":", $dataSet)[1] != null){
+                if(array_key_exists(1, explode(":", $dataSet))){
                     $viewName = explode(":", $dataSet)[1];
 
                     switch (explode(":", $dataSet)[0]) {
@@ -123,7 +121,7 @@
 
         private static function validateViewName($view)
         {
-            if(explode(".", $view)[1] == null){
+            if(!array_key_exists(1, explode(".", $view))){
                 return $view.".tpl";
             } else {
                 return $view;

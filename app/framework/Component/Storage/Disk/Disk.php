@@ -20,14 +20,24 @@
         private $disk;
         private $Driver;
 
-        function __construct($diskName)
+        /**
+         * Disk constructor.
+         * @param null $diskName
+         */
+        function __construct($diskName = null)
         {
-            if($this->isDisk($diskName)) {
-                $this->disk = $this->validateDisk(
-                    Config::getInstance()->get("disks", "filesystem")[$diskName]
-                );
+            if(strpos($diskName, '/') !== false) {
+                $this->disk = $this->validateDisk([
+                    'root' => $diskName
+                ]);
             } else {
-                throw new StorageException(StorageException::DISK_NOT_FOUND);
+                if($this->isDisk($diskName)) {
+                    $this->disk = $this->validateDisk(
+                        Config::getInstance()->get("disks", "filesystem")[$diskName]
+                    );
+                } else {
+                    handle(new StorageException(StorageException::DISK_NOT_FOUND));
+                }
             }
 
             if($this->isNull($this->disk['driver']))

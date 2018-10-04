@@ -21,7 +21,7 @@
         | of Framy.
         */
 
-        'version' => 'v0.2.3',
+        'version' => 'v0.3',
 
         /*-------------------------------------------------------------------------
         | Crypting Key
@@ -42,4 +42,15 @@
         */
 
         'timezone' => 'UTC',
+
+        /*-------------------------------------------------------------------------
+        | Debug Mode
+        |--------------------------------------------------------------------------
+        |
+        | Here you can tell Framy rather it should show exceptions or not.
+        | Its highly recommended to set false on production site, because it
+        | could reveal sensible data.
+        */
+
+        'debug' => true
     ];

@@ -35,7 +35,11 @@
                 $query .= $Column->type;
 
                 if(isset($Column->length))
-                    $query .= "(".$Column->length.")";
+                    $query .= "(".$Column->length;
+                if(isset($Column->scale))
+                    $query .= ", ".$Column->scale.")";
+                else
+                    $query .= ")";
 
                 if($Column->isUnsigned)
                     $query .= " UNSIGNED";

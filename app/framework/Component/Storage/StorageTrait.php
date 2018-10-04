@@ -20,14 +20,13 @@
           *
           * @param $storageName
           * @return Storage
-          * @throws StorageException
           */
          protected static function storage($storageName)
          {
              try {
                  return new Storage($storageName);
              } catch(StorageException $e) {
-                 throw $e;
+                 handle($e);
              }
          }
      }

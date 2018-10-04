@@ -76,6 +76,6 @@
                 }
             }
 
-            throw new \Exception("Class not found. Maybe changing '/' to '\' helps.");
+            handle(new \Exception("Class not found. Maybe changing '/' to '\' helps."));
         }
     }

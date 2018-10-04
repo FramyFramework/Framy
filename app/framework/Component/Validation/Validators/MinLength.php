@@ -32,7 +32,6 @@
          * @param bool|true $throw
          *
          * @return boolean|string
-         * @throws ValidationException
          */
         public function validate($value, $params = [], $throw = true)
         {
@@ -45,7 +44,7 @@
 
             $message = "Value must be contain %s character at least";
             if($throw){
-                throw new ValidationException($message, $limit);
+                handle(new ValidationException($message, $limit));
             }
 
             return printf($message, $limit);

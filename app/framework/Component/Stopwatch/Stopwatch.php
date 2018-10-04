@@ -43,14 +43,12 @@
          * Creates a new section or re-opens an existing section.
          *
          * @param string|null $id The id of the session to re-open, null to create a new one
-         *
-         * @throws \LogicException When the section to re-open is not reachable
          */
         public function openSection($id = null)
         {
             $current = end($this->activeSections);
             if (null !== $id && null === $current->get($id)) {
-                throw new \LogicException(sprintf('The section "%s" has been started at an other level and can not be opened.', $id));
+                handle(new \LogicException(sprintf('The section "%s" has been started at an other level and can not be opened.', $id)));
             }
             $this->start('__section__.child', 'section');
             $this->activeSections[] = $current->open($id);
@@ -66,13 +64,13 @@
          *
          * @param string $id The identifier of the section
          *
-         * @throws \LogicException When there's no started section to be stopped
+         *  LogicException When there's no started section to be stopped
          */
         public function stopSection($id)
         {
             $this->stop('__section__');
             if (1 == count($this->activeSections)) {
-                throw new \LogicException('There is no started section to stop.');
+                handler(new \LogicException('There is no started section to stop.'));
             }
             $this->sections[$id] = array_pop($this->activeSections)->setId($id);
             $this->stop('__section__.child');

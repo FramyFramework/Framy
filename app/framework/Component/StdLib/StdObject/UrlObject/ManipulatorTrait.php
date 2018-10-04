@@ -24,7 +24,6 @@
          *
          * @param StringObject|string $scheme - Scheme must end with '://'. Example 'http://'.
          *
-         * @throws UrlObjectException
          * @return $this
          */
         public function setScheme($scheme)
@@ -33,7 +32,7 @@
             try {
                 $scheme = new StringObject($scheme);
             } catch (\Exception $e) {
-                throw new UrlObjectException($e->getMessage());
+                handle(new UrlObjectException($e->getMessage()));
             }
 
             if (!$scheme->endsWith('://')) {
@@ -60,7 +59,7 @@
             try {
                 $host = new StringObject($host);
             } catch (\Exception $e) {
-                throw new UrlObjectException($e->getMessage());
+                handle(new UrlObjectException($e->getMessage()));
             }
 
             $this->host = $host->stripTrailingSlash()->trim()->val();
@@ -98,7 +97,7 @@
             try {
                 $path = new StringObject($path);
             } catch (\Exception $e) {
-                throw new UrlObjectException($e->getMessage());
+                handle(new UrlObjectException($e->getMessage()));
             }
 
             if ($path != '') {

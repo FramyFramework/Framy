@@ -19,6 +19,7 @@
         public $type;
         public $value;
         public $length;
+        public $scale;
         public $comment;
         public $collation;
         public $isAutoIncrement;

@@ -90,12 +90,12 @@
          *
          * @return $this
          *
-         * @throws \LogicException When stop() is called without a matching call to start()
+         * LogicException When stop() is called without a matching call to start()
          */
         public function stop()
         {
             if (!count($this->started)) {
-                throw new \LogicException('stop() called but start() has not been called before.');
+                handle(new \LogicException('stop() called but start() has not been called before.'));
             }
             $this->periods[] = new StopwatchPeriod(array_pop($this->started), $this->getNow());
             return $this;
@@ -216,12 +216,12 @@
          *
          * @return float The formatted time
          *
-         * @throws \InvalidArgumentException When the raw time is not valid
+         * InvalidArgumentException When the raw time is not valid
          */
         private function formatTime($time)
         {
             if (!is_numeric($time)) {
-                throw new \InvalidArgumentException('The time must be a numerical value');
+                handle(new \InvalidArgumentException('The time must be a numerical value'));
             }
             return round($time, 1);
         }

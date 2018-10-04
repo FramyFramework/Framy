@@ -53,7 +53,6 @@
          * LocalStorageDriver constructor.
          *
          * @param $config
-         * @throws StorageException
          */
         function __construct($config)
         {
@@ -62,7 +61,7 @@
             }
 
             if(!$config instanceof ArrayObject){
-                throw new StorageException('Storage driver config must be an array or ArrayObject!');
+                handle(new StorageException('Storage driver config must be an array or ArrayObject!'));
             }
 
             $this->helper = LocalHelper::getInstance();
@@ -87,17 +86,16 @@
          *
          * @param $key
          * @return mixed
-         * @throws StorageException
          */
         private function buildPath($key)
         {
             //$path = $this->helper->buildPath($key, $this->directory, $this->create);
             $path = $this->helper->buildPath($key, $this->directory, true);
             if (strpos($path, $this->directory) !== 0) {
-                throw new StorageException(StorageException::PATH_IS_OUT_OF_STORAGE_ROOT, [
+                handle(new StorageException(StorageException::PATH_IS_OUT_OF_STORAGE_ROOT, [
                     $path,
                     $this->directory
-                ]);
+                ]));
             }
 
             return $path;
@@ -265,7 +263,6 @@
          * @param string $targetKey
          *
          * @return true if succeeds
-         * @throws \app\framework\Component\Storage\StorageException
          */
         public function renameKey($sourceKey, $targetKey)
         {
@@ -277,7 +274,7 @@
 
                 return rename($this->buildPath($sourceKey), $targetPath);
             }
-            throw new StorageException(StorageException::FILE_NOT_FOUND);
+            handle(new StorageException(StorageException::FILE_NOT_FOUND));
         }
 
         /**

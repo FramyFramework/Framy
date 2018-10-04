@@ -31,7 +31,6 @@
          * @param bool|true $throw
          *
          * @return boolean|string
-         * @throws ValidationException
          */
         public function validate($value, $params = [], $throw = true)
         {
@@ -41,7 +40,7 @@
 
             $message = 'Invalid mac address';
             if ($throw) {
-                throw new ValidationException($message);
+                handle(new ValidationException($message));
             }
 
             return $message;
