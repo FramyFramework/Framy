@@ -190,12 +190,11 @@
             $result    = null;
             $stopwatch->start('queryRun');
 
-            //TODO: do more execution stuff
-            if ($result = $this->pdo->query($query)) {
+            if (! $result = $this->pdo->query($query)) {
+                handle( new \Exception("Syntax error in the query!"));
+            } else {
                 $result = $this->fetch($result);
             }
-
-            //$result = $result->fetch(PDO::FETCH_ASSOC);
 
             $this->logQuery($query, $stopwatch->stop('queryRun'));
             return $result;

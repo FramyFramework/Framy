@@ -37,15 +37,19 @@
         public function make(string $name = null): Connection
         {
             $connByConfig = Config::getInstance()->get("connections");
-            if(sizeof($connByConfig ) == 1 && $name == null) {
-                reset($connByConfig);
-                $config = $this->parseConfig($connByConfig, key($connByConfig));
-                $name = key($connByConfig);
-            } else {
-                $config = $this->parseConfig($connByConfig, $name);
-            }
+            try {
+                if(sizeof($connByConfig ) == 1 && $name == null) {
+                    reset($connByConfig);
+                    $config = $this->parseConfig($connByConfig, key($connByConfig));
+                    $name = key($connByConfig);
+                } else {
+                    $config = $this->parseConfig($connByConfig, $name);
+                }
 
-            return $this->createSingleConnection($config, $name);
+                return $this->createSingleConnection($config, $name);
+            } catch (\Exception $e) {
+                handle($e);
+            }
         }
 
         /**
@@ -53,16 +57,15 @@
          *
          * @param array $config
          * @param string $name
+         * @throws \Exception If config does not exist.
          * @return array the connection config
          */
         private function parseConfig(array $config, string $name): array
         {
-            $connection = [];
-
             if(isset($config[$name]))
                 $connection = $config[$name];
             else
-                // TODO: handle exception
+                throw new \Exception("Config " .$name. " doesn't exist.");
 
             // make sure that the default config elements exist to prevent an undefined index warning
             foreach(self::defaultConfigElements as $configElement) {

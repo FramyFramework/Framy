@@ -50,7 +50,6 @@
          */
         public $distinct = false;
 
-
         /**
          * The table which the query is targeting.
          *

@@ -214,7 +214,7 @@
          */
         protected function wrapSegments($segments)
         {
-            return collect($segments)->map(function ($segment, $key) use ($segments) {
+            return arr($segments)->map(function ($segment, $key) use ($segments) {
                 return $key == 0 && count($segments) > 1
                     ? $this->wrapTable($segment)
                     : $this->wrapValue($segment);
@@ -230,7 +230,7 @@
         protected function wrapValue($value)
         {
             if ($value !== '*') {
-                return '"' . str_replace('"', '""', $value) . '"';
+                return '`' . str_replace('"', '""', $value) . '`';
             }
 
             return $value;
