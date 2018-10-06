@@ -55,6 +55,12 @@
             $this->connections[$connection->getName()] = $connection;
         }
 
+        /**
+         * Return the connection or false if connection doesn't exist.
+         *
+         * @param string|null $name Name of the connection can be null if only one connection is configured.
+         * @return false|Connection
+         */
         public function getConnection(string $name = null)
         {
             if($name == null) {
@@ -88,23 +94,6 @@
 
             return $this;
         }
-
-        /*
-         * To interact with the database using the QueryBuilder
-         *
-         * @param string $name
-         * @return Builder
-
-        public function table(string $name)
-        {
-            // use default connection
-            if($this->connectionToUse == null)
-                $this->useConnection();
-
-            $this->QueryBuilder->table($name);
-
-            return $this->QueryBuilder;
-        }*/
 
         /**
          * @param array $columns
