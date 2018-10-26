@@ -191,7 +191,7 @@
             $stopwatch->start('queryRun');
 
             if (! $result = $this->pdo->query($query)) {
-                handle( new \Exception("Syntax error in the query!"));
+                handle( new \Exception("Syntax error in the query: '". $query."'"));
             } else {
                 $result = $this->fetch($result);
             }
