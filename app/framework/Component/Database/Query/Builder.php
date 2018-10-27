@@ -105,12 +105,6 @@
 
         }
 
-        /* TODO: do we need this method?! */
-        public function table(string $name)
-        {
-            $this->table = $name;
-        }
-
         /**
          * Set the columns to be selected.
          *
