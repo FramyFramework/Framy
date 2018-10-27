@@ -63,7 +63,7 @@
          *
          * @var bool
          */
-        protected $loggingQueries = false;
+        protected $loggingQueries = true;
 
         public function __construct(Pdo $pdo, string $database = '', string $name = '', array $conf = [])
         {

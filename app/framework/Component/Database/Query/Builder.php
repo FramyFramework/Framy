@@ -139,19 +139,27 @@
 
         /**
          * Add a basic where clause to the query.
-         * TODO: implement:
          *
          * @param  string|array  $column
          * @param  string  $operator
          * @param  mixed   $value
+         * @param  string  $bool
          * @return $this
          */
-        public function where($column, $operator = null, $value = null)
+        public function where($column, $operator = "=", $value = null, $bool = 'and')
         {
             // check if operator is valid
-            if($this->isOperatorValid($operator)) {
-
+            if(!$this->isOperatorValid($operator)) {
+                handle(new \Exception("Where operator not valid: '".$operator."'"));
             }
+
+            // Add prepared data to where array
+            $this->wheres[] = [
+                $column,
+                $operator,
+                $value,
+                $bool
+            ];
 
             return $this;
         }

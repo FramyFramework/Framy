@@ -8,6 +8,7 @@
 
     namespace app\framework\Component\Database;
 
+    use app\framework\Component\Database\Connection\Connection;
     use app\framework\Component\Database\Connection\ConnectionFactory;
     use app\framework\Component\Database\Query\Builder;
 

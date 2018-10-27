@@ -121,6 +121,41 @@
         }
 
         /**
+         * Compile the "where" portions of the query.
+         *
+         * @param  Builder  $query
+         * @return string
+         */
+        protected function compileWheres(Builder $query)
+        {
+            // Each type of where clauses has its own compiler function which is responsible
+            // for actually creating the where clauses SQL. This helps keep the code nice
+            // and maintainable since each clause has a very small method that it uses.
+            if (is_null($query->wheres)) {
+                return '';
+            }
+
+            // if multiple where clauses
+            $sql = "";
+            foreach ($query->wheres as $where) {
+                $sql .= $this->concatenateWhereClauses($query, $where);
+            }
+
+            return $sql;
+        }
+
+        protected function concatenateWhereClauses(Builder $query, $wheres)
+        {
+            $sql = "WHERE " . $wheres[0] . $wheres[1] . "'" . $wheres[2] . "'";
+
+            if(count($query->wheres) > 1) {
+                $sql .= $wheres[3];
+            }
+
+            return $sql;
+        }
+
+        /**
          * Concatenate an array of segments, removing empties.
          *
          * @param  array $segments
