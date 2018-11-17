@@ -25,6 +25,8 @@
         {
             if(is_array($value)){
                 $this->val($value);
+            } else {
+                handle(new \Exception("Your value must be an array."));
             }
         }
 

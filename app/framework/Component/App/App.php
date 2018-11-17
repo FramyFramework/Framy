@@ -28,8 +28,14 @@
             $method = null;
 
             $this->registerNewClass($classMethod, $method);
-
-            return $this->callMethod($classMethod, $method, $param);
+            try {
+                if($method == null)
+                    throw new \Exception("You have to specify an method to call");
+            } catch (\Exception $e) {
+                handle($e);
+            } finally {
+                return $this->callMethod($classMethod, $method, $param);
+            }
         }
 
         public function getClassInstance($className) 
@@ -55,8 +61,15 @@
             $method = explode("@", $class)[1];
             $class = self::validateClass(explode("@", $class)[0]);
 
-            if(! self::checkIfClassIsRegistered($class)){
-                $this->Instances[$class] = new $class;
+            try {
+                if(! is_object($t_class = new $class))
+                    throw new \Exception("Could not instantiate class");
+            } catch (\Exception $e) {
+                handle($e);
+            } finally {
+                if(! self::checkIfClassIsRegistered($class)){
+                    $this->Instances[$class] = new $class;
+                }
             }
         }
 
@@ -67,15 +80,18 @@
 
         private function validateClass($class)
         {
-            foreach($this->defaultNamespaces as $namespace){
-                //var_dump($namespace . "\\" . $class);
-                if(class_exists($namespace . "\\" . $class)){
-                    return $namespace . "\\" . $class;
-                } elseif (class_exists($class)) {
-                    return $class;
+            try {
+                foreach($this->defaultNamespaces as $namespace){
+                    //var_dump($namespace . "\\" . $class);
+                    if(class_exists($namespace . "\\" . $class)){
+                        return $namespace . "\\" . $class;
+                    } elseif (class_exists($class)) {
+                        return $class;
+                    }
                 }
+                throw new \Exception("Class not found. Maybe changing '/' to '\' helps.");
+            } catch (\Exception $e) {
+                handle($e);
             }
-
-            handle(new \Exception("Class not found. Maybe changing '/' to '\' helps."));
         }
     }
