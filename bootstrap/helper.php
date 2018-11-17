@@ -42,8 +42,10 @@
          * locally Instances of them.
          *
          * @param string $classMethod The class name(if in \app\custom\ namespace) or the "namespace+className@methodToCall"
+         * @param array $param To declare what parameter shall be passed to the method
+         * @return mixed
          */
-        function app($classMethod, $param = null) {
+        function app($classMethod, $param = []) {
             return $GLOBALS["App"]->call($classMethod, $param);
         }
     }
