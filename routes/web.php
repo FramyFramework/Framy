@@ -19,11 +19,8 @@
         $DB = new app\framework\Component\Database\Manager();
         $data = null;
 
-        $DB->addConnection();
-
         //$data = $DB->getConnection()->select("select * from user where id=1");
         $data = $DB->select()->from('user')->get();
-        //print_r($DB);
         print_r($data);
 
         echo "</pre>";

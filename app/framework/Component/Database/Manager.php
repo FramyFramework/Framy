@@ -49,11 +49,14 @@
         /**
          * Set up connection.
          * @param string $name
+         * @return Manager
          */
-        public function addConnection(string $name = null)
+        public function connection(string $name = null): Manager
         {
             $connection = $this->ConnectionFactory->make($name);
             $this->connections[$connection->getName()] = $connection;
+
+            return $this;
         }
 
         /**
@@ -85,13 +88,8 @@
          */
         public function useConnection(string $name = null): Manager
         {
-            if($name) {
-                $this->connectionToUse = $this->getConnection($name)->getName();
-            } else {
-                $this->connectionToUse = $this->getConnection()->getName();
-            }
-
-            $this->QueryBuilder = new Builder($this->connections[$this->connectionToUse]);
+            $this->connectionToUse = $this->getConnection($name)->getName();
+            $this->QueryBuilder    = new Builder($this->connections[$this->connectionToUse]);
 
             return $this;
         }
@@ -104,6 +102,7 @@
         {
             // use default connection
             if($this->connectionToUse == null)
+                $this->connection();
                 $this->useConnection();
 
             $this->QueryBuilder->select($columns);
