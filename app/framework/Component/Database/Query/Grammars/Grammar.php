@@ -144,6 +144,27 @@
             return $sql;
         }
 
+        protected function compileOrders(Builder $query, $orders)
+        {
+            $sql = "ORDER BY ";
+
+            if(is_array($orders[0])) {
+                $i = 1;
+                $count = count($orders[0]);
+                foreach ($orders[0] as $column) {
+                    $append = $count > $i ? ", " : "";
+                    $sql .= $column.$append;
+                    $i++;
+                }
+            } else {
+                $sql .= $orders[0];
+            }
+
+            $sql .= " ".$orders[1];
+
+            return $sql;
+        }
+
         protected function concatenateWhereClauses(Builder $query, $wheres)
         {
             $sql = "WHERE " . $wheres[0] . $wheres[1] . "'" . $wheres[2] . "'";

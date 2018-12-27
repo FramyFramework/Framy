@@ -11,6 +11,7 @@
     use app\framework\Component\Database\Connection\Connection;
     use app\framework\Component\Database\Model\Model;
     use app\framework\Component\Database\Query\Grammars\Grammar;
+    use app\framework\Component\EventManager\EventManager;
 
     /**
      * Class Builder
@@ -160,14 +161,21 @@
 
         /**
          * Add an "order by" clause to the query.
-         * TODO: implement:
          *
-         * @param  string  $column
-         * @param  string  $direction
+         * @param  array|string  $column
+         * @param  string        $direction asc or desc
          * @return $this
          */
         public function orderBy($column, $direction = 'asc')
         {
+            if(!($direction == 'asc' or $direction == 'desc'))
+                handle(new \Exception("Order by direction invalid: '".$direction."'"));
+
+            $this->orders = [
+                $column,
+                $direction
+            ];
+
             return $this;
         }
 
