@@ -9,14 +9,7 @@
     namespace app\framework\Component\Console;
 
     use app\framework\Component\Console\Command\Command;
-    use app\framework\Component\Console\Command\FramyVersionCommand;
-    use app\framework\Component\Console\Command\ListCommand;
-    use app\framework\Component\Console\Command\Migrate;
-    use app\framework\Component\Console\Command\MakeCommand;
-    use app\framework\Component\Console\Command\MakeController;
-    use app\framework\Component\Console\Command\NewMigration;
     use app\framework\Component\Console\CommandLoader\CommandLoader;
-    use app\framework\Component\Console\Command\HelpCommand;
     use app\framework\Component\Console\Exception\CommandNotFoundException;
     use app\framework\Component\Console\Exception\NamespaceNotFoundException;
     use app\framework\Component\Console\Helper\Helper;
@@ -29,16 +22,12 @@
     use app\framework\Component\Console\Output\Formatter\OutputFormatter;
     use app\framework\Component\Console\Output\OutputInterface;
     use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-    use app\framework\Component\StdLib\StdObject\StdObjectWrapper;
-    use app\framework\Component\Storage\Directory\Directory;
-    use app\framework\Component\Storage\Storage;
 
     class Kernel
     {
         private $defaultNamespaces = [
             'app\\framework\\Component\\Console\\Command\\',
-            'app\\framework\\Component\\Database\\Migrations\\Commands\\',
-            'app\\framework\\Component\\Database\\Model\\Console\\'
+            'app\\framework\\Component\\Database\\Commands\\',
         ];
 
         private $commandLoader;
