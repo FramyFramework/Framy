@@ -64,6 +64,35 @@
         }
 
         /**
+         * Compile a insert query into SQL
+         *
+         * @param Builder $query
+         * @param array $values
+         * @return string
+         */
+        public function compileInsert(Builder $query, array $values): string
+        {
+            $table = $this->wrapTable($query->from);
+
+            if (! is_array(reset($values))) {
+                $values = [$values];
+            }
+
+            $columns = $this->columnize(array_keys(reset($values)));
+
+            // We need to build a list of parameter place-holders of values that are bound
+            // to the query. Each insert should have the exact same amount of parameter
+            // bindings so we will loop through the record and parameterize them all.
+            $parameters = arr($values)->map(function ($record) {
+                var_dump($record);
+                return '('.$this->parameterize($record).')';
+            })->implode(', ');
+            die();
+
+            return "insert into $table ($columns) values $parameters";
+        }
+
+        /**
          * Compile the components necessary for a select clause.
          *
          * @param  Builder $query
@@ -198,6 +227,17 @@
         public function columnize(array $columns)
         {
             return implode(', ', array_map([$this, 'wrap'], $columns));
+        }
+
+        /**
+         * Create query parameter place-holders for an array.
+         *
+         * @param  array   $values
+         * @return string
+         */
+        public function parameterize(array $values)
+        {
+            return implode(', ', array_map([$this, 'parameter'], $values));
         }
 
         /**

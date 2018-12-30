@@ -28,8 +28,6 @@
 
         private $grammar;
 
-        private $table;
-
         /**
          * The columns that should be returned.
          *
@@ -117,6 +115,31 @@
             $this->columns = is_array($columns) ? $columns : func_get_args();
 
             return $this;
+        }
+
+        public function insert(array $values)
+        {
+            if (empty($values)) {
+                return true;
+            }
+
+            if (! is_array(reset($values))) {
+                $values = [$values];
+            }
+
+            // Here, we will sort the insert keys for every record so that each insert is
+            // in the same order for the record. We need to make sure this is the case
+            // so there are not any errors or problems when inserting these records.
+            else {
+                foreach ($values as $key => $value) {
+                    ksort($value);
+                    $values[$key] = $value;
+                }
+            }
+
+            return $this->connection->insert(
+                $this->grammar->compileInsert($this, $values)
+            );
         }
 
         /**

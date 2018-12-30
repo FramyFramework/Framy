@@ -109,4 +109,19 @@
 
             return $this->QueryBuilder;
         }
+
+        /**
+         *
+         * @param string $name
+         * @return Builder
+         */
+        public function table(string $name): Builder
+        {
+            // use default connection
+            if($this->connectionToUse == null)
+                $this->connection();
+                $this->useConnection();
+
+            return $this->QueryBuilder->from($name);
+        }
     }
