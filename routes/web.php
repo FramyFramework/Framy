@@ -20,7 +20,9 @@
         $data = null;
 
         //$data = $DB->getConnection()->select("select * from user where id=1");
-        $data = $DB->select()->from('user')->get();
+        $DB->table("user")->insert(['name' => "TEST"]);
+
+        $data = $DB->select()->from('user')->orderBy(['name'])->get();
         print_r($data);
 
         echo "</pre>";

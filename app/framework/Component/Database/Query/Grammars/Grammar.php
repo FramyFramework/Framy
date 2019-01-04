@@ -14,6 +14,13 @@
     class Grammar
     {
         /**
+         * The grammar table prefix.
+         *
+         * @var string
+         */
+        protected $tablePrefix = '';
+
+        /**
          * The components that make up a select clause.
          *
          * @var array
@@ -84,10 +91,8 @@
             // to the query. Each insert should have the exact same amount of parameter
             // bindings so we will loop through the record and parameterize them all.
             $parameters = arr($values)->map(function ($record) {
-                var_dump($record);
                 return '('.$this->parameterize($record).')';
             })->implode(', ');
-            die();
 
             return "insert into $table ($columns) values $parameters";
         }
@@ -241,6 +246,32 @@
         }
 
         /**
+         * Get the appropriate query parameter place-holder for a value.
+         *
+         * @param  mixed   $value
+         * @return string
+         */
+        public function parameter($value)
+        {
+            return $this->isExpression($value) ? $this->getValue($value) : '?';
+        }
+
+        /**
+         * Quote the given string literal.
+         *
+         * @param  string|array  $value
+         * @return string
+         */
+        public function quoteString($value)
+        {
+            if (is_array($value))
+                return implode(', ', array_map([$this, __FUNCTION__], $value));
+
+            return "'$value'";
+        }
+
+
+        /**
          * Wrap a table in keyword identifiers.
          *
          * @param  Expression|string $table
@@ -269,14 +300,34 @@
             }
 
             // If the value being wrapped has a column alias we will need to separate out
-            // the pieces so we can wrap each of the segments of the expression on its
-            // own, and then join these both back together using the "as" connector.
+            // the pieces so we can wrap each of the segments of the expression on it
+            // own, and then joins them both back together with the "as" connector.
+            if (strpos(strtolower($value), ' as ') !== false) {
+                $segments = explode(' ', $value);
 
-            if (stripos($value, ' as ') !== false) {
-                return $this->wrapAliasedValue($value, $prefixAlias);
+                if ($prefixAlias) {
+                    $segments[2] = $this->tablePrefix.$segments[2];
+                }
+
+                return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[2]);
             }
 
-            return $this->wrapSegments(explode('.', $value));
+            $wrapped = [];
+
+            $segments = explode('.', $value);
+
+            // If the value is not an aliased table expression, we'll just wrap it like
+            // normal, so if there is more than one segment, we will wrap the first
+            // segments as if it was a table and the rest as just regular values.
+            foreach ($segments as $key => $segment) {
+                if ($key == 0 && count($segments) > 1) {
+                    $wrapped[] = $this->wrapTable($segment);
+                } else {
+                    $wrapped[] = $this->wrapValue($segment);
+                }
+            }
+
+            return implode('.', $wrapped);
         }
 
         /**

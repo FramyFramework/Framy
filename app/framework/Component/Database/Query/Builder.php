@@ -9,9 +9,7 @@
     namespace app\framework\Component\Database\Query;
 
     use app\framework\Component\Database\Connection\Connection;
-    use app\framework\Component\Database\Model\Model;
     use app\framework\Component\Database\Query\Grammars\Grammar;
-    use app\framework\Component\EventManager\EventManager;
 
     /**
      * Class Builder
@@ -26,6 +24,11 @@
          */
         private $connection;
 
+        /**
+         * The database query grammar instance.
+         *
+         * @var Grammar
+         */
         private $grammar;
 
         /**
@@ -137,9 +140,27 @@
                 }
             }
 
-            return $this->connection->insert(
-                $this->grammar->compileInsert($this, $values)
-            );
+            // We'll treat every insert like a batch insert so we can easily insert each
+            // of the records into the database consistently. This will make it much
+            // easier on the grammars to just handle one type of record insertion.
+            $bindings = [];
+
+            foreach ($values as $record) {
+                foreach ($record as $value) {
+                    $bindings[] = $value;
+                }
+            }
+
+            $sql = $this->grammar->compileInsert($this, $values);
+
+            // Once we have compiled the insert statement's SQL we can execute it on the
+            // connection and return a result as a boolean success indicator as that
+            // is the same type of result returned by the raw connection instance.
+            $bindings = $this->cleanBindings($bindings);
+
+            dd($bindings);
+
+            return $this->connection->insert($sql, $bindings);
         }
 
         /**
@@ -205,7 +226,7 @@
         /**
          * Execute the query as a "select" statement.
          *
-         * @return Model|null
+         * @return array|null
          */
         public function get()
         {
@@ -239,5 +260,18 @@
         private function toSql()
         {
             return $this->grammar->compileSelect($this);
+        }
+
+        /**
+         * Remove all of the expressions from a list of bindings.
+         *
+         * @param  array  $bindings
+         * @return array
+         */
+        protected function cleanBindings(array $bindings)
+        {
+            return array_values(array_filter($bindings, function ($binding) {
+                return ! $binding instanceof Expression;
+            }));
         }
     }
