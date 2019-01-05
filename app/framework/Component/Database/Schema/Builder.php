@@ -36,10 +36,13 @@
 
                 if(isset($Column->length))
                     $query .= "(".$Column->length;
-                if(isset($Column->scale))
+
+                if(isset($Column->scale) && isset($Column->length)) {
                     $query .= ", ".$Column->scale.")";
-                else
-                    $query .= ")";
+                } else {
+                    if(isset($Column->length))
+                        $query .= ")";
+                }
 
                 if($Column->isUnsigned)
                     $query .= " UNSIGNED";

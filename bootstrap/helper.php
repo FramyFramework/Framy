@@ -27,10 +27,9 @@
          *
          * @param  string  $view        Name of template file.
          * @param  array   $data        Data to set values in template file
-         * @param  array   $mergeData   Some shit I don't know yet
-         * @return \app\framework\Component\View\View
+         * @return \app\framework\Component\View\View|string
          */
-        function view($view = null, $data = [], $mergeData = []) {
+        function view($view = null, $data = []) {
             $View = new \app\framework\Component\View\View($view, $data);
             return $View->render();
         }

@@ -1,6 +1,6 @@
 {
   "name": "framy",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Just a try to make an own PHP framework. Which is quite meh.",
   "main": "index.js",
   "scripts": {
