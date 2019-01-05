@@ -43,8 +43,13 @@
                     $classes[] = new $class();
             }
 
-            foreach ($classes as $class) {
-                $class->up();
+            // tell user so if there are no migrations
+            if($classes == [])
+                $output->writeln("No migrations found! You can Create migrations via the make:migrations command.");
+            else {
+                foreach ($classes as $class) {
+                    $class->up();
+                }
             }
         }
     }
