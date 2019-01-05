@@ -11,6 +11,7 @@
     use app\framework\Component\Console\Command\Command;
     use app\framework\Component\Console\Input\InputInterface;
     use app\framework\Component\Console\Output\ConsoleOutput;
+    use app\framework\Component\Console\Output\Output;
     use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 
     class Migrate extends Command
@@ -43,8 +44,18 @@
                     $classes[] = new $class();
             }
 
-            foreach ($classes as $class) {
-                $class->up();
+            // tell user so if there are no migrations
+            if($classes == [])
+                $output->writeln("No migrations found! You can Create migrations via the make:migration command.");
+            else {
+                foreach ($classes as $class) {
+                    $output->writeln("<info>Migrating: ".get_class($class)."</info>");
+                    $output->writeln("<comment>Running down!</comment>");
+                    $class->down();
+                    $output->writeln("<comment>Running up!</comment>");
+                    $class->up();
+                }
+                $output->writeln("Migration successful");
             }
         }
     }
