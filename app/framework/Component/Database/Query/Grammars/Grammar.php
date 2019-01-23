@@ -187,7 +187,7 @@
                 $count = count($orders[0]);
                 foreach ($orders[0] as $column) {
                     $append = $count > $i ? ", " : "";
-                    $sql .= $column.$append;
+                    $sql .= "`".$column."`".$append;
                     $i++;
                 }
             } else {
@@ -253,7 +253,7 @@
          */
         public function parameter($value)
         {
-            return $this->isExpression($value) ? $this->getValue($value) : '?';
+            return $this->isExpression($value) ? $this->getValue($value) : $value;
         }
 
         /**

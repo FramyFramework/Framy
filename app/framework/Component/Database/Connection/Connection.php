@@ -158,45 +158,146 @@
             return $this->config['driver'];
         }
 
-        public function select(string $query)
+        public function select(string $query, array $bindings = [])
         {
-            return $this->run($query);
+            return $this->run($query, $bindings, function ($me, $query, $bindings) {
+                // For select statements, we'll simply execute the query and return an array
+                // of the database result set. Each element in the array will be a single
+                // row from the database table, and will either be an array or objects.
+                /** @var Connection $me */
+                $statement = $me->pdo->prepare($query);
+
+                $statement->execute($bindings);
+
+                return $statement->fetchAll(PDO::FETCH_CLASS, Model::class);
+            });
         }
 
-        public function update(string $query)
+        /**
+         * Run an insert statement against the database.
+         *
+         * @param  string  $query
+         * @param  array   $bindings
+         * @return bool
+         */
+        public function insert($query, $bindings = [])
         {
-            return $this->run($query);
+            return $this->statement($query, $bindings);
         }
 
-        public function insert(string $query)
+        /**
+         * Run an update statement against the database.
+         *
+         * @param  string  $query
+         * @param  array   $bindings
+         * @return int
+         */
+        public function update($query, $bindings = [])
         {
-            return $this->run($query);
+            return $this->affectingStatement($query, $bindings);
         }
 
-        public function delete(string $query)
+        /**
+         * Run a delete statement against the database.
+         *
+         * @param  string  $query
+         * @param  array   $bindings
+         * @return int
+         */
+        public function delete($query, $bindings = [])
         {
-            return $this->run($query);
+            return $this->affectingStatement($query, $bindings);
+        }
+
+        /**
+         * Execute an SQL statement and return the boolean result.
+         *
+         * @param  string  $query
+         * @param  array   $bindings
+         * @return bool
+         */
+        public function statement($query, $bindings = [])
+        {
+            return $this->run($query, $bindings, function ($me, $query, $bindings) {
+                return $me->pdo->prepare($query)->execute($bindings);
+            });
+        }
+
+        /**
+         * Run an SQL statement and get the number of rows affected.
+         *
+         * @param  string  $query
+         * @param  array   $bindings
+         * @return int
+         */
+        public function affectingStatement($query, $bindings = [])
+        {
+            return $this->run($query, $bindings, function ($me, $query, $bindings) {
+
+                // For update or delete statements, we want to get the number of rows affected
+                // by the statement and return that back to the developer. We'll first need
+                // to execute the statement and then we'll use PDO to fetch the affected.
+                /** @var Connection $me */
+                $statement = $me->pdo->prepare($query);
+
+                $statement->execute($bindings);
+
+                return $statement->rowCount();
+            });
         }
 
         /**
          * Run a SQL statement and log its execution context.
          *
          * @param string $query
+         * @param array $bindings
+         * @param \Closure $callback
          * @return mixed
          */
-        protected function run(string $query)
+        protected function run(string $query, array $bindings, \Closure $callback)
         {
             $stopwatch = new Stopwatch();
             $result    = null;
             $stopwatch->start('queryRun');
 
-            if (! $result = $this->pdo->query($query)) {
-                handle( new \Exception("Syntax error in the query: '". $query."'"));
-            } else {
-                $result = $this->fetch($result);
+            try {
+                $result = $this->runQueryCallback($query, $bindings, $callback);
+            } catch (\Exception $e) {
+                handle($e);
             }
 
             $this->logQuery($query, $stopwatch->stop('queryRun'));
+            return $result;
+        }
+
+        /**
+         * Run a SQL statement.
+         *
+         * @param  string    $query
+         * @param  array     $bindings
+         * @param  \Closure  $callback
+         * @return mixed
+         *
+         * @throws
+         */
+        protected function runQueryCallback($query, $bindings, \Closure $callback)
+        {
+            // To execute the statement, we'll simply call the callback, which will actually
+            // run the SQL against the PDO connection. Then we can calculate the time it
+            // took to execute and log the query SQL, bindings and time in our memory.
+            try {
+                $result = $callback($this, $query, $bindings);
+            }
+
+            // If an exception occurs when attempting to run a query, we'll format the error
+            // message to include the bindings with SQL, which will make this exception a
+            // lot more helpful to the developer instead of just the database's errors.
+            catch (\Exception $e) {
+                throw new \Exception(
+                    $query, $bindings, $e
+                );
+            }
+
             return $result;
         }
 
@@ -208,7 +309,7 @@
          */
         public function logQuery(string $query, StopwatchEvent $stopwatchEvent)
         {
-            $this->eventManager()->fire("ff.database.query_execution");
+            #$this->eventManager()->fire("ff.database.query_execution");
 
             if($this->loggingQueries) {
                 $logEntry['startTime']     = $stopwatchEvent->getStartTime();
@@ -220,7 +321,7 @@
         }
 
         /**
-         * Fetch PDO Result and return and array of Models or a single one
+         * Fetch PDO Result and return and array of Models
          * @param PDOStatement $statement
          * @return Model[]|Model
          */
@@ -233,9 +334,6 @@
                 $result[$key] = new Model($this);
                 $result[$key]->fillData($value);
             }
-
-            if(sizeof($result) == 1)
-                $result = $result[0];
 
             return $result;
         }

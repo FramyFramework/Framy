@@ -120,6 +120,11 @@
             return $this;
         }
 
+        public function selectRaw(string $query, array $bindings = [])
+        {
+            return $this->connection->select($query, $bindings);
+        }
+
         public function insert(array $values)
         {
             if (empty($values)) {
@@ -158,9 +163,22 @@
             // is the same type of result returned by the raw connection instance.
             $bindings = $this->cleanBindings($bindings);
 
-            dd($bindings);
+            return $this->connection->insert($sql);
+        }
 
-            return $this->connection->insert($sql, $bindings);
+        public function insertRaw(string $query, array $bindings = [])
+        {
+            return $this->connection->insert($query, $bindings);
+        }
+
+        public function updateRaw(string $query, array $bindings = [])
+        {
+            return $this->connection->update($query, $bindings);
+        }
+
+        public function deleteRaw(string $query, array $bindings = [])
+        {
+            return $this->connection->delete($query, $bindings);
         }
 
         /**
@@ -273,5 +291,30 @@
             return array_values(array_filter($bindings, function ($binding) {
                 return ! $binding instanceof Expression;
             }));
+        }
+
+        /**
+         * Switch values in query with value fitting in binding
+         *
+         * @param string $query    The query to prepare
+         * @param array $bindings  Array of the bindings
+         * @return string          The run ready query
+         */
+        protected function prepareRawQuery(string $query, array $bindings): string
+        {
+            // search for values in query
+            preg_match_all("/:([^ ]*)/", $query,$values);
+
+            // replace values with bindings
+            foreach ($values[1] as $value) {
+                // check if fitting binding exists
+                if(array_key_exists($value, $bindings)) {
+                    $query = str_replace(":".$value, $bindings[$value], $query);
+                } else {
+                    handle(new \Exception("Could not find fitting value '$value' in bindings for query: '$query'"));
+                }
+            }
+
+            return $query;
         }
     }

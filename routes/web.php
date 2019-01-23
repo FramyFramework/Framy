@@ -10,20 +10,25 @@
     */
 
     use \app\framework\Component\Route\Klein\Klein;
+    use \app\framework\Component\Database\DB;
+
 
     $klein = new Klein();
 
     $klein->get("/", function(){
         echo "<pre>";
+        $time_start = microtime(true);
 
-        $DB = new app\framework\Component\Database\Manager();
-        $data = null;
+        var_dump(
+            DB::delete("DELETE FROM user 
+                      WHERE id<:id",
+                [":id" => 12]
+            )
+        );
 
-        //$data = $DB->getConnection()->select("select * from user where id=1");
-        $DB->table("user")->insert(['name' => "TEST"]);
-
-        $data = $DB->select()->from('user')->orderBy(['name'])->get();
-        print_r($data);
+        $time_end = microtime(true);
+        $execution_time = ($time_end - $time_start);
+        echo '<b>Total Execution Time:</b> '.$execution_time.' secs';
 
         echo "</pre>";
     });

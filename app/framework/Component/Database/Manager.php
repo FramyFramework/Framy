@@ -44,6 +44,11 @@
         public function __construct()
         {
             $this->ConnectionFactory = new ConnectionFactory();
+
+            // use default connection
+            if($this->connectionToUse == null)
+                $this->connection();
+                $this->useConnection();
         }
 
         /**
@@ -100,14 +105,29 @@
          */
         public function select($columns = ['*'])
         {
-            // use default connection
-            if($this->connectionToUse == null)
-                $this->connection();
-                $this->useConnection();
-
             $this->QueryBuilder->select($columns);
 
             return $this->QueryBuilder;
+        }
+
+        public function selectRaw(string $query, array $bindings = [])
+        {
+            return $this->QueryBuilder->selectRaw($query, $bindings);
+        }
+
+        public function insertRaw(string $query, array $bindings = [])
+        {
+            return $this->QueryBuilder->insertRaw($query, $bindings);
+        }
+
+        public function updateRaw(string $query, array $bindings = [])
+        {
+            return $this->QueryBuilder->updateRaw($query, $bindings);
+        }
+
+        public function deleteRaw(string $query, array $bindings = [])
+        {
+            return $this->QueryBuilder->deleteRaw($query, $bindings);
         }
 
         /**
@@ -117,11 +137,6 @@
          */
         public function table(string $name): Builder
         {
-            // use default connection
-            if($this->connectionToUse == null)
-                $this->connection();
-                $this->useConnection();
-
             return $this->QueryBuilder->from($name);
         }
     }
