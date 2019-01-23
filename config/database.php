@@ -7,8 +7,7 @@
          | Database Connections
          |----------------------------------------
          |
-         | Here you can configure your connections. You can ether use the
-         | here shown syntax or the syntax from Medoo. The key of the array
+         | Here you can configure your connections. The key of the array
          | in the example 'mysql' is the name of the connection.
          |
          */

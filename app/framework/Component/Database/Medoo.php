@@ -13,6 +13,11 @@ namespace app\framework\Component\Database;
 use app\framework\Component\Config\Config;
 use PDO;
 
+/**
+ * Class Medoo
+ * @deprecated This class is deprecated and will be removed in future. Use other parts of this component instead.
+ * @package app\framework\Component\Database
+ */
 class Medoo
 {
 	// General

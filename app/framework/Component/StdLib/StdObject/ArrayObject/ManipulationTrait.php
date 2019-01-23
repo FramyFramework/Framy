@@ -46,6 +46,51 @@
         }
 
         /**
+         * The method joins the items in a collection.
+         *
+         * @param string $glue The string you wish to place between the values.
+         * @param string $key  If the value contains arrays or objects, you should pass the key of the attributes you wish to join
+         * @return string
+         */
+        public function implode(string $glue, string $key = null)
+        {
+
+            if (! function_exists(__NAMESPACE__.'\useGlue')) {
+                // done this function to avoid writing redundant code
+                function useGlue(&$i, &$length, &$glue) {
+                    // don't use glue if is last element
+                    if($i < $length)
+                        return $glue;
+                    else
+                        return "";
+                }
+            }
+
+            $val    = $this->val();
+            $length = $this->count();
+            $result = "";
+
+            // check if val is key or obj
+            $i = 1;
+            foreach ($val as $item) {
+                if(is_object($item)) {
+                    $item = get_object_vars($this);
+                    //TODO finnish this case
+                } elseif(is_array($item)) {
+                    if(!isset($key))
+                        handle(new \Exception("\$key must be set!"));
+
+                    $result .= $item[$key].useGlue($i, $length, $glue);
+                } else {
+                    $result .= $item.useGlue($i, $length, $glue);
+                }
+                $i++;
+            }
+
+            return $result;
+        }
+
+        /**
          * Get or update the given key inside current array.
          *
          * @param string|int|StringObject $key Array key
@@ -145,6 +190,25 @@
 
                 $this->val($array);
             }
+        }
+
+        /**
+         * The method iterates through the array and passes each value to
+         * the given callback. The callback is free to modify the item and return it,
+         * thus forming a new ArrayObject of modified items
+         *
+         * @param callable $call
+         * @return ArrayObject
+         */
+        public function map(callable $call)
+        {
+            $array  = $this->val();
+            $result = [];
+
+            foreach ($array as $key => $item)
+                $result[] = call_user_func($call, $item, $key);
+
+            return new ArrayObject($result);
         }
 
         /**

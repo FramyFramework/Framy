@@ -104,7 +104,6 @@
             if(!$this->isInstanceOf($data, '\app\framework\EventManager\Event')){
                 $data = new Event($data);
             }
-
             return $this->eventProcessor->process($eventListeners, $data, $resultType, $limit);
         }
 

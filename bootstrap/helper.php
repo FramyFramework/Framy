@@ -91,3 +91,14 @@
             \app\framework\Component\Exception\Handler::getInstance()->handler($e);
         }
     }
+
+    if(! function_exists("arr")) {
+        /**
+         * Create an ArrayObject from array
+         * @param array $arr
+         * @return \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject
+         */
+        function arr(array $arr) {
+            return new \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject($arr);
+        }
+    }
