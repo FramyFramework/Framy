@@ -309,7 +309,7 @@
          */
         public function logQuery(string $query, StopwatchEvent $stopwatchEvent)
         {
-            #$this->eventManager()->fire("ff.database.query_execution");
+            $this->eventManager()->fire("ff.database.query_execution");
 
             if($this->loggingQueries) {
                 $logEntry['startTime']     = $stopwatchEvent->getStartTime();
