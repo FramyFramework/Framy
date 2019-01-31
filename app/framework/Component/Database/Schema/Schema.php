@@ -46,7 +46,7 @@
         {
             self::init($connection);
 
-            Builder::dropTable($name);
+            self::$Medoo->query(Builder::dropTable($name));
         }
 
 /* TODO: add methods

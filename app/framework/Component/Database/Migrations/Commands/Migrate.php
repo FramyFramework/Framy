@@ -12,11 +12,17 @@
     use app\framework\Component\Console\Input\InputInterface;
     use app\framework\Component\Console\Output\ConsoleOutput;
     use app\framework\Component\Console\Output\Output;
+    use app\framework\Component\Database\Migrations\Migration;
     use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 
     class Migrate extends Command
     {
         private $namespace = "app\\custom\\Database\\migrations\\";
+
+        /**
+         * @var Migration[] $migrations
+         */
+        private $migrations = [];
 
         protected function configure()
         {
@@ -25,6 +31,18 @@
         }
 
         protected function execute(InputInterface $input, ConsoleOutput $output)
+        {
+            $this->setMigrations();
+
+            foreach ($this->migrations as $className => $migration) {
+                $output->writeln("<info>Migrating:</info> ".$className);
+                $migration->down();
+                $migration->up();
+                $output->writeln("<comment>Migrated:</comment> ".$className);
+            }
+        }
+
+        private function setMigrations()
         {
             // get all migrations
             // run up() methods
@@ -41,7 +59,7 @@
             foreach ($filesInNamespace->val() as $value) {
                 $class = $namespace.$value;
                 if(class_exists($class) && is_subclass_of($class,'app\framework\Component\Database\Migrations\Migration'))
-                    $classes[] = new $class();
+                    $classes[$value] = new $class();
             }
 
             // tell user so if there are no migrations
