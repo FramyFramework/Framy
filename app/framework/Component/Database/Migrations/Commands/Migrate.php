@@ -9,6 +9,8 @@
     namespace app\framework\Component\Database\Migrations\Commands;
 
     use app\framework\Component\Console\Command\Command;
+    use app\framework\Component\Console\Input\InputArgument;
+    use app\framework\Component\Console\Input\InputDefinition;
     use app\framework\Component\Console\Input\InputInterface;
     use app\framework\Component\Console\Output\ConsoleOutput;
     use app\framework\Component\Console\Output\Output;
@@ -27,26 +29,36 @@
         protected function configure()
         {
             $this->setName("migrate")
-                ->setDescription("Migrate your database.");
+                ->setDescription("Migrate your database.")
+                ->setDefinition(new InputDefinition([
+                    new InputArgument("migration", InputArgument::OPTIONAL, "Specify a single migration")
+                ]));
         }
 
         protected function execute(InputInterface $input, ConsoleOutput $output)
         {
-            $this->setMigrations();
+            $migration = $input->getArgument("migration");
 
-            foreach ($this->migrations as $className => $migration) {
-                $output->writeln("<info>Migrating:</info> ".$className);
-                $migration->down();
-                $migration->up();
-                $output->writeln("<comment>Migrated:</comment> ".$className);
+            if (isset($migration)) {
+                $this->setMigration($migration, $output);
+            } else {
+                $this->setMigrations();
             }
+
+            foreach ($this->migrations as $class) {
+                $output->writeln("<info>Migrating: ".get_class($class)."</info>");
+                $output->writeln("<comment>Running down!</comment>");
+                $class->down();
+                $output->writeln("<comment>Running up!</comment>");
+                $class->up();
+            }
+            $output->writeln("Migration successful");
         }
 
         private function setMigrations()
         {
             // get all migrations
-            // run up() methods
-            $classes = [];
+            $classes   = [];
             $namespace = $this->namespace;
 
             $path = str_replace("\\","/", $namespace);
@@ -63,17 +75,26 @@
             }
 
             // tell user so if there are no migrations
-            if($classes == [])
+            if($classes == []) {
                 $output->writeln("No migrations found! You can Create migrations via the make:migration command.");
-            else {
-                foreach ($classes as $class) {
-                    $output->writeln("<info>Migrating: ".get_class($class)."</info>");
-                    $output->writeln("<comment>Running down!</comment>");
-                    $class->down();
-                    $output->writeln("<comment>Running up!</comment>");
-                    $class->up();
-                }
-                $output->writeln("Migration successful");
+            } else {
+                $this->migrations = $classes;
+            }
+        }
+
+        private function setMigration($migration, ConsoleOutput $output)
+        {
+            $migrationInstance = null;
+            $class = $this->namespace.$migration;
+            if(class_exists($class) && is_subclass_of($class,'app\framework\Component\Database\Migrations\Migration'))
+                $migrationInstance = new $class();
+
+            if($migrationInstance == null) {
+                $output->writeln("Migration not found");
+            } else {
+                // to make sure that only one element is in array
+                $this->migrations = [];
+                $this->migrations[] = $migrationInstance;
             }
         }
     }
