@@ -42,7 +42,7 @@
             if (isset($migration)) {
                 $this->setMigration($migration, $output);
             } else {
-                $this->setMigrations();
+                $this->setMigrations($output);
             }
 
             foreach ($this->migrations as $class) {
@@ -52,10 +52,12 @@
                 $output->writeln("<comment>Running up!</comment>");
                 $class->up();
             }
-            $output->writeln("Migration successful");
+
+            if (count($this->migrations) > 0)
+                $output->writeln("Migration successful");
         }
 
-        private function setMigrations()
+        private function setMigrations(ConsoleOutput $output)
         {
             // get all migrations
             $classes   = [];
