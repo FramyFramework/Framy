@@ -14,10 +14,13 @@
         /**
         * Get Validation component
         *
-        * @return Validation
+        * @param mixed        $data
+        * @param string|array $validators
+        * @param bool|true    $throw
+        * @return bool
         */
-        protected static function validate()
+        protected static function validate($data, $validators, $throw = true)
         {
-            return Validation::getInstance();
+            return Validation::getInstance()->validate($data, $validators, $throw);
         }
     }

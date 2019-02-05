@@ -32,6 +32,7 @@
          * @param bool|true $throw
          *
          * @return boolean|string
+         * @throws ValidationException
          */
         public function validate($value, $params = [], $throw = true)
         {
@@ -41,7 +42,7 @@
 
             $message = 'Value must be an number';
             if ($throw) {
-                handle(new ValidationException($message));
+                throw new ValidationException($message);
             }
 
             return $message;

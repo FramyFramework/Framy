@@ -32,6 +32,7 @@
          * @param bool|true $throw
          *
          * @return boolean|string
+         * @throws ValidationException
          */
         public function validate($value, $params = [], $throw = true)
         {
@@ -42,7 +43,7 @@
 
             $message = "Value must be greater than or equal %s";
             if($throw){
-                handle(new ValidationException($message, $cmp));
+                throw (new ValidationException($message, $cmp));
             }
 
             return sprintf($message, $cmp);
