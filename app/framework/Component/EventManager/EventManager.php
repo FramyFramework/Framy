@@ -11,6 +11,7 @@
     use app\framework\Component\StdLib\SingletonTrait;
     use app\framework\Component\StdLib\StdLibTrait;
     use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
+    use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 
     /**
      * EventManager is responsible for handling events. It is the main class for subscribing to events and firing events.<br />
@@ -45,7 +46,6 @@
          * @param string        $eventName Event name you want to listen
          * @param EventListener $eventListener (Optional) If specified, given EventListener will be used for this event
          *
-         * @throws EventManagerException
          * @return EventListener Return instance of EventListener
          */
         public function listen($eventName, EventListener $eventListener = null)
@@ -89,21 +89,24 @@
          * @param null|int    $limit Number of results to return
          *
          * @return array Array of results from EventListeners
+         * @throws StringObjectException
          */
         public function fire($eventName, $data = null, $resultType = null, $limit = null)
         {
-            if($this->suppressEvents){
+            if ($this->suppressEvents) {
                 return null;
             }
 
-            if($this->str($eventName)->endsWith('*')){
+            if ($this->str($eventName)->endsWith('*')) {
                 return $this->fireWildcardEvents($eventName, $data, $resultType);
             }
 
             $eventListeners = $this->events->key($eventName);
-            if(!$this->isInstanceOf($data, '\app\framework\EventManager\Event')){
+
+            if (!$this->isInstanceOf($data, '\app\framework\EventManager\Event')) {
                 $data = new Event($data);
             }
+
             return $this->eventProcessor->process($eventListeners, $data, $resultType, $limit);
         }
 
@@ -164,6 +167,7 @@
          * @param $resultType
          *
          * @return null|array
+         * @throws StringObjectException
          */
         private function fireWildcardEvents($eventName, $data, $resultType)
         {
@@ -171,19 +175,19 @@
             $eventPrefix = $this->str($eventName)->subString(0, -1)->val();
             // Find events starting with the prefix
             $events = [];
-            foreach($this->events as $eventName => $eventListeners){
-                if($this->str($eventName)->startsWith($eventPrefix)){
+            foreach ($this->events as $eventName => $eventListeners) {
+                if ($this->str($eventName)->startsWith($eventPrefix)) {
                     $events[$eventName] = $eventListeners;
                 }
             }
 
-            if($this->arr($events)->count() > 0){
-                if(!$this->isInstanceOf($data, '\app\framework\Component\EventManager\Event')){
+            if ($this->arr($events)->count() > 0) {
+                if (!$this->isInstanceOf($data, '\app\framework\Component\EventManager\Event')) {
                     $data = new Event($data);
                 }
 
                 $results = $this->arr();
-                foreach($events as $eventListeners){
+                foreach ($events as $eventListeners) {
                     $result = $this->eventProcessor->process($eventListeners, $data, $resultType);
                     $results->merge($result);
                 }
