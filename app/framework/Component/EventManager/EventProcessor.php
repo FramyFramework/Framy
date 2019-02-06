@@ -38,15 +38,15 @@
             $results = [];
 
             /* @var $eventListener EventListener */
-            foreach($eventListeners as $eventListener){
+            foreach ($eventListeners as $eventListener) {
                 $handler = $eventListener->getHandler();
-                if($this->isNull($handler)){
+                if ($this->isNull($handler)) {
                     continue;
                 }
 
                 $method = $eventListener->getMethod();
 
-                if($this->isCallable($handler)){
+                if ($this->isCallable($handler)) {
                     /* @var $handler \Closure */
                     $result = $handler($event);
                 } else {
@@ -57,19 +57,22 @@
                     ], [$event]);
                 }
 
-                if($this->isNull($resultType) || (!$this->isNull($resultType) && $this->isInstanceOf($result, $resultType))){
+                if ($this->isNull($resultType)
+                    || (!$this->isNull($resultType)
+                        && $this->isInstanceOf($result, $resultType))
+                ){
                     $results[] = $result;
 
-                    if($limit === 1 && count($results) === 1){
+                    if ($limit === 1 && count($results) === 1) {
                         return $results[0];
                     }
 
-                    if(count($results) === $limit){
+                    if (count($results) === $limit) {
                         return $results;
                     }
                 }
 
-                if($event->isPropagationStopped()){
+                if ($event->isPropagationStopped()) {
                     break;
                 }
 
