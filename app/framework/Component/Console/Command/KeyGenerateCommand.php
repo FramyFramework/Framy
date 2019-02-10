@@ -46,7 +46,6 @@ class KeyGenerateCommand extends Command
         file_put_contents($path, $confFile);
 
         $output->writeln("Done! Take a look at $path to see the changes.");
-
     }
 
     /**
