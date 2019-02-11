@@ -6,70 +6,70 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Storage\Directory;
+namespace app\framework\Component\Storage\Directory;
 
-    use app\framework\Component\Storage\Storage;
+use app\framework\Component\Storage\Storage;
+
+/**
+ * Basic Directory interface
+ *
+ * @package app\framework\Component\Storage\Directory
+ */
+interface DirectoryInterface
+{
+    /**
+     * Constructor
+     *
+     * @param string      $key           File key
+     * @param Storage     $storage       Storage to use
+     * @param bool        $treeStructure (Optional) By default, Directory will only read the first level if items.
+     *                                   If set to false, Directory will read all children items and list them as one-dimensional array.
+     * @param null|string $filter        (Optional) Filter to use when reading directory items
+     */
+    public function __construct($key, Storage $storage, $treeStructure = true, $filter = null);
 
     /**
-     * Basic Directory interface
+     * Filter items in a directory using given regex or extension.
      *
-     * @package app\framework\Component\Storage\Directory
+     * Example 1: '*.pdf' ($condition starting with * means: anything that ends with)
+     *
+     * Example 2: 'file*' ($condition ending with * means: anything that starts with)
+     *
+     * Example 3: Any file that ends with `file.zip`: '/(\S+)?file.zip/'
+     *
+     * @param $condition
+     *
+     * @return $this DirectoryInterface object containing only filtered values
      */
-    interface DirectoryInterface
-    {
-        /**
-         * Constructor
-         *
-         * @param string      $key           File key
-         * @param Storage     $storage       Storage to use
-         * @param bool        $treeStructure (Optional) By default, Directory will only read the first level if items.
-         *                                   If set to false, Directory will read all children items and list them as one-dimensional array.
-         * @param null|string $filter        (Optional) Filter to use when reading directory items
-         */
-        public function __construct($key, Storage $storage, $treeStructure = true, $filter = null);
+    public function filter($condition);
 
-        /**
-         * Filter items in a directory using given regex or extension.
-         *
-         * Example 1: '*.pdf' ($condition starting with * means: anything that ends with)
-         *
-         * Example 2: 'file*' ($condition ending with * means: anything that starts with)
-         *
-         * Example 3: Any file that ends with `file.zip`: '/(\S+)?file.zip/'
-         *
-         * @param $condition
-         *
-         * @return $this DirectoryInterface object containing only filtered values
-         */
-        public function filter($condition);
+    /**
+     * Count number of items in a directory
+     *
+     * @return int Number of items in the directory
+     */
+    public function count();
 
-        /**
-         * Count number of items in a directory
-         *
-         * @return int Number of items in the directory
-         */
-        public function count();
+    /**
+     * Get Storage used by the DirectoryInterface instance
+     *
+     * @return Storage Storage instance used for this directory
+     */
+    public function getStorage();
 
-        /**
-         * Get Storage used by the DirectoryInterface instance
-         *
-         * @return Storage Storage instance used for this directory
-         */
-        public function getStorage();
+    /**
+     * Get directory key
+     *
+     * @return string Directory key
+     */
+    public function getKey();
 
-        /**
-         * Get directory key
-         *
-         * @return string Directory key
-         */
-        public function getKey();
-
-        /**
-         * Delete directory and all of it's contents recursively
-         *
-         * @param bool $fireStorageEvents (Optional) If you don't want to fire StorageEvent::FILE_DELETED set this to false
-         *
-         * @return bool
-         */
-        public function delete($fireStorageEvents = true);
-    }
+    /**
+     * Delete directory and all of it's contents recursively
+     *
+     * @param bool $fireStorageEvents (Optional) If you don't want to fire StorageEvent::FILE_DELETED set this to false
+     *
+     * @return bool
+     */
+    public function delete($fireStorageEvents = true);
+}

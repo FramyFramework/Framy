@@ -6,11 +6,11 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Validation;
+namespace app\framework\Component\Validation;
 
-    use app\framework\Component\StdLib\Exception\AbstractException;
+use app\framework\Component\StdLib\Exception\AbstractException;
 
-    class ValidationException extends AbstractException
-    {
+class ValidationException extends AbstractException
+{
 
-    }
+}

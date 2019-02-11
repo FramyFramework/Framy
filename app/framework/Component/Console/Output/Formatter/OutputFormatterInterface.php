@@ -1,69 +1,68 @@
 <?php
 /**
- *
  * Framy Framework
  *
  * @copyright Copyright Framy
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Console\Output\Formatter;
+namespace app\framework\Component\Console\Output\Formatter;
+
+/**
+ * Formatter interface for console output.
+ *
+ * @author Konstantin Kudryashov <ever.zet@gmail.com>
+ */
+interface OutputFormatterInterface
+{
+    /**
+     * Sets the decorated flag.
+     *
+     * @param bool $decorated Whether to decorate the messages or not
+     */
+    public function setDecorated($decorated);
 
     /**
-     * Formatter interface for console output.
+     * Gets the decorated flag.
      *
-     * @author Konstantin Kudryashov <ever.zet@gmail.com>
+     * @return bool true if the output will decorate messages, false otherwise
      */
-    interface OutputFormatterInterface
-    {
-        /**
-         * Sets the decorated flag.
-         *
-         * @param bool $decorated Whether to decorate the messages or not
-         */
-        public function setDecorated($decorated);
+    public function isDecorated();
 
-        /**
-         * Gets the decorated flag.
-         *
-         * @return bool true if the output will decorate messages, false otherwise
-         */
-        public function isDecorated();
+    /**
+     * Sets a new style.
+     *
+     * @param string                        $name  The style name
+     * @param OutputFormatterStyleInterface $style The style instance
+     */
+    public function setStyle($name, OutputFormatterStyleInterface $style);
 
-        /**
-         * Sets a new style.
-         *
-         * @param string                        $name  The style name
-         * @param OutputFormatterStyleInterface $style The style instance
-         */
-        public function setStyle($name, OutputFormatterStyleInterface $style);
+    /**
+     * Checks if output formatter has style with specified name.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasStyle($name);
 
-        /**
-         * Checks if output formatter has style with specified name.
-         *
-         * @param string $name
-         *
-         * @return bool
-         */
-        public function hasStyle($name);
+    /**
+     * Gets style options from style with specified name.
+     *
+     * @param string $name
+     *
+     * @return OutputFormatterStyleInterface
+     *
+     * @throws \InvalidArgumentException When style isn't defined
+     */
+    public function getStyle($name);
 
-        /**
-         * Gets style options from style with specified name.
-         *
-         * @param string $name
-         *
-         * @return OutputFormatterStyleInterface
-         *
-         * @throws \InvalidArgumentException When style isn't defined
-         */
-        public function getStyle($name);
-
-        /**
-         * Formats a message according to the given styles.
-         *
-         * @param string $message The message to style
-         *
-         * @return string The styled message
-         */
-        public function format($message);
-    }
+    /**
+     * Formats a message according to the given styles.
+     *
+     * @param string $message The message to style
+     *
+     * @return string The styled message
+     */
+    public function format($message);
+}

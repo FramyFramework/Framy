@@ -6,96 +6,96 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Database\Model;
+namespace app\framework\Component\Database\Model;
 
-    use app\framework\Component\Config\Config;
-    use app\framework\Component\Database\Connection\Connection;
-    use app\framework\Component\Database\Connection\ConnectionFactory;
+use app\framework\Component\Config\Config;
+use app\framework\Component\Database\Connection\Connection;
+use app\framework\Component\Database\Connection\ConnectionFactory;
+
+/**
+ *
+ *
+ * @package app\framework\Component\Database\Model
+ */
+class Model
+{
+    /**
+     * The connection name for the model.
+     *
+     * @var $connection
+     */
+    protected $connection;
 
     /**
+     * The table associated with the model.
      *
-     *
-     * @package app\framework\Component\Database\Model
+     * @var string
      */
-    class Model
+    protected $table;
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
+
+    /**
+     * The name of the "created at" column.
+     *
+     * @var string
+     */
+    const CREATED_AT = 'created_at';
+
+    /**
+     * The name of the "updated at" column.
+     *
+     * @var string
+     */
+    const UPDATED_AT = 'updated_at';
+
+    /**
+     * Model constructor.
+     * @param Connection $connection
+     */
+    public function __construct(Connection $connection = null)
     {
-        /**
-         * The connection name for the model.
-         *
-         * @var $connection
-         */
-        protected $connection;
+        $ConnFactory = new ConnectionFactory();
+        if(is_null($connection))
+            $this->connection = $ConnFactory->make($this->connection);
+        else
+            $this->connection = $connection;
+    }
 
-        /**
-         * The table associated with the model.
-         *
-         * @var string
-         */
-        protected $table;
+    /**
+     * to save the this model to the database
+     */
+    public function save()
+    {}
 
-        /**
-         * The primary key for the model.
-         *
-         * @var string
-         */
-        protected $primaryKey = 'id';
+    /**
+     * Get number of entries in table
+     */
+    public function count()
+    {}
 
-        /**
-         * The "type" of the auto-incrementing ID.
-         *
-         * @var string
-         */
-        protected $keyType = 'int';
+    /**
+     * selects entries of table and return array of Models filled with data.
+     */
+    public function get()
+    {}
 
-        /**
-         * The name of the "created at" column.
-         *
-         * @var string
-         */
-        const CREATED_AT = 'created_at';
-
-        /**
-         * The name of the "updated at" column.
-         *
-         * @var string
-         */
-        const UPDATED_AT = 'updated_at';
-
-        /**
-         * Model constructor.
-         * @param Connection $connection
-         */
-        public function __construct(Connection $connection = null)
-        {
-            $ConnFactory = new ConnectionFactory();
-            if(is_null($connection))
-                $this->connection = $ConnFactory->make($this->connection);
-            else
-                $this->connection = $connection;
-        }
-
-        /**
-         * to save the this model to the database
-         */
-        public function save()
-        {}
-
-        /**
-         * Get number of entries in table
-         */
-        public function count()
-        {}
-
-        /**
-         * selects entries of table and return array of Models filled with data.
-         */
-        public function get()
-        {}
-
-        public function fillData(array $data)
-        {
-            foreach ($data as $key => $datum) {
-                $this->$key = $datum;
-            }
+    public function fillData(array $data)
+    {
+        foreach ($data as $key => $datum) {
+            $this->$key = $datum;
         }
     }
+}

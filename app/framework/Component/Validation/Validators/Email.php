@@ -6,43 +6,42 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Validation\Validators;
+namespace app\framework\Component\Validation\Validators;
 
-    use app\framework\Component\Validation\ValidationException;
-    use app\framework\Component\Validation\ValidatorInterface;
+use app\framework\Component\Validation\ValidationException;
+use app\framework\Component\Validation\ValidatorInterface;
 
-    class Email implements ValidatorInterface{
-        /**
-         * Get validator name, eg: email
-         *
-         * @return string
-         */
-        public function getName()
-        {
-            return "email";
-        }
-
-        /**
-         * Validate given value, using optional parameters and either throw an exception or return a boolean
-         *
-         * @param mixed     $value
-         * @param array     $params
-         * @param bool|true $throw
-         *
-         * @return boolean|string
-         */
-        public function validate($value, $params = [], $throw = true)
-        {
-            if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                return true;
-            }
-
-            $message = 'Invalid email';
-            if ($throw) {
-                handle(new ValidationException($message));
-            }
-
-            return $message;
-        }
-
+class Email implements ValidatorInterface{
+    /**
+     * Get validator name, eg: email
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return "email";
     }
+
+    /**
+     * Validate given value, using optional parameters and either throw an exception or return a boolean
+     *
+     * @param mixed     $value
+     * @param array     $params
+     * @param bool|true $throw
+     *
+     * @return boolean|string
+     */
+    public function validate($value, $params = [], $throw = true)
+    {
+        if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            return true;
+        }
+
+        $message = 'Invalid email';
+        if ($throw) {
+            handle(new ValidationException($message));
+        }
+
+        return $message;
+    }
+}

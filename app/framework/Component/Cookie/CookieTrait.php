@@ -6,17 +6,17 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Cookie;
+namespace app\framework\Component\Cookie;
 
-    trait CookieTrait
+trait CookieTrait
+{
+    protected function createCookie($cookieName, $cookieValue = null, $expire = null, $path = "/", $encrypt = false)
     {
-        protected function createCookie($cookieName, $cookieValue = null, $expire = null, $path = "/", $encrypt = false)
-        {
-            if($this->cookieJar[$cookieName] == null) {
-                $this->cookieJar[$cookieName] = new Cookie($cookieName, $cookieValue, $expire, $path, $encrypt);
-                return true;
-            } else {
-                return false;
-            }
+        if($this->cookieJar[$cookieName] == null) {
+            $this->cookieJar[$cookieName] = new Cookie($cookieName, $cookieValue, $expire, $path, $encrypt);
+            return true;
+        } else {
+            return false;
         }
     }
+}

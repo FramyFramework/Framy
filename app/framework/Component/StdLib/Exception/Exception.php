@@ -6,11 +6,11 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\StdLib\Exception;
+namespace app\framework\Component\StdLib\Exception;
 
-    require("AbstractException.php");
+require("AbstractException.php");
 
-    class Exception extends AbstractException
-    {
+class Exception extends AbstractException
+{
 
-    }
+}

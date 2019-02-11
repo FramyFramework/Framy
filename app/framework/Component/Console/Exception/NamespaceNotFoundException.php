@@ -6,8 +6,8 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Console\Exception;
+namespace app\framework\Component\Console\Exception;
 
-    class NamespaceNotFoundException extends CommandNotFoundException
-    {
-    }
+class NamespaceNotFoundException extends CommandNotFoundException
+{
+}

@@ -6,18 +6,17 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Validation;
+namespace app\framework\Component\Validation;
 
-
-    trait ValidationTrait
+trait ValidationTrait
+{
+    /**
+    * Get Validation component
+    *
+    * @return Validation
+    */
+    protected static function validate()
     {
-        /**
-        * Get Validation component
-        *
-        * @return Validation
-        */
-        protected static function validate()
-        {
-            return Validation::getInstance();
-        }
+        return Validation::getInstance();
     }
+}

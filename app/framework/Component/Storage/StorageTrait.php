@@ -6,27 +6,27 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-     namespace app\framework\Component\Storage;
+ namespace app\framework\Component\Storage;
 
+ /**
+  * A library of Storage functions
+  *
+  * @package app\framework\Component\Storage
+  */
+ trait StorageTrait
+ {
      /**
-      * A library of Storage functions
+      * Get storage
       *
-      * @package app\framework\Component\Storage
+      * @param $storageName
+      * @return Storage
       */
-     trait StorageTrait
+     protected static function storage($storageName)
      {
-         /**
-          * Get storage
-          *
-          * @param $storageName
-          * @return Storage
-          */
-         protected static function storage($storageName)
-         {
-             try {
-                 return new Storage($storageName);
-             } catch(StorageException $e) {
-                 handle($e);
-             }
+         try {
+             return new Storage($storageName);
+         } catch(StorageException $e) {
+             handle($e);
          }
      }
+ }

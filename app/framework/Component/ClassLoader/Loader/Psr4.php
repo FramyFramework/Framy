@@ -6,28 +6,28 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\ClassLoader\Loader;
+namespace app\framework\Component\ClassLoader\Loader;
 
-    //require __DIR__ . "/AbstractLoader.php";
+//require __DIR__ . "/AbstractLoader.php";
 
+/**
+ * Psr4 autoloader
+ *
+ * @package app\framework\Component\ClassLoader\Loader
+ */
+class Psr4 //extends AbstractLoader
+{
     /**
-     * Psr4 autoloader
+     * Returns File path or false
      *
-     * @package app\framework\Component\ClassLoader\Loader
+     * @param $name
+     *
+     * @return mixed
      */
-    class Psr4 //extends AbstractLoader
+    public function findClass($name)
     {
-        /**
-         * Returns File path or false
-         *
-         * @param $name
-         *
-         * @return mixed
-         */
-        public function findClass($name)
-        {
-            // TODO: Implement findClass() method.
-            return false;
-        }
-
+        // TODO: Implement findClass() method.
+        return false;
     }
+
+}
