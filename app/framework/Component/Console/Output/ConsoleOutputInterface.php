@@ -1,29 +1,28 @@
 <?php
 /**
- *
  * Framy Framework
  *
  * @copyright Copyright Framy
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Console\Output;
+namespace app\framework\Component\Console\Output;
 
+/**
+ * ConsoleOutputInterface is the interface implemented by ConsoleOutput class.
+ * This adds information about stderr and section output stream.
+ *
+ * @package app\framework\Component\Console\Output
+ */
+interface ConsoleOutputInterface
+{
     /**
-     * ConsoleOutputInterface is the interface implemented by ConsoleOutput class.
-     * This adds information about stderr and section output stream.
+     * Gets the OutputInterface for errors.
      *
-     * @package app\framework\Component\Console\Output
+     * @return OutputInterface
      */
-    interface ConsoleOutputInterface
-    {
-        /**
-         * Gets the OutputInterface for errors.
-         *
-         * @return OutputInterface
-         */
-        public function getErrorOutput();
+    public function getErrorOutput();
 
-        public function setErrorOutput(OutputInterface $error);
+    public function setErrorOutput(OutputInterface $error);
 
-    }
+}

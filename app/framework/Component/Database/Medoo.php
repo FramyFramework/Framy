@@ -10,6 +10,7 @@
  */
 
 namespace app\framework\Component\Database;
+
 use app\framework\Component\Config\Config;
 use PDO;
 

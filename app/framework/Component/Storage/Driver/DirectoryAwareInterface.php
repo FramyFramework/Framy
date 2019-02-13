@@ -6,21 +6,21 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Storage\Driver;
+namespace app\framework\Component\Storage\Driver;
 
+/**
+ * Interface DirectoryAwareInterface
+ *
+ * @package app\framework\Component\Storage\Driver
+ */
+interface DirectoryAwareInterface
+{
     /**
-     * Interface DirectoryAwareInterface
+     * Check if key is directory
      *
-     * @package app\framework\Component\Storage\Driver
+     * @param string $key
+     *
+     * @return boolean
      */
-    interface DirectoryAwareInterface
-    {
-        /**
-         * Check if key is directory
-         *
-         * @param string $key
-         *
-         * @return boolean
-         */
-        public function isDirectory($key);
-    }
+    public function isDirectory($key);
+}

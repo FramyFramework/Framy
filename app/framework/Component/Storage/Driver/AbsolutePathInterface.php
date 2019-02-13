@@ -6,20 +6,19 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Storage\Driver;
+namespace app\framework\Component\Storage\Driver;
 
-
+/**
+ * Interface AbsolutePathInterface
+ *
+ * @package app\framework\Component\Storage\Driver
+ */
+interface AbsolutePathInterface
+{
     /**
-     * Interface AbsolutePathInterface
+     * @param $key
      *
-     * @package app\framework\Component\Storage\Driver
+     * @return mixed
      */
-    interface AbsolutePathInterface
-    {
-        /**
-         * @param $key
-         *
-         * @return mixed
-         */
-        public function getAbsolutePath($key);
-    }
+    public function getAbsolutePath($key);
+}

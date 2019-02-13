@@ -6,24 +6,24 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\TemplateEngine;
+namespace app\framework\Component\TemplateEngine;
 
-    require("Smarty/Smarty.class.php");
+require("Smarty/Smarty.class.php");
 
-    class TemplateEngine
+class TemplateEngine
+{
+    private static $instance;
+
+    function __construct()
     {
-        private static $instance;
-
-        function __construct()
-        {
-            $this::$instance = new \Smarty();
-        }
-
-        /**
-         * @return \Smarty
-         */
-        public function getInstance()
-        {
-            return $this::$instance;
-        }
+        $this::$instance = new \Smarty();
     }
+
+    /**
+     * @return \Smarty
+     */
+    public function getInstance()
+    {
+        return $this::$instance;
+    }
+}

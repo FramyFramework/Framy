@@ -6,18 +6,18 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\EventManager;
+namespace app\framework\Component\EventManager;
 
+/**
+ * This interface is used for event subscriber classes
+ *
+ * @package app\framework\Component\EventManager
+ */
+interface EventSubscriberInterface
+{
     /**
-     * This interface is used for event subscriber classes
-     *
-     * @package app\framework\Component\EventManager
+     * Subscribe to events
+     * @return void
      */
-    interface EventSubscriberInterface
-    {
-        /**
-         * Subscribe to events
-         * @return void
-         */
-        public function subscribe();
-    }
+    public function subscribe();
+}

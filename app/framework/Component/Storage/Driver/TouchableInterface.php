@@ -6,21 +6,21 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Storage\Driver;
+namespace app\framework\Component\Storage\Driver;
 
+/**
+ * Interface TouchableInterface
+ *
+ * @package app\framework\Component\Storage\Driver
+ */
+interface TouchableInterface
+{
     /**
-     * Interface TouchableInterface
+     * Touch a file (change time modified)
      *
-     * @package app\framework\Component\Storage\Driver
+     * @param $key
+     *
+     * @return mixed
      */
-    interface TouchableInterface
-    {
-        /**
-         * Touch a file (change time modified)
-         *
-         * @param $key
-         *
-         * @return mixed
-         */
-        public function touchKey($key);
-    }
+    public function touchKey($key);
+}

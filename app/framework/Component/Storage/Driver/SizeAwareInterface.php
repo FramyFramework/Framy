@@ -6,21 +6,21 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Storage\Driver;
+namespace app\framework\Component\Storage\Driver;
 
+/**
+ * Interface SizeAwareInterface
+ *
+ * @package app\framework\Component\Storage\Driver
+ */
+interface SizeAwareInterface
+{
     /**
-     * Interface SizeAwareInterface
+     * Get file size
      *
-     * @package app\framework\Component\Storage\Driver
+     * @param $key
+     *
+     * @return int
      */
-    interface SizeAwareInterface {
-
-        /**
-         * Get file size
-         *
-         * @param $key
-         *
-         * @return int
-         */
-        public function getSize($key);
-    }
+    public function getSize($key);
+}

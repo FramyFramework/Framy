@@ -6,22 +6,21 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\EventManager;
+namespace app\framework\Component\EventManager;
 
-
+/**
+ * A library of EventManager functions
+ *
+ * @package app\framework\Component\EventManager
+ */
+trait EventManagerTrait
+{
     /**
-     * A library of EventManager functions
-     *
-     * @package app\framework\Component\EventManager
+     * Get event Manager
+     * @return EventManager
      */
-    trait EventManagerTrait
+    protected static function eventManager()
     {
-        /**
-         * Get event Manager
-         * @return EventManager
-         */
-        protected static function eventManager()
-        {
-            return EventManager::getInstance();
-        }
+        return EventManager::getInstance();
     }
+}

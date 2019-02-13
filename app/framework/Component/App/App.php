@@ -6,92 +6,92 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\App;
+namespace app\framework\Component\App;
 
-    class App
+class App
+{
+    private $defaultNamespaces = [
+        '\app\custom\database\migrations',
+        '\app\custom\database\seeders',
+        '\app\custom\Http\Controller',
+        '\app\custom\Http\Middleware',
+        '\app\custom\Models',
+    ];
+
+    /**
+     * @var array
+     */
+    private $Instances = [];
+
+    public function call($classMethod, $param = [])
     {
-        private $defaultNamespaces = [
-            '\app\custom\database\migrations',
-            '\app\custom\database\seeders',
-            '\app\custom\Http\Controller',
-            '\app\custom\Http\Middleware',
-            '\app\custom\Models',
-        ];
+        $method = null;
 
-        /**
-         * @var array
-         */
-        private $Instances = [];
+        $this->registerNewClass($classMethod, $method);
+        try {
+            if($method == null)
+                throw new \Exception("You have to specify an method to call");
+        } catch (\Exception $e) {
+            handle($e);
+        } finally {
+            return $this->callMethod($classMethod, $method, $param);
+        }
+    }
 
-        public function call($classMethod, $param = [])
-        {
-            $method = null;
+    public function getClassInstance($className)
+    {
+        $method = null;
+        $this->registerNewClass($className, $method);
 
-            $this->registerNewClass($classMethod, $method);
-            try {
-                if($method == null)
-                    throw new \Exception("You have to specify an method to call");
-            } catch (\Exception $e) {
-                handle($e);
-            } finally {
-                return $this->callMethod($classMethod, $method, $param);
+        return $this->Instances[$className];
+    }
+
+    private function checkIfClassIsRegistered($class)
+    {
+        foreach($this->Instances as $Class){
+            if(get_class($Class) == $class){
+                return true;
             }
         }
+        return false;
+    }
 
-        public function getClassInstance($className) 
-        {
-            $method = null;
-            $this->registerNewClass($className, $method);
+    private function registerNewClass(&$class, &$method)
+    {
+        $method = explode("@", $class)[1];
+        $class = self::validateClass(explode("@", $class)[0]);
 
-            return $this->Instances[$className];
-        }
-
-        private function checkIfClassIsRegistered($class)
-        {
-            foreach($this->Instances as $Class){
-                if(get_class($Class) == $class){
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private function registerNewClass(&$class, &$method)
-        {
-            $method = explode("@", $class)[1];
-            $class = self::validateClass(explode("@", $class)[0]);
-
-            try {
-                if(! is_object($t_class = new $class))
-                    throw new \Exception("Could not instantiate class");
-            } catch (\Exception $e) {
-                handle($e);
-            } finally {
-                if(! self::checkIfClassIsRegistered($class)){
-                    $this->Instances[$class] = new $class;
-                }
-            }
-        }
-
-        private function callMethod($class, $method, $param)
-        {
-            return call_user_func_array(array($this->Instances[$class], $method), $param);
-        }
-
-        private function validateClass($class)
-        {
-            try {
-                foreach($this->defaultNamespaces as $namespace){
-                    //var_dump($namespace . "\\" . $class);
-                    if(class_exists($namespace . "\\" . $class)){
-                        return $namespace . "\\" . $class;
-                    } elseif (class_exists($class)) {
-                        return $class;
-                    }
-                }
-                throw new \Exception("Class not found. Maybe changing '/' to '\' helps.");
-            } catch (\Exception $e) {
-                handle($e);
+        try {
+            if(! is_object($t_class = new $class))
+                throw new \Exception("Could not instantiate class");
+        } catch (\Exception $e) {
+            handle($e);
+        } finally {
+            if(! self::checkIfClassIsRegistered($class)){
+                $this->Instances[$class] = new $class;
             }
         }
     }
+
+    private function callMethod($class, $method, $param)
+    {
+        return call_user_func_array(array($this->Instances[$class], $method), $param);
+    }
+
+    private function validateClass($class)
+    {
+        try {
+            foreach($this->defaultNamespaces as $namespace){
+                //var_dump($namespace . "\\" . $class);
+                if(class_exists($namespace . "\\" . $class)){
+                    return $namespace . "\\" . $class;
+                } elseif (class_exists($class)) {
+                    return $class;
+                }
+            }
+            throw new \Exception("Class not found. Maybe changing '/' to '\' helps.");
+        } catch (\Exception $e) {
+            handle($e);
+        }
+    }
+}

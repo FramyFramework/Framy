@@ -102,3 +102,39 @@
             return new \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject($arr);
         }
     }
+
+    if(! function_exists("encrypt")) {
+        /**
+         * Encrypt the given value.
+         *
+         * @param  mixed  $value
+         * @param  bool   $serialize
+         * @throws Exception
+         * @return string
+         */
+        function encrypt($value, $serialize = true) {
+            $Encryptor = new \app\framework\Component\Encryption\Encrypter(
+                \app\framework\Component\Config\Config::getInstance()->get("CrypKey")
+            );
+
+            return $Encryptor->encrypt($value, $serialize );
+        }
+    }
+
+    if(! function_exists("decrypt")) {
+        /**
+         * Decrypt the given value.
+         *
+         * @param  string  $value
+         * @param  bool   $unserialize
+         * @throws Exception
+         * @return mixed
+         */
+        function decrypt($value, $unserialize = true) {
+            $Encryptor = new \app\framework\Component\Encryption\Encrypter(
+                \app\framework\Component\Config\Config::getInstance()->get("CrypKey")
+            );
+
+            return $Encryptor->decrypt($value, $unserialize );
+        }
+    }

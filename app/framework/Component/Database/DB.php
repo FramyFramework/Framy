@@ -6,42 +6,41 @@
  * @Author  Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\Database;
+namespace app\framework\Component\Database;
 
-
+/**
+ * Class DB
+ * Simple class for accessing functionality of the Database component
+ *
+ * @package app\framework\Component\Database
+ */
+class DB
+{
     /**
-     * Class DB
-     * Simple class for accessing functionality of the Database component
+     * To run a select query against the database
      *
-     * @package app\framework\Component\Database
+     * @param string $query
+     * @param array $bindings
+     * @return array
      */
-    class DB
+    static function select(string $query, array $bindings = [])
     {
-        /**
-         * To run a select query against the database
-         *
-         * @param string $query
-         * @param array $bindings
-         * @return array
-         */
-        static function select(string $query, array $bindings = [])
-        {
-            return (new Manager)->selectRaw($query, $bindings);
-        }
-
-        static function insert(string $query, array $bindings = [])
-        {
-            return (new Manager)->insertRaw($query, $bindings);
-        }
-
-        static function update(string $query, array $bindings = [])
-        {
-            return (new Manager)->updateRaw($query, $bindings);
-        }
-
-
-        static function delete(string $query, array $bindings = [])
-        {
-            return (new Manager)->deleteRaw($query, $bindings);
-        }
+        return (new Manager)->selectRaw($query, $bindings);
     }
+
+    static function insert(string $query, array $bindings = [])
+    {
+        return (new Manager)->insertRaw($query, $bindings);
+    }
+
+    static function update(string $query, array $bindings = [])
+    {
+        return (new Manager)->updateRaw($query, $bindings);
+    }
+
+
+    static function delete(string $query, array $bindings = [])
+    {
+        return (new Manager)->deleteRaw($query, $bindings);
+    }
+}

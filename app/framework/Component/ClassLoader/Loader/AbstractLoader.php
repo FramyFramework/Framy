@@ -6,23 +6,23 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-    namespace app\framework\Component\ClassLoader\Loader;
+namespace app\framework\Component\ClassLoader\Loader;
 
 
-    use app\framework\Component\StdLib\SingletonTrait;
+use app\framework\Component\StdLib\SingletonTrait;
 
-    require_once realpath(__DIR__."/../../StdLib/SingletonTrait.php");
+require_once realpath(__DIR__."/../../StdLib/SingletonTrait.php");
 
-    abstract class AbstractLoader
-    {
-        use SingletonTrait;
+abstract class AbstractLoader
+{
+    use SingletonTrait;
 
-        /**
-         * Returns File path or false
-         *
-         * @param $name
-         *
-         * @return mixed
-         */
-        abstract public function findClass($name);
-    }
+    /**
+     * Returns File path or false
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
+    abstract public function findClass($name);
+}
