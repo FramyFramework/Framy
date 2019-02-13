@@ -41,7 +41,7 @@ class LessThanOrEqual implements ValidatorInterface
 
         $message = "Value must be less than or equal %s";
         if($throw){
-            handle(new ValidationException($message, $cmp));
+            throw (new ValidationException($message, $cmp));
         }
 
         return sprintf($message, $cmp);

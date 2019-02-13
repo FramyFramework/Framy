@@ -41,7 +41,7 @@ class URL implements ValidatorInterface
 
         $message = 'Invalid URL';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

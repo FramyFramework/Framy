@@ -40,7 +40,7 @@ class IP implements ValidatorInterface
 
         $message = 'Invalid IP address';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

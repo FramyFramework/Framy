@@ -41,7 +41,7 @@ class GreaterThan implements ValidatorInterface
 
         $message = "Value must be greater than %s";
         if($throw){
-            handle(new ValidationException($message, $cmp));
+            throw (new ValidationException($message, $cmp));
         }
 
         return sprintf($message, $cmp);

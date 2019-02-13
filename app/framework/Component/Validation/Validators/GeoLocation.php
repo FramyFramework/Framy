@@ -40,7 +40,7 @@ class GeoLocation implements ValidatorInterface
 
         $message = 'Value must be an array containing keys `lat` and `lng`';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

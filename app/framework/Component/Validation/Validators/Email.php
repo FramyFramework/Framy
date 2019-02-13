@@ -39,7 +39,7 @@ class Email implements ValidatorInterface{
 
         $message = 'Invalid email';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

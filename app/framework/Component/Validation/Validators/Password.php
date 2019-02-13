@@ -29,7 +29,7 @@ class Password implements ValidatorInterface
 
         $message = 'Password must contain at least 8 characters, minimum one letter and one number';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

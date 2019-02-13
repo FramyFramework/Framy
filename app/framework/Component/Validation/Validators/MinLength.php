@@ -43,7 +43,7 @@ class MinLength implements ValidatorInterface
 
         $message = "Value must be contain %s character at least";
         if($throw){
-            handle(new ValidationException($message, $limit));
+            throw (new ValidationException($message, $limit));
         }
 
         return printf($message, $limit);

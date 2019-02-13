@@ -82,7 +82,7 @@ class CreditCardNumber implements ValidatorInterface
         // Remove all non-digit characters from the number
         if (($number = preg_replace('/\D+/', '', $value)) === '') {
             if ($throw) {
-                handle(new ValidationException($message));
+                throw (new ValidationException($message));
             }
 
             return $message;
@@ -98,7 +98,7 @@ class CreditCardNumber implements ValidatorInterface
 
         if (!isset($cards[$type])) {
             if ($throw) {
-                handle(new ValidationException($message));
+                throw (new ValidationException($message));
             }
 
             return $message;
@@ -110,7 +110,7 @@ class CreditCardNumber implements ValidatorInterface
         // Validate the card length by the card type
         if (!in_array($length, preg_split('/\D+/', $cards[$type]['length']))) {
             if ($throw) {
-                handle(new ValidationException($message));
+                throw (new ValidationException($message));
             }
 
             return $message;
@@ -119,7 +119,7 @@ class CreditCardNumber implements ValidatorInterface
         // Check card number prefix
         if (!preg_match('/^' . $cards[$type]['prefix'] . '/', $number)) {
             if ($throw) {
-                handle(new ValidationException($message));
+                throw (new ValidationException($message));
             }
 
             return $message;

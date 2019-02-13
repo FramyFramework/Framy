@@ -40,7 +40,7 @@ class Phone implements ValidatorInterface
 
         $message = 'Value must be a valid phone number';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

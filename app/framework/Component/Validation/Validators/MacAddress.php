@@ -40,7 +40,7 @@ class MacAddress implements ValidatorInterface
 
         $message = 'Invalid mac address';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

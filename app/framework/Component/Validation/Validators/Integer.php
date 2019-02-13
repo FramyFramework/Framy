@@ -40,7 +40,7 @@ class Integer implements ValidatorInterface
 
         $message = 'Value must be an Integer';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;

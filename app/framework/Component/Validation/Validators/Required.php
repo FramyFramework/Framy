@@ -40,7 +40,7 @@ class Required implements ValidatorInterface
 
         $message = 'Value is Required';
         if ($throw) {
-            handle(new ValidationException($message));
+            throw (new ValidationException($message));
         }
 
         return $message;
