@@ -10,6 +10,8 @@ namespace app\framework\Component\Console\Command;
 
 
 use app\framework\Component\Config\Config;
+use app\framework\Component\Encryption\Ciphers;
+use app\framework\Component\Encryption\Encrypter;
 use app\framework\Component\Console\Input\InputArgument;
 use app\framework\Component\Console\Input\InputDefinition;
 use app\framework\Component\Console\Input\InputInterface;
@@ -23,9 +25,11 @@ class KeyGenerateCommand extends Command
             ->setDescription("Auto generate the config value CrypKey")
             ->setDefinition(new InputDefinition([
                 new InputArgument(
-                    "length",
+                    "cypher",
                     InputArgument::OPTIONAL,
-                    "Define the length of the key"
+                    "The algorithm used for encryption. Available: "
+                        .Ciphers::AES_128_CBC.", ".Ciphers::AES_256_CBC,
+                    Ciphers::AES_128_CBC
                 )
             ]));
     }
@@ -33,15 +37,15 @@ class KeyGenerateCommand extends Command
     protected function execute(InputInterface $input, ConsoleOutput $output)
     {
         $path       = ROOT_PATH."/config/app.php";
-        $length     = ($input->getArgument("length")) ?: 128;
+        $Encryptor  = new Encrypter(Config::getInstance()->get("CrypKey"));
+        $cypher     = $input->getArgument("cypher");
         $currentKey = Config::getInstance()->get("CrypKey");
         $confFile   = file_get_contents($path);
-        $confFile   = str_replace($currentKey, $this->random_str($length), $confFile);
+        $confFile   = str_replace($currentKey, $Encryptor->generateKey($cypher), $confFile);
 
         file_put_contents($path, $confFile);
 
         $output->writeln("Done! Take a look at $path to see the changes.");
-
     }
 
     /**
