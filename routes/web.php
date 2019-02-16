@@ -9,14 +9,6 @@
 |
 */
 
-use \app\framework\Component\Route\Klein\Klein;
+use app\framework\Component\Route\Router;
 
-$klein = new Klein();
-
-$klein->get("/", function(){
-    view("welcome");
-});
-
-// add more routes here ...
-
-$klein->dispatch();
+Router::get("/", "AuthController@index");

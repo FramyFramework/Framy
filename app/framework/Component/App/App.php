@@ -78,7 +78,7 @@ class App
         return call_user_func_array(array($this->Instances[$class], $method), $param);
     }
 
-    private function validateClass($class)
+    public function validateClass($class)
     {
         try {
             foreach($this->defaultNamespaces as $namespace){

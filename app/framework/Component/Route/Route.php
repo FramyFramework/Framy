@@ -8,63 +8,130 @@
 
 namespace app\framework\Component\Route;
 
-use app\framework\Component\Route\Klein\Klein;
-
 class Route
 {
-    private $KleinInstance;
+    /**
+     * The URI pattern the route responds to.
+     *
+     * Examples:
+     * - '/posts'
+     * - '/posts/[:post_slug]'
+     * - '/posts/[i:id]'
+     *
+     * @var string
+     */
+    protected $uri;
 
     /**
-     * Route constructor.
+     * The HTTP methods the route responds to.
+     *
+     * May either be represented as a string or an array containing multiple methods to match
+     *
+     * Examples:
+     * - 'POST'
+     * - array('GET', 'POST')
+     *
+     * @var array
      */
-    public function __construct()
+    protected $methods;
+
+    /**
+     * The route action array.
+     *
+     * @var callable|string
+     */
+    protected $action;
+
+    /**
+     * Whether or not to count this route as a match when counting total matches
+     *
+     * @var boolean
+     */
+    protected $count_match;
+
+    /**
+     * The name of the route
+     *
+     * Mostly used for reverse routing
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Create a new Route instance.
+     *
+     * @param callable      $callback       Callable callback method to execute on route match
+     * @param string        $path           Route URI path to match
+     * @param string|array  $method  HTTP   Method to match
+     * @param boolean       $count_match    Whether or not to count the route as a match when counting total matches
+     * @param string        $name           The name of the route
+     * @return void
+     */
+    public function __construct($callback, $path = null, $method = null, $count_match = true, $name = null)
     {
-        $this->KleinInstance = new Klein();
+        // Initialize some properties (use our setters so we can validate param types)
+        $this->setAction($callback);
+        $this->setUri($path);
+        $this->setMethods($method);
+        $this->setCountMatch($count_match);
+        $this->setName($name);
     }
 
-    public function get($path, $callback)
+    /**
+     * @param string $uri
+     */
+    public function setUri(string $uri): void
     {
-        //dd(getStringBetween($path, "[", "]"));
-        $this->respond("get", $path, function($request) use ($callback) {
-            app($callback, [$request->ID]);
-        });
-    }
-/*
-    public function post($path, $callback)
-    {
-        $this->respond("post", $path, function($request) use ($callback) {
-            app($callback);
-        });
+        $this->uri = $uri;
     }
 
-    public function put($path, $callback)
+    /**
+     * @param $methods
+     */
+    public function setMethods($methods): void
     {
-        $this->respond("put", $path, function($request) use ($callback) {
-            app($callback);
-        });
+        $this->methods = (array)$methods;
     }
 
-    public function delete($path, $callback)
+    /**
+     * @param callable|string $action
+     */
+    public function setAction($action): void
     {
-        $this->respond("delete", $path, function($request) use ($callback) {
-            app($callback);
-        });
+        $this->action = $this->parseAction($action);
     }
 
-    public function patch($path, $callback)
+    /**
+     * @param bool $count_match
+     */
+    public function setCountMatch(bool $count_match): void
     {
-        $this->respond("post", $path, function($request) use ($callback) {
-            app($callback);
-        });
-    }
-*/
-    private function respond($method, $path, $callback)
-    {
-        $this->KleinInstance->respond($method, $path, $callback);
+        $this->count_match = $count_match;
     }
 
-    public function dispatch()
+    /**
+     * @param string $name
+     */
+    public function setName(string $name): void
     {
-        $this->KleinInstance->dispatch();
+        $this->name = $name;
+    }
+
+    /**
+     * Check if passed controller method is accessible. Callable gets ignored
+     *
+     * @param callable|string $action
+     * @return callable|string
+     */
+    private function parseAction($action)
+    {
+        if (! is_callable($action)) {
+            if ($GLOBALS['App']->validateClass(explode("@", $action)[0])) {
+                return $action;
+            }
+        }
+
+        return $action;
     }
 }
