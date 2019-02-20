@@ -94,6 +94,8 @@ class Request
         $this->headers      = new ArrayObject($this->server->getHeaders());
         $this->files        = new ArrayObject($files);
         $this->body         = $body ? (string) $body : null;
+
+        dd($this->uri());
     }
 
     /**
@@ -113,5 +115,30 @@ class Request
             $_FILES,
             null // Let our content getter take care of the "body"
         );
+    }
+
+    /**
+     * Gets the request URI
+     *
+     * @return string
+     */
+    public function uri()
+    {
+        return $this->server->offsetGet('REQUEST_URI') ?: '/';
+    }
+
+    /**
+     * Get the request's pathname
+     *
+     * @return string
+     */
+    public function pathname()
+    {
+        $uri = $this->uri();
+
+        // Strip the query string from the URI
+        $uri = strstr($uri, '?', true) ?: $uri;
+
+        return $uri;
     }
 }

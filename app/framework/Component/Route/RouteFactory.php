@@ -88,9 +88,14 @@ class RouteFactory
      * @param string        $name           The name of the route
      * @return Route
      */
-    public function build($callback, $path = null, $method = null, $count_match = true, $name = null)
+    public function build($callback, $path = null, $method = null, $count_match = true, string $name = "")
     {
         return new Route(
+            $callback,
+            $path,
+            $method,
+            $count_match,
+            $name
         );
     }
 }

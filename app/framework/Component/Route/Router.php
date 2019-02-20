@@ -63,6 +63,13 @@ class Router
     protected $routes;
 
     /**
+     * The Route factory object responsible for creating Route instances
+     *
+     * @type RouteFactory
+     */
+    protected $route_factory;
+
+    /**
      * The Request object passed to each matched route
      *
      * @type Request
@@ -83,19 +90,39 @@ class Router
      */
     protected $service;
 
-    public function init(ArrayObject $routes = null)
+    public function init(ArrayObject $routes = null, RouteFactory $routeFactory = null)
     {
-        $this->routes  = $routes ?: new ArrayObject([]);
+        $this->routes        = $routes       ?: new ArrayObject([]);
+        $this->route_factory = $routeFactory ?: new RouteFactory();
     }
 
     /**
      * @param string|array $method      HTTP Method to match
      * @param string       $path        Route URI path to match
      * @param callable     $callback    Callable callback method to execute on route match
+     * @return Route
      */
     public function respond($method, $path = '*', $callback = null)
     {
+        $route = $this->route_factory->build($callback, $path, $method);
 
+        $this->routes->append($route);
+
+        return $route;
+    }
+
+    public function dispatch(
+        Request  $request       = null,
+        Response $response      = null,
+                 $send_response = true
+    ) {
+        // Set/Initialize our objects to be sent in each callback
+        $this->request  = $request  ?: Request::createFromGlobals();
+        $this->response = $response ?: new Response();
+
+        // Grab some data from the request
+        $uri        = $this->request->pathname();
+        $req_method = $this->request->method();
     }
 
     /**
@@ -103,9 +130,10 @@ class Router
      *
      * @param string    $path       Route URI path to match
      * @param callable  $callback   Callable callback method to execute on route match
+     * @return Route
      */
     public static function get($path = '*', $callback = null)
     {
-        Router::getInstance()->respond("GET", $path, $callback);
+        return Router::getInstance()->respond("GET", $path, $callback);
     }
 }

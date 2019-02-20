@@ -113,12 +113,11 @@ class Request
         array $files = array(),
         $body = null
     ) {
-        // Assignment city...
         $this->params_get   = new DataCollection($params_get);
         $this->params_post  = new DataCollection($params_post);
         $this->cookies      = new DataCollection($cookies);
         $this->server       = new ServerDataCollection($server);
-        $this->headers      = new HeaderDataCollection($this->server->getHeaders());
+        #$this->headers      = new HeaderDataCollection($this->server->getHeaders());
         $this->files        = new DataCollection($files);
         $this->body         = $body ? (string) $body : null;
 
