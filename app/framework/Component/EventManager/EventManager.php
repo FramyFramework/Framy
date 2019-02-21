@@ -103,6 +103,9 @@ class EventManager
 
         $eventListeners = $this->events->key($eventName);
 
+        // to prevent error on empty listeners
+        $eventListeners = $eventListeners ?: [];
+
         if (!$this->isInstanceOf($data, '\app\framework\EventManager\Event')) {
             $data = new Event($data);
         }
