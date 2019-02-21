@@ -71,7 +71,7 @@ This is absolutely not stolen from Laravel... *cough* *cough*
 <div class="flex-center position-ref full-height">
     <div class="content">
         <div class="title m-b-md">
-            Framy
+            Framy {$version}
         </div>
         <div class="links">
             <a href="https://framyframework.github.io/FramyDocumentation/">Documentation</a>

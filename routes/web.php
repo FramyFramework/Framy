@@ -14,7 +14,7 @@ use \app\framework\Component\Route\Klein\Klein;
 $klein = new Klein();
 
 $klein->get("/", function(){
-    view("welcome");
+    view("welcome", ['version' => version()]);
 });
 
 // add more routes here ...
