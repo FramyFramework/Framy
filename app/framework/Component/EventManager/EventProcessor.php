@@ -11,6 +11,7 @@ namespace app\framework\Component\EventManager;
 use app\framework\Component\StdLib\SingletonTrait;
 use app\framework\Component\StdLib\StdLibTrait;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
+use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObjectException;
 
 /**
  * EventProcessor is a class that takes EventListeners and Event object and processes the event.
@@ -82,11 +83,12 @@ class EventProcessor
     }
 
     /**
-     * @param $eventListeners
+     * @param array $eventListeners
      *
+     * @throws ArrayObjectException
      * @return mixed
      */
-    private function orderByPriority($eventListeners)
+    private function orderByPriority(array $eventListeners)
     {
         /**
          * @param int $a

@@ -9,13 +9,12 @@
 namespace app\framework\Component\Database\Connection;
 
 use app\framework\Component\Database\Model\Model;
-use app\framework\Component\EventManager\Event;
 use app\framework\Component\EventManager\EventManagerTrait;
-use app\framework\Component\Storage\StorageEvent;
-use PDO;
-use PDOStatement;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use app\framework\Component\Stopwatch\Stopwatch;
 use app\framework\Component\Stopwatch\StopwatchEvent;
+use PDO;
+use PDOStatement;
 
 /**
  * Class Connection
@@ -254,6 +253,7 @@ class Connection
      * @param string $query
      * @param array $bindings
      * @param \Closure $callback
+     * @throws
      * @return mixed
      */
     protected function run(string $query, array $bindings, \Closure $callback)
@@ -308,10 +308,11 @@ class Connection
      *
      * @param string $query
      * @param StopwatchEvent $stopwatchEvent
+     * @throws StringObjectException
      */
     public function logQuery(string $query, StopwatchEvent $stopwatchEvent)
     {
-        #$this->eventManager()->fire("ff.database.query_execution");
+        $this->eventManager()->fire("ff.database.query_execution");
 
         if($this->loggingQueries) {
             $logEntry['startTime']     = $stopwatchEvent->getStartTime();

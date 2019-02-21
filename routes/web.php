@@ -1,22 +1,22 @@
 <?php
-    /*-------------------------------------------------------------------------
-    | Web Routes
-    |--------------------------------------------------------------------------
-    |
-    | This file is where you may define all of the routes that are handled
-    | by your application. Just tell Framy the URIs it should respond
-    | to using a Closure or controller method. Build something great!
-    |
-    */
+/*-------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| This file is where you may define all of the routes that are handled
+| by your application. Just tell Framy the URIs it should respond
+| to using a Closure or controller method. Build something great!
+|
+*/
 
-    use \app\framework\Component\Route\Klein\Klein;
+use \app\framework\Component\Route\Klein\Klein;
 
-    $klein = new Klein();
+$klein = new Klein();
 
-    $klein->get("/", function(){
-        view("welcome");
-    });
+$klein->get("/", function(){
+    view("welcome", ['version' => version()]);
+});
 
-    // add more routes here ...
+// add more routes here ...
 
-    $klein->dispatch();
+$klein->dispatch();

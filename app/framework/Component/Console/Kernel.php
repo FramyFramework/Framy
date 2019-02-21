@@ -9,14 +9,7 @@
 namespace app\framework\Component\Console;
 
 use app\framework\Component\Console\Command\Command;
-use app\framework\Component\Console\Command\FramyVersionCommand;
-use app\framework\Component\Console\Command\ListCommand;
-use app\framework\Component\Console\Command\Migrate;
-use app\framework\Component\Console\Command\MakeCommand;
-use app\framework\Component\Console\Command\MakeController;
-use app\framework\Component\Console\Command\NewMigration;
 use app\framework\Component\Console\CommandLoader\CommandLoader;
-use app\framework\Component\Console\Command\HelpCommand;
 use app\framework\Component\Console\Exception\CommandNotFoundException;
 use app\framework\Component\Console\Exception\NamespaceNotFoundException;
 use app\framework\Component\Console\Helper\Helper;
@@ -29,9 +22,6 @@ use app\framework\Component\Console\Output\ConsoleOutput;
 use app\framework\Component\Console\Output\Formatter\OutputFormatter;
 use app\framework\Component\Console\Output\OutputInterface;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-use app\framework\Component\StdLib\StdObject\StdObjectWrapper;
-use app\framework\Component\Storage\Directory\Directory;
-use app\framework\Component\Storage\Storage;
 
 class Kernel
 {
@@ -93,36 +83,20 @@ class Kernel
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
-        if($input === null)
+        if ($input === null) {
             $input = new ArgvInput();
+        }
 
-        if($output === null)
+        if ($output === null) {
             $output = new ConsoleOutput();
+        }
 
         $name = $this->getCommandName($input);
 
         // if no command in called, call default command
-        if($name == null)
+        if ($name == null) {
             $name = $this->defaultCommand;
-
-        /*$renderException = function ($e) use ($output) {
-            if (!$e instanceof \Exception) {
-                    $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
-            }
-
-            if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($e, $output->getErrorOutput());
-            } else {
-                $this->renderException($e, $output);
-            }
-        };
-
-        if ($phpHandler = set_exception_handler($renderException)) {
-            restore_exception_handler();
-            if ($debugHandler = $phpHandler[0]->setExceptionHandler($renderException)) {
-                $phpHandler[0]->setExceptionHandler($debugHandler);
-            }
-        }*/
+        }
 
         $this->configureIO($input, $output);
 
@@ -140,7 +114,8 @@ class Kernel
             // temp: some shit went wrong
             $exitCode = 1;
             echo "oh sheet some error happened:\n";
-            echo $e->getMessage(); echo "\n";
+            echo $e->getMessage();
+            echo "\n";
         }
 
         return $exitCode;
@@ -150,7 +125,7 @@ class Kernel
      * Adds a command.
      *
      * @param  Command $command
-     * @return Command | void  Void if command is not enabled;
+     * @return Command | null  null if command is not enabled;
      * @throws \LogicException if something is not correct with the Command
      */
     public function add(Command $command)
@@ -162,16 +137,24 @@ class Kernel
         if (!$command->isEnabled()) {
             $command->setKernel(null);
 
-            return;
+            return null;
         }
 
-        if ($command->getDefinition() === null)
-            throw new \LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
+        if ($command->getDefinition() === null) {
+            throw new \LogicException(sprintf(
+                'Command class "%s" is not correctly initialized. 
+                You probably forgot to call the parent constructor.',
+                get_class($command))
+            );
+        }
 
-        if (!$command->getName())
-            throw new \LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($command)));
+        if (!$command->getName()) {
+            throw new \LogicException(sprintf(
+                'The command defined in "%s" cannot have an empty name.',
+                get_class($command))
+            );
+        }
 
-        //$this->commands[$command->getName()] = $command;
         $this->commandLoader->add($command);
 
         return $command;
@@ -204,11 +187,13 @@ class Kernel
     {
         $this->init();
 
-        if(!$this->has($name) && $this->commandLoader->has($name))
+        if(!$this->has($name) && $this->commandLoader->has($name)) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
+        }
 
-        if(isset($this->commands[$name]))
+        if(isset($this->commands[$name])) {
             return $this->commands[$name];
+        }
 
         return $this->commandLoader->get($name);
     }
@@ -267,30 +252,32 @@ class Kernel
         $this->doRenderException($e, $output);
 
         if (null !== $this->runningCommand) {
-            $output->writeln(sprintf('<info>%s</info>', $this->runningCommand->getSynopsis()), OutputInterface::VERBOSITY_QUIET);
+            $output->writeln(
+                sprintf('<info>%s</info>', $this->runningCommand->getSynopsis()),
+                OutputInterface::VERBOSITY_QUIET
+            );
             $output->writeln('', OutputInterface::VERBOSITY_QUIET);
         }
     }
 
     /**
      * Gets the commands (registered in the given namespace if provided).
-     *
      * The array keys are the full names and the values the command instances.
      *
      * @param string $namespace A namespace name
-     *
+     * @throws Exception\CommandNotFoundException
      * @return Command[] An array of Command instances
      */
     public function all($namespace = null)
     {
         $this->init();
 
-        if($namespace == null) {
-            if(!$this->commandLoader)
+        if ($namespace == null) {
+            if (!$this->commandLoader)
                 return $this->commands;
 
             $commands = array();
-            foreach($this->commandLoader->getNames() as $name) {
+            foreach ($this->commandLoader->getNames() as $name) {
                 if (!isset($commands[$name]) && $this->has($name)) {
                     $commands[$name] = $this->get($name);
                 }
@@ -308,7 +295,13 @@ class Kernel
 
         if ($this->commandLoader) {
             foreach ($this->commandLoader->getNames() as $name) {
-                if (!isset($commands[$name]) && $namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1) && $this->has($name)) {
+                if (!isset($commands[$name])
+                    && $namespace === $this->extractNamespace(
+                        $name,
+                        substr_count($namespace, ':') + 1
+                    )
+                    && $this->has($name)
+                ) {
                     $commands[$name] = $this->get($name);
                 }
             }
@@ -347,7 +340,13 @@ class Kernel
     public function findNamespace($namespace)
     {
         $allNamespaces = $this->getNamespaces();
-        $expr          = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $namespace);
+        $expr          = preg_replace_callback(
+            '{([^:]+|)}',
+            function ($matches) {
+                return preg_quote($matches[1]).'[^:]*';
+            },
+            $namespace
+        );
         $namespaces    = preg_grep('{^'.$expr.'}', $allNamespaces);
 
         if (empty($namespaces)) {
@@ -366,7 +365,13 @@ class Kernel
 
         $exact = in_array($namespace, $namespaces, true);
         if (count($namespaces) > 1 && !$exact)
-            throw new NamespaceNotFoundException(sprintf("The namespace \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
+            throw new NamespaceNotFoundException(
+                sprintf(
+                    "The namespace \"%s\" is ambiguous.\nDid you mean one of these?\n%s",
+                    $namespace,
+                    $this->getAbbreviationSuggestions(array_values($namespaces))),
+                array_values($namespaces)
+            );
 
         return $exact ? $namespace : reset($namespaces);
     }
@@ -376,6 +381,7 @@ class Kernel
      *
      * It does not return the global namespace which always exists.
      *
+     * @throws CommandNotFoundException
      * @return string[] An array of namespaces
      */
     public function getNamespaces()
@@ -399,13 +405,6 @@ class Kernel
      */
     public function getLongVersion()
     {
-        /*if ('UNKNOWN' !== $this->getName()) {
-            if ('UNKNOWN' !== $this->getVersion()) {
-                return sprintf('%s <info>%s</info>', $this->getName(), $this->getVersion());
-            }
-            return $this->getName();
-        }*/
-
         return 'Console Tool';
     }
 
@@ -426,8 +425,9 @@ class Kernel
      */
     public function getDefinition()
     {
-        if (!$this->definition)
+        if (!$this->definition) {
             $this->definition = $this->getDefaultInputDefinition();
+        }
 
         if ($this->singleCommand) {
             $inputDefinition = $this->definition;
@@ -468,13 +468,14 @@ class Kernel
         // Go through all registered namespaces and get all classes inside.
         // Create instance of classes and put it in array if
         // its not the Command class and its an instance of it.
-        foreach($this->defaultNamespaces as $namespace) {
+        foreach ($this->defaultNamespaces as $namespace) {
             $path = str_replace("\\","/", $namespace);
             $filesInNamespace = new ArrayObject(scandir(ROOT_PATH."/".$path."/"));
             $filesInNamespace->removeFirst()->removeFirst();
 
-            for ($i = 0; $i <= $filesInNamespace->count()-1; $i++)
+            for ($i = 0; $i <= $filesInNamespace->count()-1; $i++) {
                 $filesInNamespace->key($i, explode(".php", $filesInNamespace->key($i))[0]);
+            }
 
             foreach ($filesInNamespace->val() as $value) {
                 $class = $namespace.$value;
@@ -497,8 +498,9 @@ class Kernel
      */
     private function init()
     {
-        if($this->isInitialized)
+        if ($this->isInitialized) {
             return;
+        }
 
         $this->isInitialized = true;
         foreach ($this->getDefaultCommands() as $command) {
@@ -562,8 +564,12 @@ class Kernel
 
                 $lev = levenshtein($subname, $parts[$i]);
 
-                if ($lev <= strlen($subname) / 3 || '' !== $subname && false !== strpos($parts[$i], $subname)) {
-                    $alternatives[$collectionName] = $exists ? $alternatives[$collectionName] + $lev : $lev;
+                if ($lev <= strlen($subname) / 3 || '' !== $subname
+                    && false !== strpos($parts[$i], $subname)
+                ) {
+                    $alternatives[$collectionName] = $exists
+                        ? $alternatives[$collectionName] + $lev
+                        : $lev;
                 } elseif ($exists) {
                     $alternatives[$collectionName] += $threshold;
                 }
@@ -578,7 +584,9 @@ class Kernel
             }
         }
 
-        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
+        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) {
+            return $lev < 2 * $threshold;
+        });
         ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
 
         return array_keys($alternatives);
@@ -586,11 +594,13 @@ class Kernel
 
     private function splitStringByWidth($string, $width)
     {
-        // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
+        // str_split is not suitable for multi-byte characters, we should use preg_split
+        // to get char array properly.
         // additionally, array_slice() is not enough as some character has doubled width.
         // we need a function to split string not by character count but by string width
-        if (false === $encoding = mb_detect_encoding($string, null, true))
+        if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return str_split($string, $width);
+        }
 
         $utf8String = mb_convert_encoding($string, 'utf8', $encoding);
         $lines = array();
@@ -626,7 +636,11 @@ class Kernel
             $message = trim($e->getMessage());
 
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $title = sprintf('  [%s%s]  ', get_class($e), 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
+                $title = sprintf(
+                    '  [%s%s]  ',
+                    get_class($e),
+                    0 !== ($code = $e->getCode()) ? ' ('.$code.')' : ''
+                );
                 $len = Helper::strlen($title);
             } else {
                 $len = 0;
@@ -646,18 +660,39 @@ class Kernel
 
             $messages = array();
 
-            if (!$e instanceof ExceptionInterface || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $messages[] = sprintf('<comment>%s</comment>', OutputFormatter::escape(sprintf('In %s line %s:', basename($e->getFile()) ?: 'n/a', $e->getLine() ?: 'n/a')));
+            if (!$e instanceof ExceptionInterface
+                || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity())
+            {
+                $messages[] = sprintf(
+                    '<comment>%s</comment>',
+                    OutputFormatter::escape(
+                        sprintf(
+                            'In %s line %s:',
+                            basename($e->getFile()) ?: 'n/a',
+                            $e->getLine() ?: 'n/a'
+                        )
+                    )
+                );
             }
 
             $messages[] = $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', $len));
 
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $messages[] = sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - Helper::strlen($title))));
+                $messages[] = sprintf(
+                    '<error>%s%s</error>',
+                    $title, str_repeat(
+                        ' ',
+                        max(0, $len - Helper::strlen($title))
+                    )
+                );
             }
 
             foreach ($lines as $line) {
-                $messages[] = sprintf('<error>  %s  %s</error>', OutputFormatter::escape($line[0]), str_repeat(' ', $len - $line[1]));
+                $messages[] = sprintf(
+                    '<error>  %s  %s</error>',
+                    OutputFormatter::escape($line[0]),
+                    str_repeat(' ', $len - $line[1])
+                );
             }
 
             $messages[] = $emptyLine;
@@ -665,7 +700,10 @@ class Kernel
             $output->writeln($messages, OutputInterface::VERBOSITY_QUIET);
 
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $output->writeln('<comment>Exception trace:</comment>', OutputInterface::VERBOSITY_QUIET);
+                $output->writeln(
+                    '<comment>Exception trace:</comment>',
+                    OutputInterface::VERBOSITY_QUIET
+                );
                 // exception related properties
                 $trace = $e->getTrace();
 
@@ -675,7 +713,17 @@ class Kernel
                     $function = $trace[$i]['function'];
                     $file = isset($trace[$i]['file']) ? $trace[$i]['file'] : 'n/a';
                     $line = isset($trace[$i]['line']) ? $trace[$i]['line'] : 'n/a';
-                    $output->writeln(sprintf(' %s%s%s() at <info>%s:%s</info>', $class, $type, $function, $file, $line), OutputInterface::VERBOSITY_QUIET);
+                    $output->writeln(
+                        sprintf(
+                            ' %s%s%s() at <info>%s:%s</info>',
+                            $class,
+                            $type,
+                            $function,
+                            $file,
+                            $line
+                        ),
+                        OutputInterface::VERBOSITY_QUIET
+                    );
                 }
                 $output->writeln('', OutputInterface::VERBOSITY_QUIET);
             }
@@ -696,35 +744,57 @@ class Kernel
             $output->setDecorated(false);
         }
 
-        if (true === $input->hasParameterOption(array('--no-interaction', '-n'), true))
+        if (true === $input->hasParameterOption(array('--no-interaction', '-n'), true)) {
             $input->setInteractive(false);
+        }
 
         switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
-            case -1: $output->setVerbosity(OutputInterface::VERBOSITY_QUIET); break;
-            case 1: $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE); break;
-            case 2: $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE); break;
-            case 3: $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG); break;
-            default: $shellVerbosity = 0; break;
+            case -1:
+                $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+                break;
+            case 1:
+                $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+                break;
+            case 2:
+                $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
+                break;
+            case 3:
+                $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+                break;
+            default:
+                $shellVerbosity = 0;
+                break;
         }
 
         if (true === $input->hasParameterOption(array('--quiet', '-q'), true)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
             $shellVerbosity = -1;
         } else {
-            if ($input->hasParameterOption('-vvv', true) || $input->hasParameterOption('--verbose=3', true) || 3 === $input->getParameterOption('--verbose', false, true)) {
+            if ($input->hasParameterOption('-vvv', true)
+                || $input->hasParameterOption('--verbose=3', true)
+                || 3 === $input->getParameterOption('--verbose', false, true)
+            ) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
                 $shellVerbosity = 3;
-            } elseif ($input->hasParameterOption('-vv', true) || $input->hasParameterOption('--verbose=2', true) || 2 === $input->getParameterOption('--verbose', false, true)) {
+            } elseif ($input->hasParameterOption('-vv', true)
+                || $input->hasParameterOption('--verbose=2', true)
+                || 2 === $input->getParameterOption('--verbose', false, true)
+            ) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
                 $shellVerbosity = 2;
-            } elseif ($input->hasParameterOption('-v', true) || $input->hasParameterOption('--verbose=1', true) || $input->hasParameterOption('--verbose', true) || $input->getParameterOption('--verbose', false, true)) {
+            } elseif ($input->hasParameterOption('-v', true)
+                || $input->hasParameterOption('--verbose=1', true)
+                || $input->hasParameterOption('--verbose', true)
+                || $input->getParameterOption('--verbose', false, true)
+            ) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
                 $shellVerbosity = 1;
             }
         }
 
-        if (-1 === $shellVerbosity)
+        if (-1 === $shellVerbosity) {
             $input->setInteractive(false);
+        }
 
         putenv('SHELL_VERBOSITY='.$shellVerbosity);
         $_ENV['SHELL_VERBOSITY'] = $shellVerbosity;
@@ -739,14 +809,53 @@ class Kernel
     protected function getDefaultInputDefinition()
     {
         return new InputDefinition(array(
-            new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
-            new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display this help message'),
-            new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Do not output any message'),
-            new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
-            new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version'),
-            new InputOption('--ansi', '', InputOption::VALUE_NONE, 'Force ANSI output'),
-            new InputOption('--no-ansi', '', InputOption::VALUE_NONE, 'Disable ANSI output'),
-            new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question'),
+            new InputArgument(
+                'command',
+                InputArgument::REQUIRED,
+                'The command to execute'
+            ),
+            new InputOption(
+                '--help',
+                '-h',
+                InputOption::VALUE_NONE,
+                'Display this help message'
+            ),
+            new InputOption(
+                '--quiet',
+                '-q',
+                InputOption::VALUE_NONE,
+                'Do not output any message'
+            ),
+            new InputOption(
+                '--verbose',
+                '-v|vv|vvv',
+                InputOption::VALUE_NONE,
+                'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'
+            ),
+            new InputOption(
+                '--version',
+                '-V',
+                InputOption::VALUE_NONE,
+                'Display this application version'
+            ),
+            new InputOption(
+                '--ansi',
+                '',
+                InputOption::VALUE_NONE,
+                'Force ANSI output'
+            ),
+            new InputOption(
+                '--no-ansi',
+                '',
+                InputOption::VALUE_NONE,
+                'Disable ANSI output'
+            ),
+            new InputOption(
+                '--no-interaction',
+                '-n',
+                InputOption::VALUE_NONE,
+                'Do not ask any interactive question'
+            ),
         ));
     }
 }
