@@ -148,3 +148,8 @@ if(! function_exists("version")) {
     }
 }
 
+if(! function_exists("isDebug")) {
+    function isDebug() {
+        return \app\framework\Component\Config\Config::getInstance()->get("debug", "app");
+    }
+}
