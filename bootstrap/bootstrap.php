@@ -19,3 +19,7 @@ $autoLoader->register();
 $App = new \app\framework\Component\App\App();
 
 include("helper.php");
+
+if(isDebug()) {
+    set_exception_handler("handle");
+}
