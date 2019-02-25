@@ -91,11 +91,26 @@ class Route
     }
 
     /**
+     * Get the path
+     *
+     * @return string
+     */
+    public function getUri()
+    {
+        return $this->uri;
+    }
+
+    /**
      * @param $methods
      */
     public function setMethods($methods): void
     {
         $this->methods = (array)$methods;
+    }
+
+    public function getMethods()
+    {
+        return $this->methods;
     }
 
     /**
@@ -107,11 +122,29 @@ class Route
     }
 
     /**
+     * @return callable|string
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
      * @param bool $count_match
      */
     public function setCountMatch(bool $count_match): void
     {
         $this->count_match = $count_match;
+    }
+
+    /**
+     * Get the count_match
+     *
+     * @return boolean
+     */
+    public function getCountMatch()
+    {
+        return $this->count_match;
     }
 
     /**
