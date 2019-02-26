@@ -1,27 +1,28 @@
 <?php
 /**
- * Framy Framework
+ * Klein (klein.php) - A fast & flexible router for PHP
  *
- * @copyright Copyright Framy
- * @Author Marco Bier <mrfibunacci@gmail.com>
+ * @author      Chris O'Hara <cohara87@gmail.com>
+ * @author      Trevor Suarez (Rican7) (contributor and v2 refactorer)
+ * @copyright   (c) Chris O'Hara
+ * @link        https://github.com/klein/klein.php
+ * @license     MIT
  */
 
 namespace app\framework\Component\Routing;
 
 /**
- * Class RouteFactory
+ * RouteFactory
+ *
+ * The default implementation of the AbstractRouteFactory
  * @package app\framework\Component\Routing
  */
-class RouteFactory
+class RouteFactory extends AbstractRouteFactory
 {
+
     /**
-     * The namespace of which to collect the routes in
-     * when matching, so you can define routes under a
-     * common endpoint
-     *
-     * @var string
+     * Constants
      */
-    protected $namespace;
 
     /**
      * The value given to path's when they are entered as null values
@@ -30,72 +31,105 @@ class RouteFactory
      */
     const NULL_PATH_VALUE = '*';
 
+
     /**
-     * Constructor
-     *
-     * @param string $namespace The initial namespace to set
+     * Methods
      */
-    public function __construct($namespace = null)
+
+    /**
+     * Check if the path is null or equal to our match-all, null-like value
+     *
+     * @param mixed $path
+     * @return boolean
+     */
+    protected function pathIsNull($path)
     {
-        $this->namespace = $namespace;
+        return (static::NULL_PATH_VALUE === $path || null === $path);
     }
 
     /**
-     * Gets the value of namespace
+     * Quick check to see whether or not to count the route
+     * as a match when counting total matches
      *
-     * @return string|null
+     * @param string $path
+     * @return boolean
      */
-    public function getNamespace(): ?string
+    protected function shouldPathStringCauseRouteMatch($path)
     {
-        return $this->namespace;
+        // Only consider a request to be matched when not using 'matchall'
+        return !$this->pathIsNull($path);
     }
 
     /**
-     * Sets the value of namespace
+     * Pre-process a path string
      *
-     * @param string $namespace The namespace from which to collect the Routes under
-     * @return $this
+     * This method wraps the path string in a regular expression syntax baesd
+     * on whether the string is a catch-all or custom regular expression.
+     * It also adds the namespace in a specific part, based on the style of expression
+     *
+     * @param string $path
+     * @return string
      */
-    public function setNamespace(?string $namespace)
+    protected function preprocessPathString($path)
     {
-        $this->namespace = $namespace;
+        // If the path is null, make sure to give it our match-all value
+        $path = (null === $path) ? static::NULL_PATH_VALUE : (string) $path;
 
-        return $this;
+        // If a custom regular expression (or negated custom regex)
+        if ($this->namespace &&
+            (isset($path[0]) && $path[0] === '@') ||
+            (isset($path[0]) && $path[0] === '!' && isset($path[1]) && $path[1] === '@')
+        ) {
+            // Is it negated?
+            if ($path[0] === '!') {
+                $negate = true;
+                $path = substr($path, 2);
+            } else {
+                $negate = false;
+                $path = substr($path, 1);
+            }
+
+            // Regex anchored to front of string
+            if ($path[0] === '^') {
+                $path = substr($path, 1);
+            } else {
+                $path = '.*' . $path;
+            }
+
+            if ($negate) {
+                $path = '@^' . $this->namespace . '(?!' . $path . ')';
+            } else {
+                $path = '@^' . $this->namespace . $path;
+            }
+
+        } elseif ($this->namespace && $this->pathIsNull($path)) {
+            // Empty route with namespace is a match-all
+            $path = '@^' . $this->namespace . '(/|$)';
+        } else {
+            // Just prepend our namespace
+            $path = $this->namespace . $path;
+        }
+
+        return $path;
     }
 
     /**
-     * Append a namespace to the current namespace
+     * Build a Route instance
      *
-     * @param string $namespace The namespace from which to collect the Routes under
-     * @return $this
-     */
-    public function appendNamespace(string $namespace)
-    {
-        $this->namespace .= $namespace;
-
-        return $this;
-    }
-
-    /**
-     * Build factory method
-     *
-     * This method should be implemented to return a Route instance
-     *
-     * @param callable      $callback       Callable callback method to execute on route match
-     * @param string        $path           Route URI path to match
-     * @param string|array  $method  HTTP   Method to match
-     * @param boolean       $count_match    Whether or not to count the route as a match when counting total matches
-     * @param string        $name           The name of the route
+     * @param callable $callback    Callable callback method to execute on route match
+     * @param string $path          Route URI path to match
+     * @param string|array $method  HTTP Method to match
+     * @param boolean $count_match  Whether or not to count the route as a match when counting total matches
+     * @param string $name          The name of the route
      * @return Route
      */
-    public function build($callback, $path = null, $method = null, $count_match = true, string $name = "")
+    public function build($callback, $path = null, $method = null, $count_match = true, $name = null)
     {
         return new Route(
             $callback,
-            $path,
+            $this->preprocessPathString($path),
             $method,
-            $count_match,
-            $name
+            $this->shouldPathStringCauseRouteMatch($path) // Ignore the $count_match boolean that they passed
         );
     }
 }

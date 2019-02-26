@@ -9,15 +9,14 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
-
-use RuntimeException;
+namespace app\framework\Component\Routing\Exceptions;
 
 /**
- * ResponseAlreadySentException
+ * HttpExceptionInterface
  *
- * Exception used for when a response is attempted to be sent after its already been sent
+ * An interface for type-hinting generic HTTP errors
+ * @package app\framework\Component\Routing\Exceptions
  */
-class ResponseAlreadySentException extends RuntimeException implements KleinExceptionInterface
+interface HttpExceptionInterface extends RoutingExceptionInterface
 {
 }

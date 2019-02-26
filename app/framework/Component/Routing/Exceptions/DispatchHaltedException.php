@@ -9,7 +9,7 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
+namespace app\framework\Component\Routing\Exceptions;
 
 use RuntimeException;
 
@@ -17,8 +17,9 @@ use RuntimeException;
  * DispatchHaltedException
  *
  * Exception used to halt a route callback from executing in a dispatch loop
+ * @package app\framework\Component\Routing\Exceptions
  */
-class DispatchHaltedException extends RuntimeException implements KleinExceptionInterface
+class DispatchHaltedException extends RuntimeException implements RoutingExceptionInterface
 {
 
     /**

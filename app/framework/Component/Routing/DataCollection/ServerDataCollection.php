@@ -9,7 +9,7 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\DataCollection;
+namespace app\framework\Component\Routing\DataCollection;
 
 /**
  * ServerDataCollection
@@ -20,6 +20,7 @@ namespace app\framework\Component\Routing\Klein\DataCollection;
  *
  * Inspired by @fabpot's Symfony 2's HttpFoundation
  * @link https://github.com/symfony/HttpFoundation/blob/master/ServerBag.php
+ * @package app\framework\Component\Routing\DataCollection
  */
 class ServerDataCollection extends DataCollection
 {

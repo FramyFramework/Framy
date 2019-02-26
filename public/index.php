@@ -31,3 +31,12 @@ include(realpath(__DIR__."/../bootstrap/bootstrap.php"));
 */
 
 include(realpath(__DIR__."/../routes/web.php"));
+
+/*---------------------------------------
+| Dispatch Routes
+|----------------------------------------
+|
+| This is done here to keep the web.php file nice and clean
+|
+*/
+\app\framework\Component\Routing\Router::getInstance()->dispatch();

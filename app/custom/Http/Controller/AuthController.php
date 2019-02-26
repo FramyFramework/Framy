@@ -7,5 +7,7 @@ class AuthController
    public function index()
    {
        echo "It works!";
+
+       return $this;
    }
 }

@@ -9,16 +9,16 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein;
+namespace app\framework\Component\Routing;
 
-use app\framework\Component\Routing\Klein\DataCollection\HeaderDataCollection;
-use app\framework\Component\Routing\Klein\DataCollection\ResponseCookieDataCollection;
-use app\framework\Component\Routing\Klein\Exceptions\LockedResponseException;
-use app\framework\Component\Routing\Klein\Exceptions\ResponseAlreadySentException;
-use app\framework\Component\Routing\Klein\ResponseCookie;
+use app\framework\Component\Routing\DataCollection\HeaderDataCollection;
+use app\framework\Component\Routing\DataCollection\ResponseCookieDataCollection;
+use app\framework\Component\Routing\Exceptions\LockedResponseException;
+use app\framework\Component\Routing\Exceptions\ResponseAlreadySentException;
 
 /**
  * AbstractResponse
+ * @package app\framework\Component\Routing
  */
 abstract class AbstractResponse
 {
@@ -167,7 +167,7 @@ abstract class AbstractResponse
     /**
      * Returns the status object
      *
-     * @return \app\framework\Component\Routing\Klein\HttpStatus
+     * @return \app\framework\Component\Routing\HttpStatus
      */
     public function status()
     {

@@ -9,12 +9,13 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein;
+namespace app\framework\Component\Routing;
 
 /**
  * ResponseCookie
  *
  * Class to represent an HTTP response cookie
+ * @package app\framework\Component\Routing
  */
 class ResponseCookie
 {

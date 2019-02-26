@@ -9,7 +9,7 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\DataCollection;
+namespace app\framework\Component\Routing\DataCollection;
 
 use ArrayAccess;
 use ArrayIterator;
@@ -24,6 +24,7 @@ use IteratorAggregate;
  *
  * Inspired by @fabpot's Symfony 2's HttpFoundation
  * @link https://github.com/symfony/HttpFoundation/blob/master/ParameterBag.php
+ * @package app\framework\Component\Routing\DataCollection
  */
 class DataCollection implements IteratorAggregate, ArrayAccess, Countable
 {

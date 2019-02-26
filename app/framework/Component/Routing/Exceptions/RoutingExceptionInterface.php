@@ -9,10 +9,10 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
+namespace app\framework\Component\Routing\Exceptions;
 
 /**
- * KleinExceptionInterface
+ * RoutingExceptionInterface
  *
  * Exception interface that Klein's exceptions should implement
  *
@@ -20,7 +20,8 @@ namespace app\framework\Component\Routing\Klein\Exceptions;
  * that can be type-hinted/instance-checked against, therefore making it
  * easier to handle Klein exceptions while still allowing the different
  * exception classes to properly extend the corresponding SPL Exception type
+ * @package app\framework\Component\Routing\Exceptions
  */
-interface KleinExceptionInterface
+interface RoutingExceptionInterface
 {
 }

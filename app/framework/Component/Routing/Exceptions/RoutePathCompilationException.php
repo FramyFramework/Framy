@@ -9,10 +9,10 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
+namespace app\framework\Component\Routing\Exceptions;
 
 use Exception;
-use app\framework\Component\Routing\Klein\Route;
+use app\framework\Component\Routing\Route;
 use RuntimeException;
 use Throwable;
 
@@ -20,8 +20,9 @@ use Throwable;
  * RoutePathCompilationException
  *
  * Exception used for when a route's path fails to compile
+ * @package app\framework\Component\Routing\Exceptions
  */
-class RoutePathCompilationException extends RuntimeException implements KleinExceptionInterface
+class RoutePathCompilationException extends RuntimeException implements RoutingExceptionInterface
 {
 
     /**

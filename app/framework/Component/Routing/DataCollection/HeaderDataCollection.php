@@ -9,12 +9,13 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\DataCollection;
+namespace app\framework\Component\Routing\DataCollection;
 
 /**
  * HeaderDataCollection
  *
  * A DataCollection for HTTP headers
+ * @package app\framework\Component\Routing\DataCollection
  */
 class HeaderDataCollection extends DataCollection
 {

@@ -9,14 +9,15 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\DataCollection;
+namespace app\framework\Component\Routing\DataCollection;
 
-use app\framework\Component\Routing\Klein\ResponseCookie;
+use app\framework\Component\Routing\ResponseCookie;
 
 /**
  * ResponseCookieDataCollection
  *
  * A DataCollection for HTTP response cookies
+ * @package app\framework\Component\Routing\DataCollection
  */
 class ResponseCookieDataCollection extends DataCollection
 {

@@ -1,146 +1,168 @@
 <?php
 /**
- * Framy Framework
+ * Klein (klein.php) - A fast & flexible router for PHP
  *
- * @copyright Copyright Framy
- * @Author Marco Bier <mrfibunacci@gmail.com>
+ * @author      Chris O'Hara <cohara87@gmail.com>
+ * @author      Trevor Suarez (Rican7) (contributor and v2 refactorer)
+ * @copyright   (c) Chris O'Hara
+ * @link        https://github.com/klein/klein.php
+ * @license     MIT
  */
 
 namespace app\framework\Component\Routing;
 
+use app\framework\Component\Routing\Exceptions\ResponseAlreadySentException;
+use RuntimeException;
 
-use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-
-class Response
+/**
+ * Response
+ * @package app\framework\Component\Routing
+ */
+class Response extends AbstractResponse
 {
-    /**
-     * The default response HTTP status code
-     * @var int
-     */
-    const DEFAULT_STATUS_CODE = 200;
 
     /**
-     * The HTTP version of the response
-     *
-     * @type string
+     * Methods
      */
-    protected $protocol_version = '1.1';
 
     /**
-     * The response body
+     * Enable response chunking
      *
-     * @type string
+     * @link https://github.com/klein/klein.php/wiki/Response-Chunking
+     * @link http://bit.ly/hg3gHb
+     * @param string $str   An optional string to send as a response "chunk"
+     * @return Response
      */
-    protected $body;
-
-    /**
-     * HTTP response status
-     *
-     * @type HttpStatus
-     */
-    protected $status;
-
-    /**
-     * HTTP response headers
-     *
-     * @type ArrayObject
-     */
-    protected $headers;
-
-    /**
-     * HTTP response cookies
-     *
-     * @type ArrayObject
-     */
-    protected $cookies;
-
-    /**
-     * Whether or not the response is "locked" from
-     * any further modification
-     *
-     * @type boolean
-     */
-    protected $locked = false;
-
-    /**
-     * Whether or not the response has been sent
-     *
-     * @type boolean
-     */
-    protected $sent = false;
-
-    /**
-     * Whether the response has been chunked or not
-     *
-     * @type boolean
-     */
-    public $chunked = false;
-
-    /**
-     * Append a string to the response's content body
-     *
-     * @param string $content   The string to append
-     * @return $this
-     */
-    public function append($content)
+    public function chunk($str = null)
     {
-        // Require that the response be unlocked before changing it
-        $this->requireUnlocked();
+        parent::chunk();
 
-        $this->body .= $content;
-
-        return $this;
-    }
-
-    /**
-     * Check if the response is locked
-     *
-     * @return boolean
-     */
-    public function isLocked()
-    {
-        return $this->locked;
-    }
-
-    /**
-     * Require that the response is unlocked
-     *
-     * Throws an exception if the response is locked,
-     * preventing any methods from mutating the response
-     * when its locked
-     *
-     * @throws LockedResponseException  If the response is locked
-     * @return $this
-     */
-    public function requireUnlocked()
-    {
-        if ($this->isLocked()) {
-            throw new LockedResponseException('Response is locked');
+        if (null !== $str) {
+            printf("%x\r\n", strlen($str));
+            echo "$str\r\n";
+            flush();
         }
 
         return $this;
     }
 
     /**
-     * Lock the response from further modification
+     * Dump a variable
      *
-     * @return $this
+     * @param mixed $obj    The variable to dump
+     * @return Response
      */
-    public function lock()
+    public function dump($obj)
     {
-        $this->locked = true;
+        if (is_array($obj) || is_object($obj)) {
+            $obj = print_r($obj, true);
+        }
+
+        $this->append('<pre>' .  htmlentities($obj, ENT_QUOTES) . "</pre><br />\n");
 
         return $this;
     }
 
     /**
-     * Unlock the response from further modification
+     * Sends a file
      *
-     * @return $this
+     * It should be noted that this method disables caching
+     * of the response by default, as dynamically created
+     * files responses are usually downloads of some type
+     * and rarely make sense to be HTTP cached
+     *
+     * Also, this method removes any data/content that is
+     * currently in the response body and replaces it with
+     * the file's data
+     *
+     * @param string $path      The path of the file to send
+     * @param string $filename  The file's name
+     * @param string $mimetype  The MIME type of the file
+     * @throws RuntimeException Thrown if the file could not be read
+     * @return Response
      */
-    public function unlock()
+    public function file($path, $filename = null, $mimetype = null)
     {
-        $this->locked = false;
+        if ($this->sent) {
+            throw new ResponseAlreadySentException('Response has already been sent');
+        }
+
+        $this->body('');
+        $this->noCache();
+
+        if (null === $filename) {
+            $filename = basename($path);
+        }
+        if (null === $mimetype) {
+            $mimetype = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
+        }
+
+        $this->header('Content-type', $mimetype);
+        $this->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
+
+        // If the response is to be chunked, then the content length must not be sent
+        // see: https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.4
+        if (false === $this->chunked) {
+            $this->header('Content-length', filesize($path));
+        }
+
+        // Send our response data
+        $this->sendHeaders();
+
+        $bytes_read = readfile($path);
+
+        if (false === $bytes_read) {
+            throw new RuntimeException('The file could not be read');
+        }
+
+        $this->sendBody();
+
+        // Lock the response from further modification
+        $this->lock();
+
+        // Mark as sent
+        $this->sent = true;
+
+        // If there running FPM, tell the process manager to finish the server request/response handling
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sends an object as json or jsonp by providing the padding prefix
+     *
+     * It should be noted that this method disables caching
+     * of the response by default, as json responses are usually
+     * dynamic and rarely make sense to be HTTP cached
+     *
+     * Also, this method removes any data/content that is
+     * currently in the response body and replaces it with
+     * the passed json encoded object
+     *
+     * @param mixed $object         The data to encode as JSON
+     * @param string $jsonp_prefix  The name of the JSON-P function prefix
+     * @return Response
+     */
+    public function json($object, $jsonp_prefix = null)
+    {
+        $this->body('');
+        $this->noCache();
+
+        $json = json_encode($object);
+
+        if (null !== $jsonp_prefix) {
+            // Should ideally be application/json-p once adopted
+            $this->header('Content-Type', 'text/javascript');
+            $this->body("$jsonp_prefix($json);");
+        } else {
+            $this->header('Content-Type', 'application/json');
+            $this->body($json);
+        }
+
+        $this->send();
 
         return $this;
     }

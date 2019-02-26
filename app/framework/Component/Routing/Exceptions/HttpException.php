@@ -9,7 +9,7 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
+namespace app\framework\Component\Routing\Exceptions;
 
 use RuntimeException;
 
@@ -17,6 +17,7 @@ use RuntimeException;
  * HttpException
  *
  * An HTTP error exception
+ * @package app\framework\Component\Routing\Exceptions
  */
 class HttpException extends RuntimeException implements HttpExceptionInterface
 {

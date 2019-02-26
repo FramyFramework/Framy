@@ -9,7 +9,7 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
+namespace app\framework\Component\Routing\Exceptions;
 
 use RuntimeException;
 
@@ -17,7 +17,8 @@ use RuntimeException;
  * UnhandledException
  *
  * Exception used for when a exception isn't correctly handled by the Klein error callbacks
+ * @package app\framework\Component\Routing\Exceptions
  */
-class UnhandledException extends RuntimeException implements KleinExceptionInterface
+class UnhandledException extends RuntimeException implements RoutingExceptionInterface
 {
 }

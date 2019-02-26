@@ -12,5 +12,3 @@
 use app\framework\Component\Routing\Router;
 
 Router::get("/", "AuthController@index");
-
-Router::getInstance()->dispatch();

@@ -9,12 +9,13 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein;
+namespace app\framework\Component\Routing;
 
 /**
  * AbstractRouteFactory
  *
  * Abstract class for a factory for building new Route instances
+ * @package app\framework\Component\Routing
  */
 abstract class AbstractRouteFactory
 {

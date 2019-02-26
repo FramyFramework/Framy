@@ -9,12 +9,13 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein;
+namespace app\framework\Component\Routing;
 
 /**
  * HttpStatus
  *
  * HTTP status code and message translator
+ * @package app\framework\Component\Routing
  */
 class HttpStatus
 {

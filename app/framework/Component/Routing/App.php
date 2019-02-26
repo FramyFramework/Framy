@@ -9,14 +9,15 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein;
+namespace app\framework\Component\Routing;
 
 use BadMethodCallException;
-use app\framework\Component\Routing\Klein\Exceptions\DuplicateServiceException;
-use app\framework\Component\Routing\Klein\Exceptions\UnknownServiceException;
+use app\framework\Component\Routing\Exceptions\DuplicateServiceException;
+use app\framework\Component\Routing\Exceptions\UnknownServiceException;
 
 /**
  * App
+ * @package app\framework\Component\Routing
  */
 class App
 {

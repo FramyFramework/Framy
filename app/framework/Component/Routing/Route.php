@@ -1,33 +1,57 @@
 <?php
 /**
- * Framy Framework
+ * Klein (klein.php) - A fast & flexible router for PHP
  *
- * @copyright Copyright Framy
- * @Author Marco Bier <mrfibunacci@gmail.com>
+ * @author      Chris O'Hara <cohara87@gmail.com>
+ * @author      Trevor Suarez (Rican7) (contributor and v2 refactorer)
+ * @copyright   (c) Chris O'Hara
+ * @link        https://github.com/klein/klein.php
+ * @license     MIT
  */
 
 namespace app\framework\Component\Routing;
 
+use InvalidArgumentException;
+
 /**
- * Class Route
+ * Route
+ *
+ * Class to represent a route definition
  * @package app\framework\Component\Routing
  */
 class Route
 {
+
     /**
-     * The URI pattern the route responds to.
+     * Properties
+     */
+
+    /**
+     * The callback method to execute when the route is matched
+     *
+     * Any valid "callable" type is allowed
+     *
+     * @link http://php.net/manual/en/language.types.callable.php
+     * @type callable
+     */
+    protected $callback;
+
+    /**
+     * The URL path to match
+     *
+     * Allows for regular expression matching and/or basic string matching
      *
      * Examples:
      * - '/posts'
      * - '/posts/[:post_slug]'
      * - '/posts/[i:id]'
      *
-     * @var string
+     * @type string
      */
-    protected $uri;
+    protected $path;
 
     /**
-     * The HTTP methods the route responds to.
+     * The HTTP method to match
      *
      * May either be represented as a string or an array containing multiple methods to match
      *
@@ -35,21 +59,14 @@ class Route
      * - 'POST'
      * - array('GET', 'POST')
      *
-     * @var array
+     * @type string|array
      */
-    protected $methods;
-
-    /**
-     * The route action array.
-     *
-     * @var callable|string
-     */
-    protected $action;
+    protected $method;
 
     /**
      * Whether or not to count this route as a match when counting total matches
      *
-     * @var boolean
+     * @type boolean
      */
     protected $count_match;
 
@@ -58,36 +75,63 @@ class Route
      *
      * Mostly used for reverse routing
      *
-     * @var string
+     * @type string
      */
     protected $name;
 
+
     /**
-     * Create a new Route instance.
-     *
-     * @param callable      $callback       Callable callback method to execute on route match
-     * @param string        $path           Route URI path to match
-     * @param string|array  $method  HTTP   Method to match
-     * @param boolean       $count_match    Whether or not to count the route as a match when counting total matches
-     * @param string        $name           The name of the route
-     * @return void
+     * Methods
      */
-    public function __construct($callback, $path = null, $method = null, $count_match = true, string $name = "")
+
+    /**
+     * Constructor
+     *
+     * @param callable $callback
+     * @param string $path
+     * @param string|array $method
+     * @param boolean $count_match
+     */
+    public function __construct($callback, $path = null, $method = null, $count_match = true, $name = null)
     {
         // Initialize some properties (use our setters so we can validate param types)
-        $this->setAction($callback);
-        $this->setUri($path);
-        $this->setMethods($method);
+        $this->setCallback($callback);
+        $this->setPath($path);
+        $this->setMethod($method);
         $this->setCountMatch($count_match);
         $this->setName($name);
     }
 
     /**
-     * @param string $uri
+     * Get the callback
+     *
+     * @return callable
      */
-    public function setUri(string $uri): void
+    public function getCallback()
     {
-        $this->uri = $uri;
+        return $this->callback;
+    }
+
+    /**
+     * Set the callback
+     *
+     * @param callable $callback
+     * @throws InvalidArgumentException If the callback isn't a callable
+     * @return Route
+     */
+    public function setCallback($callback)
+    {
+        if (!is_string($callback)) {
+            if (!is_callable($callback)) {
+                throw new InvalidArgumentException(
+                    'Expected a callable or string. Got an uncallable or not string'. gettype($callback)
+                );
+            }
+        }
+
+        $this->callback = $callback;
+
+        return $this;
     }
 
     /**
@@ -95,46 +139,51 @@ class Route
      *
      * @return string
      */
-    public function getUri()
+    public function getPath()
     {
-        return $this->uri;
+        return $this->path;
     }
 
     /**
-     * @param $methods
+     * Set the path
+     *
+     * @param string $path
+     * @return Route
      */
-    public function setMethods($methods): void
+    public function setPath($path)
     {
-        $this->methods = (array)$methods;
-    }
+        $this->path = (string) $path;
 
-    public function getMethods()
-    {
-        return $this->methods;
-    }
-
-    /**
-     * @param callable|string $action
-     */
-    public function setAction($action): void
-    {
-        $this->action = $this->parseAction($action);
+        return $this;
     }
 
     /**
-     * @return callable|string
+     * Get the method
+     *
+     * @return string|array
      */
-    public function getAction()
+    public function getMethod()
     {
-        return $this->action;
+        return $this->method;
     }
 
     /**
-     * @param bool $count_match
+     * Set the method
+     *
+     * @param string|array|null $method
+     * @throws InvalidArgumentException If a non-string or non-array type is passed
+     * @return Route
      */
-    public function setCountMatch(bool $count_match): void
+    public function setMethod($method)
     {
-        $this->count_match = $count_match;
+        // Allow null, otherwise expect an array or a string
+        if (null !== $method && !is_array($method) && !is_string($method)) {
+            throw new InvalidArgumentException('Expected an array or string. Got a '. gettype($method));
+        }
+
+        $this->method = $method;
+
+        return $this;
     }
 
     /**
@@ -148,27 +197,61 @@ class Route
     }
 
     /**
-     * @param string $name
+     * Set the count_match
+     *
+     * @param boolean $count_match
+     * @return Route
      */
-    public function setName(string $name): void
+    public function setCountMatch($count_match)
     {
-        $this->name = $name;
+        $this->count_match = (boolean) $count_match;
+
+        return $this;
     }
 
     /**
-     * Check if passed controller method is accessible. Callable gets ignored
+     * Get the name
      *
-     * @param callable|string $action
-     * @return callable|string
+     * @return string
      */
-    private function parseAction($action)
+    public function getName()
     {
-        if (! is_callable($action)) {
-            if ($GLOBALS['App']->validateClass(explode("@", $action)[0])) {
-                return $action;
-            }
+        return $this->name;
+    }
+
+    /**
+     * Set the name
+     *
+     * @param string $name
+     * @return Route
+     */
+    public function setName($name)
+    {
+        if (null !== $name) {
+            $this->name = (string) $name;
+        } else {
+            $this->name = $name;
         }
 
-        return $action;
+        return $this;
+    }
+
+
+    /**
+     * Magic "__invoke" method
+     *
+     * Allows the ability to arbitrarily call this instance like a function
+     *
+     * @param mixed $args Generic arguments, magically accepted
+     * @return mixed
+     */
+    public function __invoke($args = null)
+    {
+        $args = func_get_args();
+
+        return call_user_func_array(
+            $this->callback,
+            $args
+        );
     }
 }

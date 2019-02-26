@@ -9,15 +9,16 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
+namespace app\framework\Component\Routing\Exceptions;
 
 use RuntimeException;
 
 /**
- * RegularExpressionCompilationException
+ * LockedResponseException
  *
- * Exception used for when a regular expression fails to compile
+ * Exception used for when a response is attempted to be modified while its locked
+ * @package app\framework\Component\Routing\Exceptions
  */
-class RegularExpressionCompilationException extends RuntimeException implements KleinExceptionInterface
+class LockedResponseException extends RuntimeException implements RoutingExceptionInterface
 {
 }

@@ -9,14 +9,15 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\DataCollection;
+namespace app\framework\Component\Routing\DataCollection;
 
-use app\framework\Component\Routing\Klein\Route;
+use app\framework\Component\Routing\Route;
 
 /**
  * RouteCollection
  *
  * A DataCollection for Routes
+ * @package app\framework\Component\Routing\DataCollection
  */
 class RouteCollection extends DataCollection
 {

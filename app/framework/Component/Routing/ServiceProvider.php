@@ -9,15 +9,16 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein;
+namespace app\framework\Component\Routing;
 
-use app\framework\Component\Routing\Klein\DataCollection\DataCollection;
+use app\framework\Component\Routing\DataCollection\DataCollection;
 
 /**
  * ServiceProvider
  *
  * Service provider class for handling logic extending between
  * a request's data and a response's behavior
+ * @package app\framework\Component\Routing
  */
 class ServiceProvider
 {
@@ -107,7 +108,7 @@ class ServiceProvider
     /**
      * Returns the shared data collection object
      *
-     * @return \app\framework\Component\Routing\Klein\DataCollection\DataCollection
+     * @return \app\framework\Component\Routing\DataCollection\DataCollection
      */
     public function sharedData()
     {
@@ -348,43 +349,6 @@ class ServiceProvider
         $this->render($view, $data);
         $this->layout = $layout;
     }
-
-    /**
-     * Add a custom validator for our validation method
-     *
-     * @param string $method        The name of the validator method
-     * @param callable $callback    The callback to perform on validation
-     * @return void
-     */
-    public function addValidator($method, $callback)
-    {
-        Validator::addValidator($method, $callback);
-    }
-
-    /**
-     * Start a validator chain for the specified string
-     *
-     * @param string $string    The string to validate
-     * @param string $err       The custom exception message to throw
-     * @return Validator
-     */
-    public function validate($string, $err = null)
-    {
-        return new Validator($string, $err);
-    }
-
-    /**
-     * Start a validator chain for the specified parameter
-     *
-     * @param string $param     The name of the parameter to validate
-     * @param string $err       The custom exception message to throw
-     * @return Validator
-     */
-    public function validateParam($param, $err = null)
-    {
-        return $this->validate($this->request->param($param), $err);
-    }
-
 
     /**
      * Magic "__isset" method

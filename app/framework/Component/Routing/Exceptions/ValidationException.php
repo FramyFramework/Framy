@@ -9,15 +9,16 @@
  * @license     MIT
  */
 
-namespace app\framework\Component\Routing\Klein\Exceptions;
+namespace app\framework\Component\Routing\Exceptions;
 
-use OutOfBoundsException;
+use UnexpectedValueException;
 
 /**
- * UnknownServiceException
+ * ValidationException
  *
- * Exception used for when a service was called that doesn't exist
+ * Exception used for Validation errors
+ * @package app\framework\Component\Routing\Exceptions
  */
-class UnknownServiceException extends OutOfBoundsException implements KleinExceptionInterface
+class ValidationException extends UnexpectedValueException implements RoutingExceptionInterface
 {
 }
