@@ -260,7 +260,22 @@ class Builder
      */
     public function first()
     {
+        $this->limit = 1;
+
         return $this->get()[0];
+    }
+
+    /**
+     * To only get a single value
+     *
+     * @param $val
+     * @return mixed
+     */
+    public function value(string $val)
+    {
+        $this->columns = [$val];
+
+        return $this->first()->$val;
     }
 
     /**

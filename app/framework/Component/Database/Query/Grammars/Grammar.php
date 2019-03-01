@@ -199,6 +199,20 @@ class Grammar
         return $sql;
     }
 
+    /**
+     * Compile the "limit" portions of the query.
+     *
+     * @param Builder $query
+     * @param $limit
+     * @return string
+     */
+    protected function compileLimit(Builder $query, $limit)
+    {
+        $sql = "LIMIT ".$limit;
+
+        return $sql;
+    }
+
     protected function concatenateWhereClauses(Builder $query, $wheres)
     {
         $sql = "WHERE " . $wheres[0] . $wheres[1] . "'" . $wheres[2] . "'";
