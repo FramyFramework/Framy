@@ -6,11 +6,11 @@
  * @Author Marco Bier <mrfibunacci@gmail.com>
  */
 
-namespace app\framework\Component\Auth\Controller;
+namespace app\framework\Component\Auth;
 
 /**
  * Class RegistrationController
- * @package app\framework\Component\Auth\Controller
+ * @package app\custom\Http\Controller
  */
 class RegistrationController
 {

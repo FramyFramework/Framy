@@ -85,6 +85,11 @@ abstract class User implements UserInterface, GroupableInterface
     protected $passwordRequestedAt;
 
     /**
+     * @var GroupInterface[]|ArrayObject
+     */
+    protected $groups;
+
+    /**
      * @var array
      */
     protected $roles;
@@ -354,7 +359,16 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function serialize()
     {
-        // TODO: Implement serialize() method.
+        return serialize([
+            $this->password,
+            $this->salt,
+            $this->usernameCanonical,
+            $this->username,
+            $this->enabled,
+            $this->id,
+            $this->email,
+            $this->emailCanonical,
+        ]);
     }
 
     /**
@@ -362,7 +376,28 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function unserialize($serialized)
     {
-        // TODO: Implement unserialize() method.
+        $data = unserialize($serialized);
+
+        if (13 === count($data)) {
+            // Unserializing a User object from 1.3.x
+            unset($data[4], $data[5], $data[6], $data[9], $data[10]);
+            $data = array_values($data);
+        } elseif (11 === count($data)) {
+            // Unserializing a User from a dev version somewhere between 2.0-alpha3 and 2.0-beta1
+            unset($data[4], $data[7], $data[8]);
+            $data = array_values($data);
+        }
+
+        list(
+            $this->password,
+            $this->salt,
+            $this->usernameCanonical,
+            $this->username,
+            $this->enabled,
+            $this->id,
+            $this->email,
+            $this->emailCanonical
+        ) = $data;
     }
 
     /**
@@ -431,7 +466,13 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function setSuperAdmin(bool $boolean)
     {
-        // TODO: Implement setSuperAdmin() method.
+        if (true === $boolean) {
+            $this->addRole(static::ROLE_SUPER_ADMIN);
+        } else {
+            $this->removeRole(static::ROLE_SUPER_ADMIN);
+        }
+
+        return $this;
     }
 
     /**
@@ -439,7 +480,7 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function hasRole($role)
     {
-        // TODO: Implement hasRole() method.
+        return in_array(strtoupper($role), $this->getRoles(), true);
     }
 
     /**
@@ -447,7 +488,17 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function addRole($role)
     {
-        // TODO: Implement addRole() method.
+        $role = strtoupper($role);
+
+        if ($role === static::ROLE_DEFAULT) {
+            return $this;
+        }
+
+        if (!in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+
+        return $this;
     }
 
     /**
@@ -455,7 +506,12 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function removeRole($role)
     {
-        // TODO: Implement removeRole() method.
+        if (false !== $key = array_search(strtoupper($role), $this->roles, true)) {
+            unset($this->roles[$key]);
+            $this->roles = array_values($this->roles);
+        }
+
+        return $this;
     }
 
     /**
@@ -463,7 +519,7 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function isAccountNonExpired()
     {
-        // TODO: Implement isAccountNonExpired() method.
+        return true;
     }
 
     /**
@@ -471,7 +527,7 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function isAccountNonLocked()
     {
-        // TODO: Implement isAccountNonLocked() method.
+        return true;
     }
 
     /**
@@ -479,8 +535,6 @@ abstract class User implements UserInterface, GroupableInterface
      */
     public function isCredentialsNonExpired()
     {
-        // TODO: Implement isCredentialsNonExpired() method.
+        return true;
     }
-
-
 }

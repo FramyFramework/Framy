@@ -17,6 +17,39 @@ $klein->get("/", function(){
     view("welcome", ['version' => version()]);
 });
 
+$klein->get("/login", function() {
+    app("Auth\AuthController@getLogin");
+});
+
+$klein->post("/login", function($request) {
+    app("Auth\AuthController@postLogin", [$request]);
+});
+
+$klein->get("/login_check", function($request) {
+    app("Auth\AuthController@check", [$request]);
+});
+
+$klein->get("/logout", function($request) {
+});
+
+$klein->get("/register", function() {
+    app("Auth\SecurityController@register");
+});
+
+$klein->get("/check-email", function($request) {
+});
+
+$klein->get("/confirm/[:token]", function($request) {
+});
+
+
+$klein->get("/confirmed", function($request) {
+});
+
+$klein->get("/change-password", function() {
+    app("Auth\SecurityController@register");
+});
+
 // add more routes here ...
 
 $klein->dispatch();
