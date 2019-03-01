@@ -245,10 +245,13 @@ class Builder
     /**
      * Execute the query as a "select" statement.
      *
+     * @param array $columns
      * @return array|null
      */
-    public function get()
+    public function get(array $columns = ['*'])
     {
+        $this->columns = $columns;
+
         return $this->connection->select(
             $this->toSql()
         );
@@ -256,13 +259,15 @@ class Builder
 
     /**
      * Return only first result from database
+     *
+     * @param array $columns
      * @return Model
      */
-    public function first()
+    public function first(array $columns = ['*'])
     {
         $this->limit = 1;
 
-        return $this->get()[0];
+        return $this->get($columns)[0];
     }
 
     /**
@@ -273,9 +278,7 @@ class Builder
      */
     public function value(string $val)
     {
-        $this->columns = [$val];
-
-        return $this->first()->$val;
+        return $this->first([$val])->$val;
     }
 
     /**
