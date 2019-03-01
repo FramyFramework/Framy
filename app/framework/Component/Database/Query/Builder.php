@@ -9,6 +9,7 @@
 namespace app\framework\Component\Database\Query;
 
 use app\framework\Component\Database\Connection\Connection;
+use app\framework\Component\Database\Model\Model;
 use app\framework\Component\Database\Query\Grammars\Grammar;
 
 /**
@@ -251,6 +252,15 @@ class Builder
         return $this->connection->select(
             $this->toSql()
         );
+    }
+
+    /**
+     * Return only first result from database
+     * @return Model
+     */
+    public function first()
+    {
+        return $this->get()[0];
     }
 
     /**
