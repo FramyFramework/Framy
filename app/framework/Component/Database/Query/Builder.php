@@ -280,6 +280,107 @@ class Builder
     {
         return $this->first([$val])->$val;
     }
+    
+    /**
+     * Retrieve the "count" result of the query.
+     *
+     * @param  string  $columns
+     * @return int
+     */
+    public function count($columns = '*')
+    {
+        if (! is_array($columns)) {
+            $columns = [$columns];
+        }
+
+        return (int) $this->aggregate(__FUNCTION__, $columns);
+    }
+
+    /**
+     * Retrieve the minimum value of a given column.
+     *
+     * @param  string  $column
+     * @return float|int
+     */
+    public function min(string $column)
+    {
+        return $this->aggregate(__FUNCTION__, [$column]);
+    }
+
+    /**
+     * Retrieve the maximum value of a given column.
+     *
+     * @param  string  $column
+     * @return float|int
+     */
+    public function max($column)
+    {
+        return $this->aggregate(__FUNCTION__, [$column]);
+    }
+
+    /**
+     * Retrieve the sum of the values of a given column.
+     *
+     * @param  string  $column
+     * @return float|int
+     */
+    public function sum($column)
+    {
+        $result = $this->aggregate(__FUNCTION__, [$column]);
+
+        return $result ?: 0;
+    }
+
+    /**
+     * Retrieve the average of the values of a given column.
+     *
+     * @param  string  $column
+     * @return float|int
+     */
+    public function avg($column)
+    {
+        return $this->aggregate(__FUNCTION__, [$column]);
+    }
+
+    /**
+     * Alias for the "avg" method.
+     *
+     * @param  string  $column
+     * @return float|int
+     */
+    public function average($column)
+    {
+        return $this->avg($column);
+    }
+
+    /**
+     * Execute an aggregate function on the database.
+     *
+     * @param  string  $function
+     * @param  array   $columns
+     * @return float|int
+     */
+    public function aggregate($function, $columns = ['*'])
+    {
+        $this->aggregate = compact('function', 'columns');
+
+        $previousColumns = $this->columns;
+
+        $results = $this->get($columns);
+
+        // Once we have executed the query, we will reset the aggregate property so
+        // that more select queries can be executed against the database without
+        // the aggregate value getting in the way when the grammar builds it.
+        $this->aggregate = null;
+
+        $this->columns = $previousColumns;
+
+        if (isset($results[0])) {
+            $result = array_change_key_case((array) $results[0]);
+
+            return $result['aggregate'];
+        }
+    }
 
     /**
      * Check if the operator is in the list of valid operators.
