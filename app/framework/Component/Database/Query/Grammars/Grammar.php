@@ -239,6 +239,19 @@ class Grammar
     }
 
     /**
+     * Compile an exists statement into SQL.
+     *
+     * @param Builder $query
+     * @return string
+     */
+    public function compileExists(Builder $query)
+    {
+        $select = $this->compileSelect($query);
+
+        return "select exists($select) as {$this->wrap('exists')}";
+    }
+
+    /**
      * Concatenate an array of segments, removing empties.
      *
      * @param  array $segments

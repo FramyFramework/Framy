@@ -280,7 +280,7 @@ class Builder
     {
         return $this->first([$val])->$val;
     }
-    
+
     /**
      * Retrieve the "count" result of the query.
      *
@@ -351,6 +351,36 @@ class Builder
     public function average($column)
     {
         return $this->avg($column);
+    }
+
+    /**
+     * Determine if any rows exist for the current query.
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        $sql = $this->grammar->compileExists($this);
+
+        $results = $this->connection->select($sql);
+
+        if (isset($results[0])) {
+            $results = (array) $results[0];
+
+            return (bool) $results['exists'];
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if any rows does not exist for the current query.
+     *
+     * @return bool
+     */
+    public function doesntExist()
+    {
+        return ! $this->exists();
     }
 
     /**
