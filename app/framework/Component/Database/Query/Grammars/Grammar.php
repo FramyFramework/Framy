@@ -215,7 +215,21 @@ class Grammar
 
     protected function concatenateWhereClauses(Builder $query, $wheres)
     {
-        $sql = "WHERE " . $wheres[0] . $wheres[1] . "'" . $wheres[2] . "'";
+        $sql = "";
+
+        // for multiple where statements
+        if (is_array($wheres[0])) {
+            $length = count($wheres[0]);
+            $i = 1;
+            foreach ($wheres[0] as $where) {
+                $sql .= $i == 1 ? "WHERE " : "";
+                $sql .= $where[0] . $where[1] . "'" . $where[2] . "'";
+                $sql .= $length <= $i ? "" : " OR ";
+                $i++;
+            }
+        } else {
+            $sql = "WHERE " . $wheres[0] . $wheres[1] . "'" . $wheres[2] . "'";
+        }
 
         if(count($query->wheres) > 1) {
             $sql .= $wheres[3];
