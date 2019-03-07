@@ -8,11 +8,13 @@
 
 namespace app\framework\Component\Auth;
 
+use app\framework\Component\Validation\ValidationTrait;
+
 /**
  * Trait AuthenticatesAndRegistersUsers
  * @package app\custom\Http\Controller\Auth
  */
 trait AuthenticatesAndRegistersUsers
 {
-    use AuthenticatesUsers;
+    use AuthenticatesUsers,RegistersUsers,ValidationTrait;
 }

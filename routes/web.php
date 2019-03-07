@@ -33,7 +33,11 @@ $klein->get("/logout", function($request) {
 });
 
 $klein->get("/register", function() {
-    app("Auth\SecurityController@register");
+    app("Auth\AuthController@getRegister");
+});
+
+$klein->post("/register", function($request) {
+    app("Auth\AuthController@postRegister", [$request]);
 });
 
 $klein->get("/check-email", function($request) {
@@ -47,7 +51,7 @@ $klein->get("/confirmed", function($request) {
 });
 
 $klein->get("/change-password", function() {
-    app("Auth\SecurityController@register");
+    app("Auth\AuthController@register");
 });
 
 // add more routes here ...
