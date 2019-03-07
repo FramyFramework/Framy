@@ -46,7 +46,7 @@ class MinLength implements ValidatorInterface
             throw (new ValidationException($message, $limit));
         }
 
-        return printf($message, $limit);
+        return sprintf($message, $limit);
     }
 
 }
