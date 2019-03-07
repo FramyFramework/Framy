@@ -339,4 +339,35 @@ trait ManipulationTrait
 
         return $this;
     }
+
+    /**
+     * Flatten a multi-dimensional array into a single level.
+     *
+     * @param  array $array
+     * @param  int   $depth
+     * @return array
+     */
+    public function flatten(array $array = null, $depth = INF)
+    {
+        $result = [];
+        $val    = $array ?: $this->val();
+
+        foreach ($val as $item) {
+            $item = $item instanceof $this ? $item->val() : $item;
+
+            if (is_array($item)) {
+                if ($depth === 1) {
+                    $result = array_merge($result, $item);
+                    continue;
+                }
+
+                $result = array_merge($result, $this->flatten($item, $depth - 1));
+                continue;
+            }
+
+            $result[] = $item;
+        }
+
+        return $result;
+    }
 }

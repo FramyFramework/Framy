@@ -48,7 +48,6 @@ class Grammar
      */
     public function compileSelect(Builder $query)
     {
-
         // If the query does not have any columns set, we'll set the columns to the
         // * character to just get all of the columns from the database. Then we
         // can build the query and concatenate all the pieces together as one.
@@ -79,6 +78,9 @@ class Grammar
      */
     public function compileInsert(Builder $query, array $values): string
     {
+        // Essentially we will force every insert to be treated as a batch insert which
+        // simply makes creating the SQL easier for us since we can utilize the same
+        // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
         if (! is_array(reset($values))) {
@@ -90,9 +92,13 @@ class Grammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = arr($values)->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
+        $parameters = [];
+
+        foreach ($values as $record) {
+            $parameters[] = '('.$this->parameterize($record).')';
+        }
+
+        $parameters = implode(', ', $parameters);
 
         return "insert into $table ($columns) values $parameters";
     }
@@ -162,82 +168,70 @@ class Grammar
      */
     protected function compileWheres(Builder $query)
     {
-        // Each type of where clauses has its own compiler function which is responsible
-        // for actually creating the where clauses SQL. This helps keep the code nice
-        // and maintainable since each clause has a very small method that it uses.
+        $sql = [];
+
         if (is_null($query->wheres)) {
             return '';
         }
 
-        // if multiple where clauses
-        $sql = "";
+        // Each type of where clauses has its own compiler function which is responsible
+        // for actually creating the where clauses SQL. This helps keep the code nice
+        // and maintainable since each clause has a very small method that it uses.
         foreach ($query->wheres as $where) {
-            $sql .= $this->concatenateWhereClauses($query, $where);
+            $method = "where{$where['type']}";
+
+            $sql[] = $where['boolean'].' '.$this->$method($query, $where);
         }
 
-        return $sql;
+        // If we actually have some where clauses, we will strip off the first boolean
+        // operator, which is added by the query builders for convenience so we can
+        // avoid checking for the first clauses in each of the compilers methods.
+        if (count($sql) > 0) {
+            $sql = implode(' ', $sql);
+
+            return 'where '.$this->removeLeadingBoolean($sql);
+        }
+
+        return '';
     }
 
+    /**
+     * Compile the "order by" portions of the query.
+     *
+     * @param  Builder  $query
+     * @param  array  $orders
+     * @return string
+     */
     protected function compileOrders(Builder $query, $orders)
     {
-        $sql = "ORDER BY ";
-
-        if(is_array($orders[0])) {
-            $i = 1;
-            $count = count($orders[0]);
-            foreach ($orders[0] as $column) {
-                $append = $count > $i ? ", " : "";
-                $sql .= "`".$column."`".$append;
-                $i++;
+        return 'order by '.implode(', ', array_map(function ($order) {
+            if (isset($order['sql'])) {
+                return $order['sql'];
             }
-        } else {
-            $sql .= $orders[0];
-        }
 
-        $sql .= " ".$orders[1];
-
-        return $sql;
+            return $this->wrap($order['column']).' '.$order['direction'];
+        }, $orders));
     }
 
     /**
      * Compile the "limit" portions of the query.
      *
-     * @param Builder $query
-     * @param $limit
+     * @param  Builder  $query
+     * @param  int  $limit
      * @return string
      */
     protected function compileLimit(Builder $query, $limit)
     {
-        $sql = "LIMIT ".$limit;
-
-        return $sql;
+        return 'limit '.(int) $limit;
     }
 
-    protected function concatenateWhereClauses(Builder $query, $wheres)
-    {
-        $sql = "";
-
-        // for multiple where statements
-        if (is_array($wheres[0])) {
-            $length = count($wheres[0]);
-            $i = 1;
-            foreach ($wheres[0] as $where) {
-                $sql .= $i == 1 ? "WHERE " : "";
-                $sql .= $where[0] . $where[1] . "'" . $where[2] . "'";
-                $sql .= $length <= $i ? "" : " OR ";
-                $i++;
-            }
-        } else {
-            $sql = "WHERE " . $wheres[0] . $wheres[1] . "'" . $wheres[2] . "'";
-        }
-
-        if(count($query->wheres) > 1) {
-            $sql .= $wheres[3];
-        }
-
-        return $sql;
-    }
-
+    /**
+     * Compile an aggregated select clause.
+     *
+     * @param  Builder  $query
+     * @param  array  $aggregate
+     * @return string
+     */
     protected function compileAggregate(Builder $query, $aggregate)
     {
         $column = $this->columnize($aggregate['columns']);
@@ -264,6 +258,35 @@ class Grammar
 
         return "select exists($select) as {$this->wrap('exists')}";
     }
+
+    /**
+     * Compile a basic where clause.
+     *
+     * @param  Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBasic(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+    }
+
+    /**
+     * Compile a "between" where clause.
+     *
+     * @param  Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBetween(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        return $this->wrap($where['column']).' '.$between.' ? and ?';
+    }
+
 
     /**
      * Concatenate an array of segments, removing empties.
@@ -458,5 +481,16 @@ class Grammar
     public function isExpression($value)
     {
         return $value instanceof Expression;
+    }
+
+    /**
+     * Remove the leading boolean from a statement.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function removeLeadingBoolean($value)
+    {
+        return preg_replace('/and |or /i', '', $value, 1);
     }
 }
