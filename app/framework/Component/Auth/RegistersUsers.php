@@ -11,6 +11,7 @@ namespace app\framework\Component\Auth;
 
 use app\framework\Component\Route\Klein\Request;
 use app\framework\Component\Route\Klein\Response;
+use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 
 trait RegistersUsers
 {
@@ -27,11 +28,12 @@ trait RegistersUsers
     /**
      * Show the application registration form.
      *
+     * @param $errors
      * @return Response
      */
-    public function showRegistrationForm()
+    public function showRegistrationForm($errors = null)
     {
-        return view('auth/register');
+        return view('auth/register', ['errors' => $errors]);
     }
 
     /**
@@ -53,8 +55,20 @@ trait RegistersUsers
      */
     public function register(Request $request)
     {
+        /** @var ArrayObject $errors */
         $errors = $this->validator($request->params());
 
-        
+        // handle if errors appear
+        $errors->removeIfValue(true);
+        if ($errors->count() > 0) {
+            return $this->showRegistrationForm($errors);
+        }
+
+        // call create function
+        $this->create($request->params());
+
+        // redirect
+        header("Location: /");
+        exit;
     }
 }

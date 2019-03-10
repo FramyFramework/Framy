@@ -46,6 +46,25 @@ trait ManipulationTrait
     }
 
     /**
+     * Go thru all the entries and remove all with given value
+     *
+     * @param $_value
+     * @return $this
+     */
+    public function removeIfValue($_value)
+    {
+        $values = $this->val();
+
+        foreach ($values as $key => $value) {
+            if ($value === $_value) {
+                $this->removeKey($key);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * The method joins the items in a collection.
      *
      * @param string $glue The string you wish to place between the values.

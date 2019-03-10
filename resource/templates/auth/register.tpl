@@ -1,18 +1,28 @@
 <form class="form-horizontal" role="form" method="POST" action="">
 
     <div class="form-group">
-        <label class="col-md-4 control-label">E-Mail Address</label>
+        <label class="col-md-4 control-label" for="email">E-Mail Address</label>
 
         <div class="col-md-6">
-            <input type="email" class="form-control" name="email" value="">
+            <input type="email" id="email" class="form-control" name="email" value="">
+            {if !is_null($errors) && $errors->keyExists("email")}
+                <span class="help-block">
+                    <strong>{$errors->key('email')}</strong>
+                </span>
+            {/if}
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-md-4 control-label">Password</label>
+        <label class="col-md-4 control-label" for="password">Password</label>
 
         <div class="col-md-6">
-            <input type="password" class="form-control" name="password">
+            <input type="password" id="password" class="form-control" name="password">
+            {if !is_null($errors) && $errors->keyExists("password")}
+                <span class="help-block">
+                    <strong>{$errors->key('password')}</strong>
+                </span>
+            {/if}
         </div>
     </div>
 

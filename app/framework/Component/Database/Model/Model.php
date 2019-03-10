@@ -47,7 +47,8 @@ class Model
      */
     protected $keyType = 'int';
 
-    /**
+    /**use app\framework\Component\Database\DB;
+
      * The name of the "created at" column.
      *
      * @var string
