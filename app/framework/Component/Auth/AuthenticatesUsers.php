@@ -10,6 +10,7 @@ namespace app\framework\Component\Auth;
 
 use app\framework\Component\Database\DB;
 use app\framework\Component\Route\Klein\Request;
+use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
 
 /**
@@ -58,9 +59,15 @@ trait AuthenticatesUsers
      */
     public function login(Request $request)
     {
-        $credenctials = $this->getCredentials($request);
+        $credenctials = $request->params();
 
         //validate fields
+        /** @var ArrayObject $errors */
+        $errors = $this->validator($credenctials);
+
+        if ($errors->count() > 0) {
+            $this->showLoginForm();
+        }
 
         //check for to many tries
 

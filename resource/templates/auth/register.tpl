@@ -1,6 +1,19 @@
 <form class="form-horizontal" role="form" method="POST" action="">
 
     <div class="form-group">
+        <label class="col-md-4 control-label" for="email">Username</label>
+
+        <div class="col-md-6">
+            <input type="text" id="name" class="form-control" name="name" value="">
+            {if !is_null($errors) && $errors->keyExists("name")}
+                <span class="help-block">
+                    <strong>{$errors->key('name')}</strong>
+                </span>
+            {/if}
+        </div>
+    </div>
+
+    <div class="form-group">
         <label class="col-md-4 control-label" for="email">E-Mail Address</label>
 
         <div class="col-md-6">
