@@ -1,5 +1,11 @@
 <form class="form-horizontal" role="form" method="POST" action="">
 
+    {if !is_null($errors) && $errors->keyExists("falseCredentials")}
+        <span class="help-block">
+            <strong>{$errors->key('falseCredentials')}</strong>
+        </span>
+    {/if}
+
     <div class="form-group">
         <label class="col-md-4 control-label" for="email">E-Mail Address</label>
 
