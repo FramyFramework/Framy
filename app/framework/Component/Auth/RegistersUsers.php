@@ -8,7 +8,6 @@
 
 namespace app\framework\Component\Auth;
 
-
 use app\framework\Component\Route\Klein\Request;
 use app\framework\Component\Route\Klein\Response;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
@@ -66,6 +65,8 @@ trait RegistersUsers
 
         // call create function
         $this->create($request->params());
+
+        //TODO: user should be logged in automatically
 
         // redirect
         header("Location: ".$this->redirectTo);

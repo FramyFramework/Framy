@@ -8,15 +8,9 @@
 
 namespace app\framework\Component\Auth;
 
-use app\framework\Component\Database\DB;
-use app\framework\Component\Database\Model\Model;
 use app\framework\Component\EventManager\EventManagerTrait;
-use app\framework\Component\Hashing\Hash;
 use app\framework\Component\Route\Klein\Request;
-use app\framework\Component\Route\Klein\Response;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-use app\framework\Component\StdLib\StdObject\StdObjectException;
-use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
 
 /**
  * Trait AuthenticatesUsers
@@ -72,150 +66,47 @@ trait AuthenticatesUsers
     {
         $credentials = $request->paramsPost()->all();
         unset($credentials['remember']);
-        $remember = is_null($request->param("remember")) ? false : $request->param("remember");
 
-        //validate fields
+        $remember = $request->param("remember") ?: false;
+
         /** @var ArrayObject $errors */
         $errors = $this->validator($credentials);
 
         $errors->removeIfValue(true);
 
-        // TODO remove this as soon as the validate method looses backwards capability needs
+        //TODO: remove this as soon as the validate method looses backwards capability needs
         $errors->removeKey("name");
 
         if ($errors->count() > 0) {
             return $this->showLoginForm($errors);
         }
 
-        //check for to many tries
-        if ($this->attempt($credentials, $remember)) {
+        if ($this->getGuard()->attempt($credentials, $remember)) {
             // handle user was authenticated
             header("Location: ".$this->redirectTo);
             exit;
         }
+
         //TODO: increase failed attempt count
 
         $errors->append("falseCredentials", "The entered credentials are false");
         return $this->showLoginForm($errors);
     }
 
-    /**
-     * Attempt to authenticate a user using the given credentials.
-     *
-     * @param array $credentials
-     * @param bool $remember
-     * @param bool $login
-     * @return bool
-     */
-    protected function attempt(array $credentials = [], bool $remember = false, $login = true): bool
+    public function logout()
     {
-        $this->fireAttemptingEvent($credentials, $remember, $login);
+        $this->getGuard()->logout();
 
-        $this->lastAttempted = $user = $this->retrieveByCredentials($credentials);
-
-        if ($this->hasValidCredentials($user, $credentials)) {
-            if ($login) {
-                //save user in session
-                $_SESSION[$this->getName()] = $user->id;
-
-                if ($remember) {
-                    //createRememberTokenIfDoesntExist
-                    $this->createRememberTokenIfDoesntExist($user);
-
-                    //save in cookie
-                    $value = $user->id."|".$user->remember_token;
-                    setcookie("remember_session_".sha1(get_class($this)), $value);
-                }
-
-                $this->fireLoginEvent($user, $remember);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    protected function hasValidCredentials($user, $credentials)
-    {
-        return !is_null($user) && Hash::check($credentials['password'], $user->password);
+        //TODO: set where to redirect in AuthController
+        header("Location: /");
+        exit;
     }
 
     /**
-     * Retrieve a user by the given credentials.
-     *
-     * @param  array  $credential
-     * @return Model|null
+     * @return SessionGuard
      */
-    protected function retrieveByCredentials(array $credential)
+    protected function getGuard()
     {
-        // First we will add each credential element to the query as a where clause.
-        // Then we can execute the query and, if we found a user, return it in a
-        // generic "user" object that will be utilized by the Guard instances.
-        $query = "SELECT * FROM users WHERE ";
-
-        $i = 0;
-        foreach ($credential as $key => $value) {
-            try {
-                $key = new StringObject($key);
-            } catch (StdObjectException $e) {
-                handle($e);
-            }
-
-            if (! $key->contains("password")) {
-                $prepend = (0 < $i ? ", " : "");
-
-                $query  .= $prepend. $key ."='". $value."'";
-
-                $i++;
-            }
-        }
-
-        return DB::select($query)[0];
-    }
-
-    protected function createRememberTokenIfDoesntExist(&$user)
-    {
-        if (! isset($user->remember_token)) {
-            $this->createRememberToken($user);
-        }
-    }
-
-    protected function createRememberToken(&$user)
-    {
-        $token = StringObject::random(60);
-        DB::update("UPDATE users SET remember_token=:token WHERE id=:id", [
-            'token' => $token,
-            'id' => $user->id
-        ]);
-
-        $user->rember_token = $token;
-    }
-
-    /**
-     * Get a unique identifier for the auth session value.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'login_session_'.sha1(get_class($this));
-    }
-
-    protected function fireAttemptingEvent(array $credentials = [], bool $remember = false, $login = true)
-    {
-        $this->eventManager()->fire("auth.attempting", [
-            'credentials' => $credentials,
-            'remember' => $remember,
-            'login' => $login
-        ]);
-    }
-
-    protected function fireLoginEvent($user, $remember)
-    {
-        $this->eventManager()->fire("auth.login", [
-            'user' => $user,
-            'remember' => $remember,
-        ]);
+        return SessionGuard::getInstance();
     }
 }

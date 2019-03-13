@@ -30,6 +30,7 @@ $klein->get("/login_check", function($request) {
 });
 
 $klein->get("/logout", function($request) {
+    app("Auth\AuthController@logout", [$request]);
 });
 
 $klein->get("/register", function() {
