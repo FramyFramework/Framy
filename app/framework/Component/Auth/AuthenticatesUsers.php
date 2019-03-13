@@ -10,6 +10,7 @@ namespace app\framework\Component\Auth;
 
 use app\framework\Component\Database\DB;
 use app\framework\Component\Database\Model\Model;
+use app\framework\Component\EventManager\EventManagerTrait;
 use app\framework\Component\Hashing\Hash;
 use app\framework\Component\Route\Klein\Request;
 use app\framework\Component\Route\Klein\Response;
@@ -23,6 +24,8 @@ use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
  */
 trait AuthenticatesUsers
 {
+    use EventManagerTrait;
+
     /**
      * The user we last attempted to retrieve.
      *
@@ -68,6 +71,7 @@ trait AuthenticatesUsers
     public function login(Request $request)
     {
         $credentials = $request->paramsPost()->all();
+        unset($credentials['remember']);
         $remember = is_null($request->param("remember")) ? false : $request->param("remember");
 
         //validate fields
@@ -75,6 +79,7 @@ trait AuthenticatesUsers
         $errors = $this->validator($credentials);
 
         $errors->removeIfValue(true);
+
         // TODO remove this as soon as the validate method looses backwards capability needs
         $errors->removeKey("name");
 
@@ -85,7 +90,8 @@ trait AuthenticatesUsers
         //check for to many tries
         if ($this->attempt($credentials, $remember)) {
             // handle user was authenticated
-            dd("LÖGEDIN");
+            header("Location: ".$this->redirectTo);
+            exit;
         }
         //TODO: increase failed attempt count
 
@@ -103,7 +109,7 @@ trait AuthenticatesUsers
      */
     protected function attempt(array $credentials = [], bool $remember = false, $login = true): bool
     {
-        //todo: fire attempt event
+        $this->fireAttemptingEvent($credentials, $remember, $login);
 
         $this->lastAttempted = $user = $this->retrieveByCredentials($credentials);
 
@@ -114,10 +120,14 @@ trait AuthenticatesUsers
 
                 if ($remember) {
                     //createRememberTokenIfDoesntExist
+                    $this->createRememberTokenIfDoesntExist($user);
+
                     //save in cookie
+                    $value = $user->id."|".$user->remember_token;
+                    setcookie("remember_session_".sha1(get_class($this)), $value);
                 }
 
-                //TODO: Fire login event
+                $this->fireLoginEvent($user, $remember);
             }
 
             return true;
@@ -164,6 +174,24 @@ trait AuthenticatesUsers
         return DB::select($query)[0];
     }
 
+    protected function createRememberTokenIfDoesntExist(&$user)
+    {
+        if (! isset($user->remember_token)) {
+            $this->createRememberToken($user);
+        }
+    }
+
+    protected function createRememberToken(&$user)
+    {
+        $token = StringObject::random(60);
+        DB::update("UPDATE users SET remember_token=:token WHERE id=:id", [
+            'token' => $token,
+            'id' => $user->id
+        ]);
+
+        $user->rember_token = $token;
+    }
+
     /**
      * Get a unique identifier for the auth session value.
      *
@@ -172,5 +200,22 @@ trait AuthenticatesUsers
     public function getName()
     {
         return 'login_session_'.sha1(get_class($this));
+    }
+
+    protected function fireAttemptingEvent(array $credentials = [], bool $remember = false, $login = true)
+    {
+        $this->eventManager()->fire("auth.attempting", [
+            'credentials' => $credentials,
+            'remember' => $remember,
+            'login' => $login
+        ]);
+    }
+
+    protected function fireLoginEvent($user, $remember)
+    {
+        $this->eventManager()->fire("auth.login", [
+            'user' => $user,
+            'remember' => $remember,
+        ]);
     }
 }
