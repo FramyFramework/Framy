@@ -22,16 +22,23 @@ class AuthController
      */
     protected $redirectTo = '/';
 
-   public function validator($data)
-   {
-       $errors = new ArrayObject([]);
+    /**
+     * Where to redirect users after logout.
+     *
+     * @var string
+     */
+    protected $redirectAfterLogout = "/";
 
-       $errors->append('name', $this->validate($data['name'], "required", false));
-       $errors->append('email', $this->validate($data['email'], "email", false));
-       $errors->append('password', $this->validate($data['password'], "min length:8,max length:255", false));
+    public function validator($data)
+    {
+        $errors = new ArrayObject([]);
 
-       return $errors;
-   }
+        $errors->append('name', $this->validate($data['name'], "required", false));
+        $errors->append('email', $this->validate($data['email'], "email", false));
+        $errors->append('password', $this->validate($data['password'], "min length:8,max length:255", false));
+
+        return $errors;
+    }
 
     /**
      * Create a new user instance after a valid registration.

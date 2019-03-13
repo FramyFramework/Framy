@@ -97,8 +97,7 @@ trait AuthenticatesUsers
     {
         $this->getGuard()->logout();
 
-        //TODO: set where to redirect in AuthController
-        header("Location: /");
+        header("Location: ".$this->redirectAfterLogout);
         exit;
     }
 
