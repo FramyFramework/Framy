@@ -14,7 +14,7 @@ use \app\framework\Component\Route\Klein\Klein;
 $klein = new Klein();
 
 $klein->get("/", function(){
-    view("welcome", ['version' => version()]);
+    view("welcome", ['version' => \app\framework\Component\Auth\Auth::user()->username]);
 });
 
 $klein->get("/login", function() {
@@ -39,16 +39,6 @@ $klein->get("/register", function() {
 
 $klein->post("/register", function($request) {
     app("Auth\AuthController@postRegister", [$request]);
-});
-
-$klein->get("/check-email", function($request) {
-});
-
-$klein->get("/confirm/[:token]", function($request) {
-});
-
-
-$klein->get("/confirmed", function($request) {
 });
 
 $klein->get("/change-password", function() {

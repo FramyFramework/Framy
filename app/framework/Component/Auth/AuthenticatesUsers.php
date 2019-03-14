@@ -37,12 +37,13 @@ trait AuthenticatesUsers
 
     /**
      * Show the application login form.
-     * @param $errors
+     * @param       $errors
+     * @param array $oldValues
      * @return mixed
      */
-    public function showLoginForm($errors = null)
+    public function showLoginForm($errors = null, array $oldValues = [])
     {
-        return view("auth/login", ["errors" => $errors]);
+        return view("auth/login", ["errors" => $errors, 'old' => $oldValues]);
     }
 
     /**
@@ -78,7 +79,7 @@ trait AuthenticatesUsers
         $errors->removeKey("name");
 
         if ($errors->count() > 0) {
-            return $this->showLoginForm($errors);
+            return $this->showLoginForm($errors, $credentials);
         }
 
         if ($this->getGuard()->attempt($credentials, $remember)) {
@@ -90,7 +91,7 @@ trait AuthenticatesUsers
         //TODO: increase failed attempt count
 
         $errors->append("falseCredentials", "The entered credentials are false");
-        return $this->showLoginForm($errors);
+        return $this->showLoginForm($errors, $credentials);
     }
 
     public function logout()

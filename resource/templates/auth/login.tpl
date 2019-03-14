@@ -10,7 +10,7 @@
         <label class="col-md-4 control-label" for="email">E-Mail Address</label>
 
         <div class="col-md-6">
-            <input type="email" id="email" class="form-control" name="email" value="">
+            <input type="email" id="email" class="form-control" name="email" value="{$old['email']}">
             {if !is_null($errors) && $errors->keyExists("email")}
                 <span class="help-block">
                     <strong>{$errors->key('email')}</strong>

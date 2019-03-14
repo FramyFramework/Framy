@@ -27,12 +27,13 @@ trait RegistersUsers
     /**
      * Show the application registration form.
      *
-     * @param $errors
+     * @param       $errors
+     * @param array $oldValues
      * @return Response
      */
-    public function showRegistrationForm($errors = null)
+    public function showRegistrationForm($errors = null, array $oldValues = [])
     {
-        return view('auth/register', ['errors' => $errors]);
+        return view('auth/register', ['errors' => $errors, 'old' => $oldValues]);
     }
 
     /**
@@ -54,19 +55,19 @@ trait RegistersUsers
      */
     public function register(Request $request)
     {
+        $params = $request->params();
+
         /** @var ArrayObject $errors */
-        $errors = $this->validator($request->params());
+        $errors = $this->validator($params);
 
         // handle if errors appear
         $errors->removeIfValue(true);
         if ($errors->count() > 0) {
-            return $this->showRegistrationForm($errors);
+            return $this->showRegistrationForm($errors, $params);
         }
 
         // call create function
-        $this->create($request->params());
-
-        //TODO: user should be logged in automatically
+        $this->create($params);
 
         // redirect
         header("Location: ".$this->redirectTo);
