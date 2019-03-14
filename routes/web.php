@@ -14,7 +14,7 @@ use \app\framework\Component\Route\Klein\Klein;
 $klein = new Klein();
 
 $klein->get("/", function(){
-    view("welcome", ['version' => \app\framework\Component\Auth\Auth::user()->username]);
+    view("welcome", ['version' => version()]);
 });
 
 $klein->get("/login", function() {
