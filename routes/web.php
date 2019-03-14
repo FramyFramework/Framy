@@ -11,4 +11,8 @@
 
 use app\framework\Component\Routing\Router;
 
-Router::get("/", "AuthController@index");
+Router::get("/", function() {
+    view("welcome", ['version' => version()]);
+});
+
+// add more routes here
