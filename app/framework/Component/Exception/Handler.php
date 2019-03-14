@@ -15,7 +15,7 @@ class Handler
 {
     use SingletonTrait;
 
-    public function handler(\Exception $e)
+    public function handler($e)
     {
         if(Config::getInstance()->get("debug", "app")) {
             view("exception", [

@@ -87,7 +87,7 @@ if(! function_exists("getStringBetween")) {
 }
 
 if(! function_exists("handle")) {
-    function handle(\Exception $e) {
+    function handle( $e) {
         \app\framework\Component\Exception\Handler::getInstance()->handler($e);
     }
 }
