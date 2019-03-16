@@ -28,4 +28,13 @@ class Auth
     {
         return static::user() !== null;
     }
+
+    /**
+     * Get the currently authenticated user's ID...
+     * @return int
+     */
+    public static function id():int
+    {
+        return static::user()->id;
+    }
 }
