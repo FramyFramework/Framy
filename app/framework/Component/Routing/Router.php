@@ -1265,4 +1265,14 @@ class Router
 
         return Router::getInstance()->respond('PATCH', $path, $callback);
     }
+
+    public static function auth(): void
+    {
+        static::get("/login", "Auth\AuthController@getLogin");
+        static::post("/login", "Auth\AuthController@postLogin");
+        static::get("/login_check", "Auth\AuthController@check");
+        static::get("/logout", "Auth\AuthController@logout");
+        static::get("/register", "Auth\AuthController@getRegister");
+        static::post("/register", "Auth\AuthController@postRegister");
+    }
 }

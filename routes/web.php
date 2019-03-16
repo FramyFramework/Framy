@@ -15,32 +15,6 @@ Router::get("/", function() {
     view("welcome", ['version' => version()]);
 });
 
-$klein->get("/login", function() {
-    app("Auth\AuthController@getLogin");
-});
-
-$klein->post("/login", function($request) {
-    app("Auth\AuthController@postLogin", [$request]);
-});
-
-$klein->get("/login_check", function($request) {
-    app("Auth\AuthController@check", [$request]);
-});
-
-$klein->get("/logout", function($request) {
-    app("Auth\AuthController@logout", [$request]);
-});
-
-$klein->get("/register", function() {
-    app("Auth\AuthController@getRegister");
-});
-
-$klein->post("/register", function($request) {
-    app("Auth\AuthController@postRegister", [$request]);
-});
-
-$klein->get("/change-password", function() {
-    app("Auth\AuthController@register");
-});
+Router::auth();
 
 // add more routes here ...
