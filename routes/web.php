@@ -15,4 +15,6 @@ Router::get("/", function() {
     view("welcome", ['version' => version()]);
 });
 
-// add more routes here
+Router::auth();
+
+// add more routes here ...
