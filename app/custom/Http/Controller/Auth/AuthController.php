@@ -29,7 +29,13 @@ class AuthController
      */
     protected $redirectAfterLogout = "/";
 
-    public function validator($data)
+    /**
+     * Validation of Registration and Login
+     *
+     * @param array $data
+     * @return ArrayObject
+     */
+    public function validator(array $data)
     {
         $errors = new ArrayObject([]);
 
