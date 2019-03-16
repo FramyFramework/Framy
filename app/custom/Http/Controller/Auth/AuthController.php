@@ -27,7 +27,7 @@ class AuthController
      *
      * @var string
      */
-    protected $redirectAfterLogout = "/";
+    protected $redirectAfterLogout = '/';
 
     /**
      * Validation of Registration and Login

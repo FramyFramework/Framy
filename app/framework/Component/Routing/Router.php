@@ -1266,6 +1266,9 @@ class Router
         return Router::getInstance()->respond('PATCH', $path, $callback);
     }
 
+    /**
+     * Holding all the Auth routes
+     */
     public static function auth(): void
     {
         static::get("/login", "Auth\AuthController@getLogin");
