@@ -13,7 +13,7 @@ use app\framework\Component\Database\Model\Model;
 use app\framework\Component\EventManager\EventManagerTrait;
 use app\framework\Component\Hashing\Hash;
 use app\framework\Component\Http\Session;
-use app\framework\Component\Route\Klein\Request;
+use app\framework\Component\Routing\Request;
 use app\framework\Component\StdLib\SingletonTrait;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;

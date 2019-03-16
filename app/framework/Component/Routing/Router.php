@@ -1277,5 +1277,8 @@ class Router
         static::get("/logout", "Auth\AuthController@logout");
         static::get("/register", "Auth\AuthController@getRegister");
         static::post("/register", "Auth\AuthController@postRegister");
+        static::get("/reset-password", "Auth\AuthController@getPasswordReset");
+        static::post("/reset-password/[:token]", "Auth\AuthController@resetPassword");
+        static::get("/reset-password/[:token]", "Auth\AuthController@resetPassword");
     }
 }

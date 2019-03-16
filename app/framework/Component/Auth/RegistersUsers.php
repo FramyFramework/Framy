@@ -8,8 +8,8 @@
 
 namespace app\framework\Component\Auth;
 
-use app\framework\Component\Route\Klein\Request;
-use app\framework\Component\Route\Klein\Response;
+use app\framework\Component\Routing\Request;
+use app\framework\Component\Routing\Response;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 
 trait RegistersUsers
