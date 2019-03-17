@@ -15,6 +15,10 @@ Router::get("/", function() {
     view("welcome", ['version' => version()]);
 });
 
+Router::get("/home", function() {
+    view("home");
+});
+
 Router::auth();
 
 // add more routes here ...
