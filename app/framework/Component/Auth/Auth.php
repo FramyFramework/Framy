@@ -8,7 +8,6 @@
 
 namespace app\framework\Component\Auth;
 
-
 class Auth
 {
     /**
