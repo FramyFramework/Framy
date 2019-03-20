@@ -39,7 +39,7 @@
 
             'viewCompiled' => [
                 'driver' => 'local',
-                'root' => pathTo('/resource/templates/templates_c')
+                'root' => pathTo('/storage/framework/cache/templates/')
             ],
 
             'lang' => [
