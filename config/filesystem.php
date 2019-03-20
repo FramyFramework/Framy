@@ -42,6 +42,10 @@
                 'root' => pathTo('/resource/templates/templates_c')
             ],
 
+            'lang' => [
+                'root' => pathTo('/resource/lang/')
+            ],
+
             'language' => [
                 'driver' => 'local',
                 'root' => pathTo('/storage/lang/')
