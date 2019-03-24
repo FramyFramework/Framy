@@ -9,14 +9,16 @@
 |
 */
 
-use \app\framework\Component\Route\Klein\Klein;
+use app\framework\Component\Routing\Router;
 
-$klein = new Klein();
-
-$klein->get("/", function(){
+Router::get("/", function() {
     view("welcome", ['version' => version()]);
 });
 
-// add more routes here ...
+Router::get("/home", function() {
+    view("home");
+});
 
-$klein->dispatch();
+Router::auth();
+
+// add more routes here ...

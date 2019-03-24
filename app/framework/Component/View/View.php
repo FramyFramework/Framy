@@ -100,12 +100,12 @@ class View
     private function assignData($data)
     {
         foreach ($data as $valueName => $dataSet) {
-            if(array_key_exists(1, explode(":", $dataSet))){
+            if(is_string($dataSet) && array_key_exists(1, explode(":", $dataSet))){
                 $viewName = explode(":", $dataSet)[1];
 
                 switch (explode(":", $dataSet)[0]) {
                     case "fetch":
-                            $this->TemplateEngine->assign($valueName, $this->TemplateEngine->fetch(self::validateViewName($viewName)));
+                        $this->TemplateEngine->assign($valueName, $this->TemplateEngine->fetch(self::validateViewName($viewName)));
                         break;
                     default:
                         $this->TemplateEngine->assign($valueName, $dataSet);
