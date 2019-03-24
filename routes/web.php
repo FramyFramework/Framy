@@ -11,7 +11,7 @@
 use app\framework\Component\Routing\Router;
 
 Router::get("/", function() {
-    view("landingPage");
+    view("welcome", ["version" => version()]);
 });
 
 Router::get("/home", function() {
