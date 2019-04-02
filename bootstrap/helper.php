@@ -30,6 +30,7 @@ if(! function_exists("view")) {
      * @return \app\framework\Component\View\View|string
      */
     function view($view = null, $data = []) {
+        $data['auth'] = new \app\framework\Component\Auth\Auth;
         $View = new \app\framework\Component\View\View($view, $data);
         return $View->render();
     }
@@ -87,7 +88,7 @@ if(! function_exists("getStringBetween")) {
 }
 
 if(! function_exists("handle")) {
-    function handle(\Exception $e) {
+    function handle( $e) {
         \app\framework\Component\Exception\Handler::getInstance()->handler($e);
     }
 }

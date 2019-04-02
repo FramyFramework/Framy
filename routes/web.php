@@ -8,15 +8,16 @@
 | to using a Closure or controller method. Build something great!
 |
 */
+use app\framework\Component\Routing\Router;
 
-use \app\framework\Component\Route\Klein\Klein;
-
-$klein = new Klein();
-
-$klein->get("/", function(){
-    view("welcome", ['version' => version()]);
+Router::get("/", function() {
+    view("welcome", ["version" => version()]);
 });
 
-// add more routes here ...
+Router::get("/home", function() {
+    view("home");
+});
 
-$klein->dispatch();
+Router::auth();
+
+// add more routes here ...
