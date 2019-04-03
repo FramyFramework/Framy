@@ -10,6 +10,7 @@ namespace app\framework\Component\StdLib\StdObject\ArrayObject;
 
 use app\framework\Component\StdLib\StdObject\StdObjectWrapper;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
+use ErrorException;
 
 trait ManipulationTrait
 {
@@ -276,8 +277,8 @@ trait ManipulationTrait
     {
         try {
             $arr = array_rand($this->val(), $num);
-        } catch (\ErrorException $e) {
-            handle(new ArrayObjectException($e->getMessage()));
+        } catch (ErrorException $e) {
+            throw new ArrayObjectException($e->getMessage());
         }
 
         if (!$this->isArray($arr)) {
@@ -372,19 +373,15 @@ trait ManipulationTrait
         $val    = $array ?: $this->val();
 
         foreach ($val as $item) {
-            $item = $item instanceof $this ? $item->val() : $item;
+            $item = $item instanceof ArrayObject ? $item->val() : $item;
 
-            if (is_array($item)) {
-                if ($depth === 1) {
-                    $result = array_merge($result, $item);
-                    continue;
-                }
-
+            if (! is_array($item) or $item === []) {
+                $result[] = $item;
+            } elseif ($depth === 1) {
+                $result = array_merge($result, array_values($item));
+            } else {
                 $result = array_merge($result, $this->flatten($item, $depth - 1));
-                continue;
             }
-
-            $result[] = $item;
         }
 
         return $result;

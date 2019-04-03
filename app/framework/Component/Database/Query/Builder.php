@@ -12,6 +12,7 @@ use Closure;
 use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Model\Model;
 use app\framework\Component\Database\Query\Grammars\Grammar;
+use InvalidArgumentException;
 
 /**
  * Class Builder
@@ -178,12 +179,12 @@ class Builder
      * @param  string  $type
      * @return $this
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function addBinding($value, $type = 'where')
     {
         if (! array_key_exists($type, $this->bindings)) {
-            throw new \InvalidArgumentException("Invalid binding type: {$type}.");
+            throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
         if (is_array($value)) {

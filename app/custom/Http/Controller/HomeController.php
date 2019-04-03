@@ -10,8 +10,8 @@ class HomeController
     {
         dd(
             DB::table("table_name")
-                ->where("column_1", "=", 1, "or")
-                ->where("column_1", "=", 4)
+                ->where("column_1", ">", 1)
+                ->where("column_1", "<", 5)
                 ->get()
         );
     }
