@@ -12,6 +12,7 @@ use Closure;
 use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Model\Model;
 use app\framework\Component\Database\Query\Grammars\Grammar;
+use Exception;
 use InvalidArgumentException;
 
 /**
@@ -134,6 +135,7 @@ class Builder
     protected function addArrayOfWheres($column, string $boolean)
     {
         return $this->whereNested(function ($query) use ($column) {
+
             /** @var Builder $query */
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
@@ -156,6 +158,19 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "and where" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @return Builder|static
+     */
+    public function andWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'and');
     }
 
     /**
@@ -317,7 +332,7 @@ class Builder
         if (func_num_args() == 2) {
             list($value, $operator) = [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
-            throw new \InvalidArgumentException('Illegal operator and value combination.');
+            throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
         // If the given operator is not found in the list of valid operators we will
@@ -356,6 +371,63 @@ class Builder
     }
 
     /**
+     * Add a where in statement to the query.
+     *
+     * @param $column
+     * @param array $values
+     * @param string $boolean
+     * @param bool $not
+     * @return $this
+     */
+    public function whereIn($column, array $values, $boolean = 'and', $not = false)
+    {
+        $type = 'in';
+
+        $this->wheres[] = compact('column', 'type', 'boolean', 'not');
+
+        $this->addBinding($values, 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a where not in statement to the query.
+     *
+     * @param $column
+     * @param array $values
+     * @param string $boolean
+     * @return Builder
+     */
+    public function whereNotIn($column, array $values, $boolean = 'and')
+    {
+        return $this->whereIn($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add a or where in statement to the query.
+     *
+     * @param $column
+     * @param array $values
+     * @return Builder
+     */
+    public function orWhereIn($column, array $values)
+    {
+        return $this->whereIn($column, $values, 'or');
+    }
+
+    /**
+     * Add a or where not in statement to the query.
+     *
+     * @param $column
+     * @param array $values
+     * @return Builder
+     */
+    public function orWhereNotIn($column, array $values)
+    {
+        return $this->whereIn($column, $values, 'or', true);
+    }
+
+    /**
      * Add a where between statement to the query.
      *
      * @param  string  $column
@@ -376,9 +448,46 @@ class Builder
     }
 
     /**
+     * Add a or where between statement to the query.
+     *
+     * @param $column
+     * @param array $values
+     * @return Builder
+     */
+    public function orWhereBetween($column, array $values)
+    {
+        return $this->whereBetween($column, $values, 'or');
+    }
+
+    /**
+     * Add a where not between statement to the query.
+     *
+     * @param $column
+     * @param array $values
+     * @param string $boolean
+     * @return Builder
+     */
+    public function whereNotBetween($column, array $values, $boolean = 'and')
+    {
+        return $this->whereBetween($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add a or where not between statement to the query.
+     *
+     * @param $column
+     * @param array $values
+     * @return Builder
+     */
+    public function orWhereNotBetween($column, array $values)
+    {
+        return $this->whereBetween($column, $values, 'or', true);
+    }
+
+    /**
      * Add a nested where statement to the query.
      *
-     * @param  \Closure $callback
+     * @param  Closure $callback
      * @param  string   $boolean
      * @return Builder|static
      */
@@ -428,7 +537,7 @@ class Builder
      *
      * @param  string   $column
      * @param  string   $operator
-     * @param  \Closure $callback
+     * @param  Closure $callback
      * @param  string   $boolean
      * @return $this
      */
@@ -460,9 +569,9 @@ class Builder
      */
     public function whereNull($column, $boolean = 'and', $not = false)
     {
-        $type = $not ? 'NotNull' : 'Null';
+        $type = 'Null';
 
-        $this->wheres[] = compact('type', 'column', 'boolean');
+        $this->wheres[] = compact('type', 'column', 'boolean', 'not');
 
         return $this;
     }
@@ -498,7 +607,7 @@ class Builder
      */
     public function orWhereNotNull($column)
     {
-        return $this->whereNotNull($column, 'or');
+        return $this->whereNull($column, 'or', true);
     }
 
     /**
@@ -598,8 +707,9 @@ class Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
-        if(!($direction == 'asc' or $direction == 'desc'))
-            handle(new \Exception("Order by direction invalid: '".$direction."'"));
+        if(!($direction == 'asc' or $direction == 'desc')) {
+            handle(new Exception("Order by direction invalid: '".$direction."'"));
+        }
 
         $this->orders = [
             $column,
@@ -618,7 +728,7 @@ class Builder
     public function get(array $columns = ['*'])
     {
         $this->columns = $columns;
-
+//        dd($this->toSql());
         return $this->connection->select(
             $this->toSql(),
             $this->getBindings()
@@ -794,14 +904,16 @@ class Builder
      * Check if the operator is in the list of valid operators.
      * Returns true if it is.
      *
+     * @internal might be removed if it's not needed.
      * @param $operatorToCheck
      * @return bool
      */
     private function isOperatorValid($operatorToCheck)
     {
         foreach ($this->operators as $operator) {
-            if($operatorToCheck === $operator)
+            if($operatorToCheck === $operator) {
                 return true;
+            }
         }
 
         return false;
@@ -848,7 +960,7 @@ class Builder
             if(array_key_exists($value, $bindings)) {
                 $query = str_replace(":".$value, $bindings[$value], $query);
             } else {
-                handle(new \Exception("Could not find fitting value '$value' in bindings for query: '$query'"));
+                handle(new Exception("Could not find fitting value '$value' in bindings for query: '$query'"));
             }
         }
 

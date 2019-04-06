@@ -287,6 +287,90 @@ class Grammar
         return $this->wrap($where['column']).' '.$between.' ? and ?';
     }
 
+    /**
+     * Compile a "in" where clause.
+     *
+     * @param Builder $query
+     * @param $where
+     * @return string
+     */
+    protected function whereIn(Builder $query, $where)
+    {
+        $in = $where['not'] ? 'not in' : 'in';
+
+        $values = " (";
+
+        $count = count($query->getBindings());
+        for ($i = 1; $i <= $count; $i++) {
+            $append = ($count >  $i) ? "," : "";
+            $values .= "?" . $append;
+        }
+        $values .= ")";
+
+        return $this->wrap($where['column']). ' '.$in.$values;
+    }
+
+    /**
+     * Compile a "null" where clause.
+     *
+     * @param Builder $query
+     * @param $where
+     * @return string
+     */
+    protected function whereNull(Builder $query, $where)
+    {
+        $null = $where['not'] ? 'is not null' : 'is null';
+
+        return $this->wrap($where['column']). ' '.$null;
+    }
+
+    /**
+     * Compile a "date" where clause.
+     *
+     * @param Builder $builder
+     * @param $where
+     * @return string
+     */
+    protected function whereDate(Builder $builder, $where)
+    {
+        return $this->wrap($where['column']).$where['operator'].$where['value'];
+    }
+
+    /**
+     * Compile a "date year" where clause.
+     *
+     * @param Builder $builder
+     * @param $where
+     * @return string
+     */
+    protected function whereYear(Builder $builder, $where)
+    {
+        return "year(".$this->wrap($where['column']).")".$where['operator'].$where['value'];
+    }
+
+    /**
+     * Compile a "date month" where clause.
+     *
+     * @param Builder $builder
+     * @param $where
+     * @return string
+     */
+    protected function whereMonth(Builder $builder, $where)
+    {
+        return "month(".$this->wrap($where['column']).")".$where['operator'].$where['value'];
+    }
+
+    /**
+     * Compile a "date day" where clause.
+     *
+     * @param Builder $builder
+     * @param $where
+     * @return string
+     */
+    protected function whereDay(Builder $builder, $where)
+    {
+        return "day(".$this->wrap($where['column']).")".$where['operator'].$where['value'];
+    }
 
     /**
      * Concatenate an array of segments, removing empties.
@@ -342,8 +426,9 @@ class Grammar
      */
     public function quoteString($value)
     {
-        if (is_array($value))
+        if (is_array($value)) {
             return implode(', ', array_map([$this, __FUNCTION__], $value));
+        }
 
         return "'$value'";
     }

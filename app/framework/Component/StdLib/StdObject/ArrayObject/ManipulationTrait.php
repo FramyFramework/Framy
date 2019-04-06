@@ -376,7 +376,9 @@ trait ManipulationTrait
             $item = $item instanceof ArrayObject ? $item->val() : $item;
 
             if (! is_array($item) or $item === []) {
-                $result[] = $item;
+                if ($item !== []) {
+                    $result[] = $item;
+                }
             } elseif ($depth === 1) {
                 $result = array_merge($result, array_values($item));
             } else {
