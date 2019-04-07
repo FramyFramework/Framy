@@ -113,10 +113,24 @@ class Grammar
     public function compileUpdate(Builder $query, array $values): string
     {
         $table      = $this->wrapTable($query->from);
-        $columns    = array_keys($values);
-        $parameters = $this->parameterizeForUpdate($columns, $values);
 
-        return "update $table set $parameters ".$this->compileWheres($query);
+        // Each one of the columns in the update statements needs to be wrapped in the
+        // keyword identifiers, also a place-holder needs to be created for each of
+        // the values in the list of bindings so we can make the sets statements.
+        $columns = [];
+
+        foreach ($values as $key => $value) {
+            $columns[] = $this->wrap($key).' = '.$this->parameter($value);
+        }
+
+        $columns = implode(', ', $columns);
+
+        // Of course, update queries may also be constrained by where clauses so we'll
+        // need to compile the where clauses and attach it to the query so only the
+        // intended records are updated by the SQL statements we generate to run.
+        $where = $this->compileWheres($query);
+
+        return "update {$table} set $columns $where";
     }
 
     /**
@@ -464,7 +478,6 @@ class Grammar
 
         return "'$value'";
     }
-
 
     /**
      * Wrap a table in keyword identifiers.

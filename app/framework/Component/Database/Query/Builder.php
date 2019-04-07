@@ -218,6 +218,17 @@ class Builder
     }
 
     /**
+     * Create a raw database expression.
+     *
+     * @param  mixed  $value
+     * @return Expression
+     */
+    public function raw($value)
+    {
+        return $this->connection->raw($value);
+    }
+
+    /**
      * Get the current query value bindings in a flattened array.
      *
      * @return array
@@ -296,14 +307,50 @@ class Builder
     }
 
     /**
+     * Update a record in the database.
+     *
      * @param array $values
      * @return int
      */
     public function update(array $values)
     {
+        $bindings = array_values(array_merge($values, $this->getBindings()));
+
         $sql = $this->grammar->compileUpdate($this, $values);
 
-        return $this->connection->update($sql);
+        return $this->connection->update($sql, $this->cleanBindings($bindings));
+    }
+
+    /**
+     * Increment a column's value by a given amount.
+     *
+     * @param string $column
+     * @param int $amount
+     * @return int
+     */
+    public function increment(string $column, int $amount = 1)
+    {
+        $wrapped = $this->grammar->wrap($column);
+
+        $columns = array_merge([$column => $this->raw("$wrapped + $amount")]);
+
+        return $this->update($columns);
+    }
+
+    /**
+     * Decrement a column's value by a given amount.
+     *
+     * @param string $column
+     * @param int $amount
+     * @return int
+     */
+    public function decrement(string $column, int $amount = 1)
+    {
+        $wrapped = $this->grammar->wrap($column);
+
+        $columns = array_merge([$column => $this->raw("$wrapped - $amount")]);
+
+        return $this->update($columns);
     }
 
     /**

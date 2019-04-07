@@ -9,6 +9,7 @@
 namespace app\framework\Component\Database\Connection;
 
 use app\framework\Component\Database\Model\Model;
+use app\framework\Component\Database\Query\Expression;
 use app\framework\Component\EventManager\EventManagerTrait;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use app\framework\Component\Stopwatch\Stopwatch;
@@ -359,5 +360,16 @@ class Connection
         return class_exists($model)
             ? $model
             : Model::class;
+    }
+
+    /**
+     * Get a new raw query expression.
+     *
+     * @param $value
+     * @return Expression
+     */
+    public function raw($value)
+    {
+        return new Expression($value);
     }
 }
