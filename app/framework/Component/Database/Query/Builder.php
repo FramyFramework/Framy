@@ -240,11 +240,20 @@ class Builder
         return $this;
     }
 
+    /**
+     * @param string $query
+     * @param array $bindings
+     * @return mixed
+     */
     public function selectRaw(string $query, array $bindings = [])
     {
         return $this->connection->select($query, $bindings);
     }
 
+    /**
+     * @param array $values
+     * @return bool
+     */
     public function insert(array $values)
     {
         if (empty($values)) {
@@ -283,19 +292,45 @@ class Builder
         // is the same type of result returned by the raw connection instance.
         $bindings = $this->cleanBindings($bindings);
 
-        return $this->connection->insert($sql);
+        return $this->connection->insert($sql, $bindings);
     }
 
+    /**
+     * @param array $values
+     * @return int
+     */
+    public function update(array $values)
+    {
+        $sql = $this->grammar->compileUpdate($this, $values);
+
+        return $this->connection->update($sql);
+    }
+
+    /**
+     * @param string $query
+     * @param array $bindings
+     * @return bool
+     */
     public function insertRaw(string $query, array $bindings = [])
     {
         return $this->connection->insert($query, $bindings);
     }
 
+    /**
+     * @param string $query
+     * @param array $bindings
+     * @return int
+     */
     public function updateRaw(string $query, array $bindings = [])
     {
         return $this->connection->update($query, $bindings);
     }
 
+    /**
+     * @param string $query
+     * @param array $bindings
+     * @return int
+     */
     public function deleteRaw(string $query, array $bindings = [])
     {
         return $this->connection->delete($query, $bindings);

@@ -104,6 +104,22 @@ class Grammar
     }
 
     /**
+     * Compile a update query into SQL
+     *
+     * @param Builder $query
+     * @param array $values
+     * @return string
+     */
+    public function compileUpdate(Builder $query, array $values): string
+    {
+        $table      = $this->wrapTable($query->from);
+        $columns    = array_keys($values);
+        $parameters = $this->parameterizeForUpdate($columns, $values);
+
+        return "update $table set $parameters ".$this->compileWheres($query);
+    }
+
+    /**
      * Compile the components necessary for a select clause.
      *
      * @param  Builder $query
@@ -403,7 +419,24 @@ class Grammar
      */
     public function parameterize(array $values)
     {
-        return implode(', ', array_map([$this, 'parameter'], $values));
+        $val = array_map([$this, 'parameter'], $values);
+
+        foreach ($val as $key => $item) {
+            $val[$key] = $this->quoteString($item);
+        }
+
+        return implode(', ', $val);
+    }
+
+    public function parameterizeForUpdate(array $columns, array $values)
+    {
+        $queryValues = [];
+
+        for ($i = 0; $i < count($values); $i++) {
+            $queryValues[] = $columns[$i]."=".$this->quoteString(array_values($values)[$i]);
+        }
+
+        return implode(", ", $queryValues);
     }
 
     /**
