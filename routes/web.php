@@ -8,12 +8,9 @@
 | to using a Closure or controller method. Build something great!
 |
 */
-
 use app\framework\Component\Routing\Router;
 
-Router::get("/", function() {
-    view("welcome", ['version' => version()]);
-});
+Router::get("/", "HomeController@index");
 
 Router::get("/home", function() {
     view("home");
