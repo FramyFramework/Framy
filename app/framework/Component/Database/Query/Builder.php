@@ -99,6 +99,13 @@ class Builder
     public $limit;
 
     /**
+     * An offset to define how manny entries should be skipped
+     *
+     * @var int
+     */
+    public $offset;
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -122,7 +129,6 @@ class Builder
         $this->connection = $connection;
 
         $this->grammar = new Grammar();
-
     }
 
     /**
@@ -711,12 +717,42 @@ class Builder
             handle(new Exception("Order by direction invalid: '".$direction."'"));
         }
 
+        $column = is_array($column) ? $column : [$column];
+
         $this->orders = [
             $column,
             $direction
         ];
 
         return $this;
+    }
+
+    /**
+     * @param $column
+     * @return Builder
+     */
+    public function latest($column)
+    {
+        return $this->orderBy($column, "desc");
+    }
+
+    /**
+     * @param string $column
+     * @return Builder
+     */
+    public function oldest($column = "created_at")
+    {
+        return $this->orderBy($column, "desc");
+    }
+
+    /**
+     * Retrieve the results in random order
+     *
+     * @return Builder
+     */
+    public function inRandomOrder()
+    {
+        return $this->orderBy("rand()");
     }
 
     /**
@@ -728,11 +764,60 @@ class Builder
     public function get(array $columns = ['*'])
     {
         $this->columns = $columns;
-//        dd($this->toSql());
+
         return $this->connection->select(
             $this->toSql(),
-            $this->getBindings()
+            $this->getBindings(),
+            $this->from
         );
+    }
+
+    /**
+     * Add an "limit" to the query
+     *
+     * @param int $limit
+     * @return $this
+     */
+    public function limit(int $limit)
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * @param int $limit
+     * @return $this
+     */
+    public function take(int $limit)
+    {
+        $this->limit($limit);
+
+        return $this;
+    }
+
+    /**
+     * Add an "offset" clause to the query.
+     *
+     * @param int $offset
+     * @return $this
+     */
+    public function offset(int $offset)
+    {
+        $this->offset = $offset;
+
+        return $this;
+    }
+
+    /**
+     * @param int $offset
+     * @return $this
+     */
+    public function skip(int $offset)
+    {
+        $this->offset($offset);
+
+        return $this;
     }
 
     /**
@@ -743,7 +828,7 @@ class Builder
      */
     public function first(array $columns = ['*'])
     {
-        $this->limit = 1;
+        $this->limit(1);
 
         return $this->get($columns)[0];
     }

@@ -204,13 +204,7 @@ class Grammar
      */
     protected function compileOrders(Builder $query, $orders)
     {
-        return 'order by '.implode(', ', array_map(function ($order) {
-            if (isset($order['sql'])) {
-                return $order['sql'];
-            }
-
-            return $this->wrap($order['column']).' '.$order['direction'];
-        }, $orders));
+        return 'order by '.implode(', ', $orders[0])." ".$orders[1];
     }
 
     /**
@@ -257,6 +251,11 @@ class Grammar
         $select = $this->compileSelect($query);
 
         return "select exists($select) as {$this->wrap('exists')}";
+    }
+
+    public function compileOffset(Builder $query)
+    {
+        return "offset ".$query->offset;
     }
 
     /**
