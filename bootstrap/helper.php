@@ -104,6 +104,12 @@ if(! function_exists("arr")) {
     }
 }
 
+if(! function_exists("str")) {
+    function str($str) {
+        return new \app\framework\Component\StdLib\StdObject\StringObject\StringObject($str);
+    }
+}
+
 if(! function_exists("encrypt")) {
     /**
      * Encrypt the given value.
