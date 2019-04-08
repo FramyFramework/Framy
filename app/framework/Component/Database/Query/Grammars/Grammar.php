@@ -134,6 +134,32 @@ class Grammar
     }
 
     /**
+     * Compile a delete statement into SQL.
+     *
+     * @param  Builder  $query
+     * @return string
+     */
+    public function compileDelete(Builder $query)
+    {
+        $table = $this->wrapTable($query->from);
+
+        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
+
+        return trim("delete from $table ".$where);
+    }
+
+    /**
+     * Compile a truncate table statement into SQL.
+     *
+     * @param  Builder  $query
+     * @return array
+     */
+    public function compileTruncate(Builder $query)
+    {
+        return ['truncate '.$this->wrapTable($query->from) => []];
+    }
+
+    /**
      * Compile the components necessary for a select clause.
      *
      * @param  Builder $query

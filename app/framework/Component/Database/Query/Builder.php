@@ -354,6 +354,38 @@ class Builder
     }
 
     /**
+     * Delete a record from the database.
+     *
+     * @param  mixed  $id
+     * @return int
+     */
+    public function delete($id = null)
+    {
+        // If an ID is passed to the method, we will set the where clause to check
+        // the ID to allow developers to simply and quickly remove a single row
+        // from their database without manually specifying the where clauses.
+        if (! is_null($id)) {
+            $this->where('id', '=', $id);
+        }
+
+        $sql = $this->grammar->compileDelete($this);
+
+        return $this->connection->delete($sql, $this->getBindings());
+    }
+
+    /**
+     * Run a truncate statement on the table.
+     *
+     * @return void
+     */
+    public function truncate()
+    {
+        foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
+            $this->connection->statement($sql, $bindings);
+        }
+    }
+
+    /**
      * @param string $query
      * @param array $bindings
      * @return bool
