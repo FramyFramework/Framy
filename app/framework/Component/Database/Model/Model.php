@@ -8,16 +8,14 @@
 
 namespace app\framework\Component\Database\Model;
 
-use app\framework\Component\Config\Config;
-use app\framework\Component\Database\Connection\Connection;
-use app\framework\Component\Database\Connection\ConnectionFactory;
+use ArrayAccess;
+use JsonSerializable;
+use app\framework\Component\Database\Query\Builder as QueryBuilder;
 
 /**
- *
- *
  * @package app\framework\Component\Database\Model
  */
-class Model
+class Model implements ArrayAccess, JsonSerializable
 {
     /**
      * The connection name for the model.
@@ -34,6 +32,13 @@ class Model
     protected $table;
 
     /**
+     * Rather or not the model has been booted
+     *
+     * @var bool
+     */
+    protected static $isBooted = false;
+
+    /**
      * The primary key for the model.
      *
      * @var string
@@ -46,6 +51,20 @@ class Model
      * @var string
      */
     protected $keyType = 'int';
+
+    /**
+     * The model's attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [];
+
+    /**
+     * The model attribute's original state.
+     *
+     * @var array
+     */
+    protected $original;
 
     /**use app\framework\Component\Database\DB;
 
@@ -64,15 +83,57 @@ class Model
 
     /**
      * Model constructor.
-     * @param Connection $connection
+     * @param array $attributes
      */
-    public function __construct(Connection $connection = null)
+    public function __construct(array $attributes = [])
     {
-        $ConnFactory = new ConnectionFactory();
-        if(is_null($connection))
-            $this->connection = $ConnFactory->make($this->connection);
-        else
-            $this->connection = $connection;
+        $this->bootIfNotBooted();
+
+        $this->syncOriginal();
+
+        $this->fill($attributes);
+    }
+
+    protected static function boot()
+    {
+        // todo: something should happen here
+    }
+
+    /**
+     * Check if the model needs to be booted, and if so boot
+     */
+    public function bootIfNotBooted()
+    {
+        if (! self::$isBooted) {
+            self::boot();
+
+            self::$isBooted = true;
+        }
+    }
+
+    /**
+     * Sync the original attributes with the current.
+     *
+     * @return $this
+     */
+    public function syncOriginal()
+    {
+        $this->original = $this->attributes;
+
+        return $this;
+    }
+
+    /**
+     * Sync a single original attribute with its current value.
+     *
+     * @param  string  $attribute
+     * @return $this
+     */
+    public function syncOriginalAttribute($attribute)
+    {
+        $this->original[$attribute] = $this->attributes[$attribute];
+
+        return $this;
     }
 
     /**
@@ -93,10 +154,141 @@ class Model
     public function get()
     {}
 
+    public function fill(array $attributes)
+    {
+        foreach ($attributes as $key => $values) {
+            $this->setAttribute($key, $values);
+        }
+    }
+
     public function fillData(array $data)
     {
         foreach ($data as $key => $datum) {
             $this->$key = $datum;
         }
+    }
+
+    public static function all(array $columns = ['*'])
+    {
+        $instance = new static;
+
+        return $instance->newQuery()->get($columns);
+    }
+
+    /**
+     * Set a given attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setAttribute($key, $value)
+    {
+        $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Whether a offset exists
+     * @link https://php.net/manual/en/arrayaccess.offsetexists.php
+     * @param mixed $offset <p>
+     * An offset to check for.
+     * </p>
+     * @return boolean true on success or false on failure.
+     * </p>
+     * <p>
+     * The return value will be casted to boolean if non-boolean was returned.
+     * @since 5.0.0
+     */
+    public function offsetExists($offset)
+    {
+        // TODO: Implement offsetExists() method.
+    }
+
+    /**
+     * Offset to retrieve
+     * @link https://php.net/manual/en/arrayaccess.offsetget.php
+     * @param mixed $offset <p>
+     * The offset to retrieve.
+     * </p>
+     * @return mixed Can return all value types.
+     * @since 5.0.0
+     */
+    public function offsetGet($offset)
+    {
+        // TODO: Implement offsetGet() method.
+    }
+
+    /**
+     * Offset to set
+     * @link https://php.net/manual/en/arrayaccess.offsetset.php
+     * @param mixed $offset <p>
+     * The offset to assign the value to.
+     * </p>
+     * @param mixed $value <p>
+     * The value to set.
+     * </p>
+     * @return void
+     * @since 5.0.0
+     */
+    public function offsetSet($offset, $value)
+    {
+        // TODO: Implement offsetSet() method.
+    }
+
+    /**
+     * Offset to unset
+     * @link https://php.net/manual/en/arrayaccess.offsetunset.php
+     * @param mixed $offset <p>
+     * The offset to unset.
+     * </p>
+     * @return void
+     * @since 5.0.0
+     */
+    public function offsetUnset($offset)
+    {
+        // TODO: Implement offsetUnset() method.
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        // TODO: Implement jsonSerialize() method.
+    }
+
+    /**
+     * Get a new Query Builder
+     *
+     * @return Builder
+     */
+    public function newQuery()
+    {
+        return new Builder(
+            $this->newBaseQueryBuilder()
+        );
+    }
+
+    /**
+     * Get a new query builder instance for the connection.
+     *
+     * @return QueryBuilder
+     */
+    protected function newBaseQueryBuilder()
+    {
+        $conn = $this->getConnection();
+
+        return new QueryBuilder($conn);
     }
 }
