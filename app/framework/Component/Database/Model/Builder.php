@@ -40,15 +40,58 @@ class Builder
      * @var array
      */
     protected $passThru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql',
+        'insert', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
     ];
 
     /**
-     * @inheritDoc
+     * Builder constructor.
+     *
+     * @param QueryBulder $queryBuilder
+     * @param $model
      */
-    public function __construct(QueryBulder $queryBuilder)
+    public function __construct(QueryBulder $queryBuilder, $model)
     {
         $this->queryBuilder = $queryBuilder;
+        $this->model        = $model;
+    }
+
+    /**
+     * QueryBuilder getter
+     *
+     * @return QueryBulder
+     */
+    public function getQuery()
+    {
+        return $this->queryBuilder;
+    }
+
+    /**
+     * Get a base query builder instance.
+     *
+     * @return QueryBulder
+     */
+    public function toBase()
+    {
+        return $this->getQuery();
+    }
+
+    public function get(array $columns = ['*'])
+    {
+        return $this->toBase()->from("test")->get($columns);
+    }
+
+    /**
+     * Dynamically handle calls into the query instance.
+     *
+     * @param $name
+     * @param $arguments
+     * @return Builder|mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if(in_array($name, $this->passThru)) {
+            return call_user_func_array([$this->toBase(), $name], $arguments);
+        }
     }
 }

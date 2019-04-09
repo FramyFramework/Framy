@@ -299,7 +299,7 @@ class Connection
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
             throw new Exception(
-                $query, $bindings, $e
+                $query, $e->getCode(), $e
             );
         }
 

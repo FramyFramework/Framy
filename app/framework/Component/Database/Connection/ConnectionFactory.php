@@ -8,12 +8,27 @@
 
 namespace app\framework\Component\Database\Connection;
 
+use app\framework\Component\Config\Config;
+use app\framework\Component\StdLib\SingletonTrait;
+use Exception;
 use PDO;
 use PDOException;
-use app\framework\Component\Config\Config;
 
+/**
+ * Class ConnectionFactory
+ * Created to be an convenient way of creating connections
+ * based on configurations. But will be modified to hold the
+ * instances of the connections as well, so for every connection
+ * used only one instance of it will exist.
+ *
+ * TODO: do the thing explained above!
+ *
+ * @package app\framework\Component\Database\Connection
+ */
 class ConnectionFactory
 {
+    use SingletonTrait;
+
     const defaultConfigElements = [
         'driver',
         'host',
@@ -47,7 +62,7 @@ class ConnectionFactory
             }
 
             return $this->createSingleConnection($config, $name);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             handle($e);
         }
     }
@@ -57,7 +72,7 @@ class ConnectionFactory
      *
      * @param array $config
      * @param string $name
-     * @throws \Exception If config does not exist.
+     * @throws Exception If config does not exist.
      * @return array the connection config
      */
     private function parseConfig(array $config, string $name): array
@@ -65,7 +80,7 @@ class ConnectionFactory
         if(isset($config[$name]))
             $connection = $config[$name];
         else
-            throw new \Exception("Config " .$name. " doesn't exist.");
+            throw new Exception("Config " .$name. " doesn't exist.");
 
         // make sure that the default config elements exist to prevent an undefined index warning
         foreach(self::defaultConfigElements as $configElement) {

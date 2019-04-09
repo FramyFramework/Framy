@@ -8,6 +8,8 @@
 
 namespace app\framework\Component\Database\Model;
 
+use app\framework\Component\Database\Connection\Connection;
+use app\framework\Component\Database\Connection\ConnectionFactory;
 use ArrayAccess;
 use JsonSerializable;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
@@ -189,6 +191,11 @@ class Model implements ArrayAccess, JsonSerializable
         return $this;
     }
 
+    /**
+     * Get connection
+     *
+     * @return Connection
+     */
     public function getConnection()
     {
         return $this->connection;
@@ -276,7 +283,8 @@ class Model implements ArrayAccess, JsonSerializable
     public function newQuery()
     {
         return new Builder(
-            $this->newBaseQueryBuilder()
+            $this->newBaseQueryBuilder(),
+            $this
         );
     }
 
@@ -287,7 +295,9 @@ class Model implements ArrayAccess, JsonSerializable
      */
     protected function newBaseQueryBuilder()
     {
-        $conn = $this->getConnection();
+        $conn = ConnectionFactory::getInstance()->make(
+            $this->getConnection()
+        );
 
         return new QueryBuilder($conn);
     }
