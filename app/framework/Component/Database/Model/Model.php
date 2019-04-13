@@ -10,9 +10,10 @@ namespace app\framework\Component\Database\Model;
 
 use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Connection\ConnectionFactory;
+use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
+use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use ArrayAccess;
 use JsonSerializable;
-use app\framework\Component\Database\Query\Builder as QueryBuilder;
 
 /**
  * @package app\framework\Component\Database\Model
@@ -279,6 +280,7 @@ class Model implements ArrayAccess, JsonSerializable
      * Get a new Query Builder
      *
      * @return Builder
+     * @throws ConnectionNotConfiguredException
      */
     public function newQuery()
     {
@@ -292,10 +294,11 @@ class Model implements ArrayAccess, JsonSerializable
      * Get a new query builder instance for the connection.
      *
      * @return QueryBuilder
+     * @throws ConnectionNotConfiguredException
      */
     protected function newBaseQueryBuilder()
     {
-        $conn = ConnectionFactory::getInstance()->make(
+        $conn = ConnectionFactory::getInstance()->get(
             $this->getConnection()
         );
 
