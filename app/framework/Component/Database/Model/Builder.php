@@ -78,7 +78,9 @@ class Builder
 
     public function get(array $columns = ['*'])
     {
-        return $this->toBase()->from("test")->get($columns);
+        return $this->toBase()
+            ->from($this->model->getTable())
+            ->get($columns);
     }
 
     /**

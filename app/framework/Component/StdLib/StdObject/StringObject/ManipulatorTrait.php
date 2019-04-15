@@ -1320,7 +1320,10 @@ trait ManipulatorTrait
      */
     public function snakeCase()
     {
-        $this->pregReplace('/[A-Z]/', '_$0')->caseLower()->replace(['-', ' '], '_')->trim('_');
+        $this->pregReplace('/[A-Z]/', '_$0')
+            ->caseLower()
+            ->replace(['-', ' '], '_')
+            ->trim('_');
 
         return $this;
     }

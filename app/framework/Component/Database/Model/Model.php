@@ -201,6 +201,20 @@ class Model implements ArrayAccess, JsonSerializable
         return $this->connection;
     }
 
+    public function getTable()
+    {
+        $table = $this->table;
+
+        if ($table === null) {
+            $table = str(str(get_class($this))->explode("\\")->last());
+            $table->snakeCase();
+
+            $table->append("s");
+        }
+
+        return $this->table = $table->val();
+    }
+
     /**
      * Whether a offset exists
      * @link https://php.net/manual/en/arrayaccess.offsetexists.php
