@@ -10,9 +10,7 @@ namespace app\framework\Component\Database\Connection;
 
 use app\framework\Component\Config\Config;
 use app\framework\Component\StdLib\SingletonTrait;
-use Exception;
 use PDO;
-use PDOException;
 
 /**
  * Class ConnectionFactory
@@ -20,8 +18,6 @@ use PDOException;
  * based on configurations. But will be modified to hold the
  * instances of the connections as well, so for every connection
  * used only one instance of it will exist.
- *
- * TODO: do the thing explained above!
  *
  * @package app\framework\Component\Database\Connection
  */
@@ -44,65 +40,122 @@ class ConnectionFactory
     ];
 
     /**
-     * Establish a PDO connection based on the configuration.
-     * Set up default connection or the one defined
-     * @param $name String Name of the connection. If null use default.
-     * @return Connection
+     * @var Connection[]
      */
-    public function make(string $name = null): Connection
-    {
-        $connByConfig = Config::getInstance()->get("connections");
-        try {
-            if(sizeof($connByConfig ) == 1 && $name == null) {
-                reset($connByConfig);
-                $config = $this->parseConfig($connByConfig, key($connByConfig));
-                $name = key($connByConfig);
-            } else {
-                $config = $this->parseConfig($connByConfig, $name);
-            }
+    private $connections = [];
 
-            return $this->createSingleConnection($config, $name);
-        } catch (Exception $e) {
-            handle($e);
+    /**
+     * Contains the connection configuration information's
+     *
+     * @var array
+     */
+    private $configuration = [];
+
+    /**
+     * @param string|null $name
+     * @return Connection
+     * @throws ConnectionNotConfiguredException
+     */
+    public function get(string $name = null): Connection
+    {
+        // check if connection with $name was already instantiated if yes return
+        if(isset($this->connections[$name])) {
+            return $this->connections[$name];
         }
+
+        // otherwise create and save in $connections
+        return $this->make($name);
     }
 
     /**
-     * To be sure that the config array is as he is supposed to be.
+     * Establish a PDO connection based on the configuration.
+     * Set up default connection or the one defined and save in $connections
      *
-     * @param array $config
-     * @param string $name
-     * @throws Exception If config does not exist.
-     * @return array the connection config
+     * @param $name String Name of the connection. If null use default.
+     * @return Connection
+     * @throws ConnectionNotConfiguredException
      */
-    private function parseConfig(array $config, string $name): array
+    public function make(string $name = null): Connection
     {
-        if(isset($config[$name]))
-            $connection = $config[$name];
-        else
-            throw new Exception("Config " .$name. " doesn't exist.");
+        $this->extractConfig();
 
-        // make sure that the default config elements exist to prevent an undefined index warning
-        foreach(self::defaultConfigElements as $configElement) {
-            if(!array_key_exists($configElement, $connection))
-                $connection[$configElement];
-        }
+        $connection = $this->createSingleConnection(
+            $this->getConnectionName($name)
+        );
+
+        $this->connections[$name] = $connection;
 
         return $connection;
     }
 
     /**
+     *  Sets the $configuration value
+     */
+    private function extractConfig()
+    {
+        $connByConfig = Config::getInstance()->get("connections");
+        $config = [];
+
+        foreach ($connByConfig as $name => $con) {
+            $config[$name] = $this->parseConfig($con);
+        }
+
+        $this->configuration = $config;
+    }
+
+    /**
+     * @param string|null $name
+     * @return int|string|null
+     * @throws ConnectionNotConfiguredException
+     */
+    private function getConnectionName(string $name = null)
+    {
+        $config = $this->configuration;
+
+        if (is_null($name)) {
+            reset($config);
+            return key($config);
+        }
+
+        if (isset($config[$name])) {
+            return $name;
+        } else {
+            // if conf not found Exception
+            throw new ConnectionNotConfiguredException("Connection $name is not Configured");
+        }
+    }
+    
+    /**
+     * To be sure that the config array is as he is supposed to be.
+     *
+     * @param array $config
+     * @return array the connection config
+     */
+    private function parseConfig(array $config): array
+    {
+        // make sure that the default config elements exist to prevent an undefined index warning
+        foreach(self::defaultConfigElements as $configElement) {
+            if(!array_key_exists($configElement, $config)) {
+                $config[$configElement];
+            }
+        }
+
+        return $config;
+    }
+
+    /**
      * Create a single database connection instance.
      *
-     * @param  array  $config
      * @param string $name
      * @return Connection
      */
-    private function createSingleConnection(array $config, string $name = ''): Connection
+    private function createSingleConnection(string $name): Connection
     {
-        $Pdo = $this->createPdoInstance($config);
+        $config = $this->configuration;
 
-        return $this->createConnection($Pdo, $config['database'], $name, $config);
+        $Pdo = $this->createPdoInstance($config[$name]);
+
+        return $this->createConnection($Pdo, $config[$name]['database'], $name, $config);
     }
 
     /**
@@ -140,11 +193,7 @@ class ConnectionFactory
             //    break;
         }
 
-        try {
-            return new PDO($dsn, $config['username'], $config['password']);
-        } catch (PDOException $e) {
-            handle($e);
-        }
+        return new PDO($dsn, $config['username'], $config['password']);
     }
 
     /**
