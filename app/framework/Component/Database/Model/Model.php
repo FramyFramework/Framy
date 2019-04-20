@@ -12,6 +12,8 @@ use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Connection\ConnectionFactory;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
+use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use ArrayAccess;
 use JsonSerializable;
 
@@ -140,6 +142,26 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * primaryKey getter
+     *
+     * @return string
+     */
+    public function getPrimaryKey(): string
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * primaryKey setter
+     *
+     * @param string $primaryKey
+     */
+    public function setPrimaryKey(string $primaryKey): void
+    {
+        $this->primaryKey = $primaryKey;
+    }
+
+    /**
      * to save the this model to the database
      */
     public function save()
@@ -149,7 +171,10 @@ class Model implements ArrayAccess, JsonSerializable
      * Get number of entries in table
      */
     public function count()
-    {}
+    {
+        $instance = new static();
+        $instance->newQuery()->count();
+    }
 
     /**
      * selects entries of table and return array of Models filled with data.
@@ -179,25 +204,29 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @param $column
-     * @param string $operator
-     * @param null $value
-     * @param string $boolean
-     * @return QueryBuilder
-     */
-    public static function where($column, $operator = "=", $value = null, $boolean = 'and')
-    {
-        $instance = new static;
-
-        return $instance->newQuery()->where($column, $operator, $value, $boolean);
-    }
-
-    /**
-     * @param int|array $id
+     * @param array|int $id
+     * @return ArrayObject|Model|null
      */
     public static function find($id)
     {
-        
+        $instance = new static();
+
+        return $instance->newQuery()->find($id);
+    }
+
+    public static function findOrFail($id)
+    {
+        $instance = new static();
+
+        return $instance->newQuery()->findOrFail($id);
+    }
+
+    public static function first()
+    {
+    }
+
+    public static function latest()
+    {
     }
 
     /**
@@ -224,6 +253,10 @@ class Model implements ArrayAccess, JsonSerializable
         return $this->connection;
     }
 
+    /**
+     * @return mixed
+     * @throws StringObjectException
+     */
     public function getTable()
     {
         $table = $this->table;
@@ -235,17 +268,7 @@ class Model implements ArrayAccess, JsonSerializable
             $table->append("s");
         }
 
-        return $this->table = $table->val();
-    }
-
-    /**
-     * Table getter
-     *
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
+        return $this->table = is_string($table) ? $table : $table->val();
     }
 
     /**
@@ -262,7 +285,7 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public function offsetExists($offset)
     {
-        // TODO: Implement offsetExists() method.
+        return isset($this->attributes[$offset]);
     }
 
     /**
@@ -276,7 +299,7 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public function offsetGet($offset)
     {
-        // TODO: Implement offsetGet() method.
+        return $this->attributes[$offset];
     }
 
     /**
@@ -293,7 +316,7 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public function offsetSet($offset, $value)
     {
-        // TODO: Implement offsetSet() method.
+        $this->attributes[$offset] = $value;
     }
 
     /**
@@ -307,7 +330,7 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public function offsetUnset($offset)
     {
-        // TODO: Implement offsetUnset() method.
+        unset($this->attributes[$offset]);
     }
 
     /**
