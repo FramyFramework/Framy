@@ -179,6 +179,28 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * @param $column
+     * @param string $operator
+     * @param null $value
+     * @param string $boolean
+     * @return QueryBuilder
+     */
+    public static function where($column, $operator = "=", $value = null, $boolean = 'and')
+    {
+        $instance = new static;
+
+        return $instance->newQuery()->where($column, $operator, $value, $boolean);
+    }
+
+    /**
+     * @param int|array $id
+     */
+    public static function find($id)
+    {
+        
+    }
+
+    /**
      * Set a given attribute on the model.
      *
      * @param  string  $key
@@ -200,6 +222,16 @@ class Model implements ArrayAccess, JsonSerializable
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Table getter
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
     }
 
     /**

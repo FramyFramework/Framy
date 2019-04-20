@@ -40,6 +40,7 @@ class Builder
      * @var array
      */
     protected $passThru = [
+        'get', 'where',
         'insert', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
     ];
@@ -76,9 +77,12 @@ class Builder
         return $this->getQuery();
     }
 
-    public function get(array $columns = ['*'])
+    /**
+     * @return QueryBulder
+     */
+    private function fromTable()
     {
-        return $this->toBase()->from("test")->get($columns);
+        return $this->toBase()->from($this->model->getTable());
     }
 
     /**
@@ -91,7 +95,7 @@ class Builder
     public function __call($name, $arguments)
     {
         if(in_array($name, $this->passThru)) {
-            return call_user_func_array([$this->toBase(), $name], $arguments);
+            return call_user_func_array([$this->fromTable(), $name], $arguments);
         }
     }
 }
