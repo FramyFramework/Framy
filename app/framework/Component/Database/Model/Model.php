@@ -13,6 +13,7 @@ use app\framework\Component\Database\Connection\ConnectionFactory;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use ArrayAccess;
 use JsonSerializable;
@@ -230,6 +231,20 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * @param $column
+     * @param string $operator
+     * @param null $value
+     * @param string $boolean
+     * @return QueryBuilder
+     */
+    public static function where($column, $operator = "=", $value = null, $boolean = 'and')
+    {
+        $instance = new static();
+
+        return $instance->newQuery()->where($column, $operator, $value, $boolean);
+    }
+
+    /**
      * Set a given attribute on the model.
      *
      * @param  string  $key
@@ -259,6 +274,7 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public function getTable()
     {
+        /** @var String|StringObject $table */
         $table = $this->table;
 
         if ($table === null) {
@@ -268,7 +284,7 @@ class Model implements ArrayAccess, JsonSerializable
             $table->append("s");
         }
 
-        return $this->table = is_string($table) ? $table : $table->val();
+        return $this->table = is_string($table) ? $table->val() : $table;
     }
 
     /**

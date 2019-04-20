@@ -355,7 +355,7 @@ class Connection
      */
     private function getNeededModel($table)
     {
-        $model = "app\custom\Models\\".str($table)->charFirstUpper();
+        $model = "app\custom\Models\\".str($table)->charFirstUpper()->singularize();
 
         return class_exists($model)
             ? $model

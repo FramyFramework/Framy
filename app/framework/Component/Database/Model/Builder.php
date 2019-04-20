@@ -9,6 +9,7 @@
 namespace app\framework\Component\Database\Model;
 
 use app\framework\Component\Database\Query\Builder as QueryBulder;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 
 /**
  * Model Query Builder
@@ -16,6 +17,7 @@ use app\framework\Component\Database\Query\Builder as QueryBulder;
  * It is another layer between the Model and The QueryBuilder
  * providing useful stuff.
  *
+ * @method where($column, $operator = "=", $value = null, $boolean = 'and')
  * @package app\framework\Component\Database\Model
  */
 class Builder
@@ -43,6 +45,7 @@ class Builder
         'get', 'where',
         'insert', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
+        'first'
     ];
 
     /**
@@ -79,12 +82,43 @@ class Builder
 
     /**
      * @return QueryBulder
+     * @throws StringObjectException
      */
     private function fromTable()
     {
         return $this->toBase()
-            ->from($this->model->getTable())
-            ->get($columns);
+            ->from($this->model->getTable());
+    }
+
+    public function find($id)
+    {
+        $builder  = $this->toBase()
+            ->from($this->model->getTable());
+
+        if (!is_array($id)) {
+            $id = [$id];
+        }
+
+        foreach ($id as $item) {
+            $builder->orWhere($this->model->getPrimaryKey(), "=", $item);
+        }
+
+        if (sizeof($id) === 1) {
+            $result = $builder->first();
+        } else {
+            $result = $builder->get();
+        }
+
+        return $result;
+    }
+
+    public function findOrFail($id)
+    {
+        if (!is_null($res = $this->find($id))) {
+            return $res;
+        }
+
+        throw new ModelNotFoundException("Model `".$this->model->getTable()."` not found.");
     }
 
     /**
@@ -93,6 +127,7 @@ class Builder
      * @param $name
      * @param $arguments
      * @return Builder|mixed
+     * @throws StringObjectException
      */
     public function __call($name, $arguments)
     {
