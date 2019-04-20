@@ -82,7 +82,9 @@ class Builder
      */
     private function fromTable()
     {
-        return $this->toBase()->from($this->model->getTable());
+        return $this->toBase()
+            ->from($this->model->getTable())
+            ->get($columns);
     }
 
     /**
