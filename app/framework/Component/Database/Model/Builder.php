@@ -8,7 +8,7 @@
 
 namespace app\framework\Component\Database\Model;
 
-use app\framework\Component\Database\Query\Builder as QueryBulder;
+use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 
 /**
@@ -17,7 +17,7 @@ use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
  * It is another layer between the Model and The QueryBuilder
  * providing useful stuff.
  *
- * @method where($column, $operator = "=", $value = null, $boolean = 'and')
+ * @method QueryBuilder where($column, $operator = "=", $value = null, $boolean = 'and')
  * @package app\framework\Component\Database\Model
  */
 class Builder
@@ -25,7 +25,7 @@ class Builder
     /**
      * The base query builder instance.
      *
-     * @var QueryBulder
+     * @var QueryBuilder
      */
     protected $queryBuilder;
 
@@ -51,10 +51,10 @@ class Builder
     /**
      * Builder constructor.
      *
-     * @param QueryBulder $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param $model
      */
-    public function __construct(QueryBulder $queryBuilder, $model)
+    public function __construct(QueryBuilder $queryBuilder, $model)
     {
         $this->queryBuilder = $queryBuilder;
         $this->model        = $model;
@@ -63,7 +63,7 @@ class Builder
     /**
      * QueryBuilder getter
      *
-     * @return QueryBulder
+     * @return QueryBuilder
      */
     public function getQuery()
     {
@@ -73,7 +73,7 @@ class Builder
     /**
      * Get a base query builder instance.
      *
-     * @return QueryBulder
+     * @return QueryBuilder
      */
     public function toBase()
     {
@@ -81,7 +81,7 @@ class Builder
     }
 
     /**
-     * @return QueryBulder
+     * @return QueryBuilder
      * @throws StringObjectException
      */
     private function fromTable()
