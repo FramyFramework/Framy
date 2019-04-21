@@ -132,7 +132,10 @@ class Grammar
         $columns = [];
 
         foreach ($values as $key => $value) {
-            $columns[] = $this->wrap($key).' = '.$this->parameter($value);
+            $param = $this->parameter($value);
+            $param = is_string($param) ? "'".$param."'" : $param;
+
+            $columns[] = $this->wrap($key)." = ".$param;
         }
 
         $columns = implode(', ', $columns);

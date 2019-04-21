@@ -217,7 +217,7 @@ class Model implements ArrayAccess, JsonSerializable
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
-
+            $saved = $this->performUpdate($this->newQuery());
         }
 
         // If the model is brand new, we'll insert it into our database and set the
@@ -450,6 +450,30 @@ class Model implements ArrayAccess, JsonSerializable
         $this->exists = true;
 
         return true;
+    }
+
+    /**
+     * Performing an model update operation.
+     *
+     * @param Builder $query
+     */
+    protected function performUpdate(Builder $query)
+    {
+        // We will need to set the updated at stamp to current time
+        if ($this->usesTimestamps()) {
+            $this->setUpdatedAt($this->freshTimestamp());
+        }
+
+        // Get the changed attributes which shall then be updated
+        $attributes = array_diff($this->getAttributes(), $this->original);
+
+        $query->where(
+            $this->getPrimaryKey(),
+            '=',
+            $this->offsetGet($this->getPrimaryKey())
+        )->update($attributes);
+
+        $this->syncOriginal();
     }
     
     /**
