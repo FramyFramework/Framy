@@ -9,6 +9,7 @@
 namespace app\framework\Component\Database\Connection;
 
 use app\framework\Component\Database\Model\Model;
+use app\framework\Component\Database\Query\Builder;
 use app\framework\Component\Database\Query\Expression;
 use app\framework\Component\EventManager\EventManagerTrait;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
@@ -371,5 +372,21 @@ class Connection
     public function raw($value)
     {
         return new Expression($value);
+    }
+
+    /**
+     * Process an  "insert get ID" query
+     *
+     * @param string $sql
+     * @param array $values
+     * @return int|string
+     */
+    public function processInsertGetId(string $sql, array $values)
+    {
+        $this->insert($sql, $values);
+
+        $id = $this->pdo->lastInsertId();
+
+        return is_numeric($id) ? (int) $id : $id;
     }
 }

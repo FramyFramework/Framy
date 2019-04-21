@@ -307,6 +307,21 @@ class Builder
     }
 
     /**
+     * Insert a new record and get the value of the primary key.
+     *
+     * @param array $values
+     * @return int
+     */
+    public function insertGetId(array $values)
+    {
+        $sql = $this->grammar->compileInsertGetId($this, $values);
+
+        $values = $this->cleanBindings($values);
+
+        return $this->connection->processInsertGetId($sql, $values);
+    }
+
+    /**
      * Update a record in the database.
      *
      * @param array $values

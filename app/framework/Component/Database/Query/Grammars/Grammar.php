@@ -70,6 +70,18 @@ class Grammar
     }
 
     /**
+     * Compile an insert and get ID statement into SQL.
+     *
+     * @param  Builder  $query
+     * @param  array   $values
+     * @return string
+     */
+    public function compileInsertGetId(Builder $query, $values)
+    {
+        return $this->compileInsert($query, $values);
+    }
+
+    /**
      * Compile a insert query into SQL
      *
      * @param Builder $query

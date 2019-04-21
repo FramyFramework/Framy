@@ -43,7 +43,7 @@ class Builder
      */
     protected $passThru = [
         'get', 'where',
-        'insert', 'getBindings', 'toSql',
+        'insert', 'insertGetId', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
         'first'
     ];

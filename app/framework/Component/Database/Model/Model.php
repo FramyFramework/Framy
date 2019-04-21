@@ -13,6 +13,7 @@ use app\framework\Component\Database\Connection\ConnectionFactory;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
+use app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use ArrayAccess;
@@ -59,6 +60,18 @@ class Model implements ArrayAccess, JsonSerializable
     protected $keyType = 'int';
 
     /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    protected $incrementing = true;
+
+    /**
+     * @var bool
+     */
+    protected $timestamps = true;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -70,7 +83,21 @@ class Model implements ArrayAccess, JsonSerializable
      *
      * @var array
      */
-    protected $original;
+    protected $original = [];
+
+    /**
+     * The number of models to return for pagination.
+     *
+     * @var int
+     */
+    protected $perPage = 15;
+
+    /**
+     * Indicates if the model exists.
+     *
+     * @var bool
+     */
+    public $exists = false;
 
     /**use app\framework\Component\Database\DB;
 
@@ -163,25 +190,64 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * to save the this model to the database
+     * @return bool
+     */
+    public function isIncrementing(): bool
+    {
+        return $this->incrementing;
+    }
+
+    /**
+     * @param bool $incrementing
+     */
+    public function setIncrementing(bool $incrementing): void
+    {
+        $this->incrementing = $incrementing;
+    }
+
+    /**
+     * Save the model to the database.
+     *
+     * @return void
+     * @throws ConnectionNotConfiguredException
      */
     public function save()
-    {}
+    {
+        // If the model already exists in the database we can just update our record
+        // that is already in this database using the current IDs in this "where"
+        // clause to only update this model. Otherwise, we'll just insert them.
+        if ($this->exists) {
+
+        }
+
+        // If the model is brand new, we'll insert it into our database and set the
+        // ID attribute on the model to the value of the newly inserted row's ID
+        // which is typically an auto-increment value managed by the database.
+        else {
+            $saved = $this->performInsert($this->newQuery());
+        }
+
+        // If the model is successfully saved, we need to do a few more things once
+        // that is done. We will call the "saved" method here to run any actions
+        // we need to happen after a model gets successfully saved right here.
+        if ($saved) {
+            $this->finishSave();
+        }
+
+        return $saved;
+    }
 
     /**
      * Get number of entries in table
      */
     public function count()
     {
-        $instance = new static();
-        $instance->newQuery()->count();
-    }
+        $instance       = new static();
+        $result         = $instance->newQuery()->count();
+        $result->exists = true;
 
-    /**
-     * selects entries of table and return array of Models filled with data.
-     */
-    public function get()
-    {}
+        return $result;
+    }
 
     public function fill(array $attributes)
     {
@@ -190,18 +256,13 @@ class Model implements ArrayAccess, JsonSerializable
         }
     }
 
-    public function fillData(array $data)
-    {
-        foreach ($data as $key => $datum) {
-            $this->$key = $datum;
-        }
-    }
-
     public static function all(array $columns = ['*'])
     {
-        $instance = new static;
+        $instance       = new static();
+        $result         = $instance->newQuery()->get($columns);
+        $result->exists = true;
 
-        return $instance->newQuery()->get($columns);
+        return $result;
     }
 
     /**
@@ -210,24 +271,30 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public static function find($id)
     {
-        $instance = new static();
+        $instance       = new static();
+        $result         = $instance->newQuery()->find($id);
+        $result->exists = true;
 
-        return $instance->newQuery()->find($id);
+        return $result;
     }
 
     public static function findOrFail($id)
     {
-        $instance = new static();
+        $instance       = new static();
+        $result         = $instance->newQuery()->findOrFail($id);
+        $result->exists = true;
 
-        return $instance->newQuery()->findOrFail($id);
+        return $result;
     }
 
     public static function first()
     {
+        // TODO: implement
     }
 
     public static function latest()
     {
+        // TODO: implement
     }
 
     /**
@@ -239,9 +306,11 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public static function where($column, $operator = "=", $value = null, $boolean = 'and')
     {
-        $instance = new static();
+        $instance       = new static();
+        $result         = $instance->newQuery()->where($column, $operator, $value, $boolean);
+        $result->exists = true;
 
-        return $instance->newQuery()->where($column, $operator, $value, $boolean);
+        return $result;
     }
 
     /**
@@ -258,6 +327,11 @@ class Model implements ArrayAccess, JsonSerializable
         return $this;
     }
 
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
     /**
      * Get connection
      *
@@ -269,6 +343,8 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Returns table name. Extracts table name if not yet set.
+     *
      * @return mixed
      * @throws StringObjectException
      */
@@ -284,9 +360,98 @@ class Model implements ArrayAccess, JsonSerializable
             $table->append("s");
         }
 
-        return $this->table = is_string($table) ? $table->val() : $table;
+        return $this->table = is_string($table) ? $table : $table->val();
     }
 
+    /**
+     * Set the value of the "created at" attribute.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setCreatedAt($value)
+    {
+        $this->{static::CREATED_AT} = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of the "updated at" attribute.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setUpdatedAt($value)
+    {
+        $this->{static::UPDATED_AT} = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the name of the "created at" column.
+     *
+     * @return string
+     */
+    public function getCreatedAtColumn()
+    {
+        return static::CREATED_AT;
+    }
+
+    /**
+     * Get the name of the "updated at" column.
+     *
+     * @return string
+     */
+    public function getUpdatedAtColumn()
+    {
+        return static::UPDATED_AT;
+    }
+
+    /**
+     * Perform a model insert operation.
+     *
+     * @param Builder $query
+     * @return bool
+     */
+    protected function performInsert(Builder $query)
+    {
+        // First we'll need to create a fresh query instance and touch the creation and
+        // update timestamps on this model, which are maintained by us for developer
+        // convenience. After, we will just continue saving these model instances.
+        if ($this->usesTimestamps()) {
+            $this->updateTimestamps();
+        }
+
+        // If the model has an incrementing key, we can use the "insertGetId" method on
+        // the query builder, which will give us back the final inserted ID for this
+        // table from the database. Not all tables have to be incrementing though.
+        $attributes = $this->getAttributes();
+
+        if ($this->isIncrementing()) {
+            $this->insertAndSetId($query, $attributes);
+        }
+
+        // If the table isn't incrementing we'll simply insert these attributes as they
+        // are. These attribute arrays must contain an "id" column previously placed
+        // there by the developer as the manually determined key for these models.
+        else {
+            if (empty($attributes)) {
+                return true;
+            }
+
+            $query->insert($attributes);
+        }
+
+        // We will go ahead and set the exists property to true, so that it is set when
+        // the created event is fired, just in case the developer tries to update it
+        // during the event. This will allow them to do so and run an update here.
+        $this->exists = true;
+
+        return true;
+    }
+    
     /**
      * Whether a offset exists
      * @link https://php.net/manual/en/arrayaccess.offsetexists.php
@@ -362,6 +527,22 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __set($name, $value)
+    {
+        $this->offsetSet($name, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __get($name)
+    {
+        return $this->offsetGet($name);
+    }
+
+    /**
      * Get a new Query Builder
      *
      * @return Builder
@@ -388,5 +569,67 @@ class Model implements ArrayAccess, JsonSerializable
         );
 
         return new QueryBuilder($conn);
+    }
+
+    /**
+     * Update the creation and update timestamps.
+     *
+     * @return void
+     */
+    protected function updateTimestamps()
+    {
+        $time = $this->freshTimestamp();
+
+        if (! is_null(static::UPDATED_AT) ) {
+            $this->setUpdatedAt($time);
+        }
+
+        if (! is_null(static::CREATED_AT)) {
+            $this->setCreatedAt($time);
+        }
+    }
+
+    /**
+     * Insert the given attributes and set the ID on the model.
+     *
+     * @param  Builder  $query
+     * @param  array  $attributes
+     * @return void
+     */
+    protected function insertAndSetId(Builder $query, $attributes)
+    {
+        $id = $query->insertGetId($attributes, $keyName = $this->getPrimaryKey());
+
+        $this->setAttribute($keyName, $id);
+    }
+
+    /**
+     * Determine if the model uses timestamps.
+     *
+     * @return bool
+     */
+    public function usesTimestamps()
+    {
+        return $this->timestamps;
+    }
+
+    /**
+     * Returns current date time
+     *
+     * @return string
+     */
+    protected function freshTimestamp()
+    {
+        return (new DateTimeObject())->val();
+    }
+
+    /**
+     * Perform any actions that are necessary after the model is saved.
+     */
+    protected function finishSave()
+    {
+        // fire Event?
+
+        $this->syncOriginal();
     }
 }
