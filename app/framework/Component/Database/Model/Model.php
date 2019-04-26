@@ -249,6 +249,11 @@ class Model implements ArrayAccess, JsonSerializable
         return $result;
     }
 
+    /**
+     * Fill attributes by giving array.
+     *
+     * @param array $attributes
+     */
     public function fill(array $attributes)
     {
         foreach ($attributes as $key => $values) {
@@ -256,11 +261,36 @@ class Model implements ArrayAccess, JsonSerializable
         }
     }
 
+    /**
+     * Deletes the model
+     *
+     * @return int Number of effected rows
+     * @throws StringObjectException
+     * @throws ConnectionNotConfiguredException
+     */
+    public function delete()
+    {
+        return $this->newQuery()
+            ->wherePrimaryKey(
+                $this->offsetGet($this->getPrimaryKey())
+            )->delete();
+    }
+
+    /**
+     * Receive all model
+     *
+     * @param array $columns
+     * @return mixed
+     */
     public static function all(array $columns = ['*'])
     {
-        $instance       = new static();
-        $result         = $instance->newQuery()->get($columns);
-        $result->exists = true;
+        $instance = new static();
+        /** @var ArrayObject $result */
+        $result   = $instance->newQuery()->get($columns);
+
+        $result->map(function ($item) {
+            $item->exists = true;
+        });
 
         return $result;
     }
@@ -271,9 +301,12 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public static function find($id)
     {
-        $instance       = new static();
-        $result         = $instance->newQuery()->find($id);
-        $result->exists = true;
+        $instance = new static();
+        $result   = $instance->newQuery()->find($id);
+
+        if (! is_null($result)) {
+            $result->exists = true;
+        }
 
         return $result;
     }
@@ -306,9 +339,8 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public static function where($column, $operator = "=", $value = null, $boolean = 'and')
     {
-        $instance       = new static();
-        $result         = $instance->newQuery()->where($column, $operator, $value, $boolean);
-        $result->exists = true;
+        $instance = new static();
+        $result   = $instance->newQuery()->where($column, $operator, $value, $boolean);
 
         return $result;
     }

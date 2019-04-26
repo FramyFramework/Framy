@@ -112,6 +112,18 @@ class Builder
         return $result;
     }
 
+    /**
+     * Add where constrain where {primarykey} = $value
+     *
+     * @param $value
+     * @return QueryBuilder
+     * @throws StringObjectException
+     */
+    public function wherePrimaryKey($value)
+    {
+        return $this->fromTable()->Where($this->model->getPrimaryKey(), "=", $value);
+    }
+
     public function findOrFail($id)
     {
         if (!is_null($res = $this->find($id))) {
