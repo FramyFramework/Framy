@@ -18,6 +18,7 @@ use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
  * providing useful stuff.
  *
  * @method QueryBuilder where($column, $operator = "=", $value = null, $boolean = 'and')
+ * @method int insertGetId()
  * @package app\framework\Component\Database\Model
  */
 class Builder
