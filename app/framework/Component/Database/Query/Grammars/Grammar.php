@@ -70,6 +70,18 @@ class Grammar
     }
 
     /**
+     * Compile an insert and get ID statement into SQL.
+     *
+     * @param  Builder  $query
+     * @param  array   $values
+     * @return string
+     */
+    public function compileInsertGetId(Builder $query, $values)
+    {
+        return $this->compileInsert($query, $values);
+    }
+
+    /**
      * Compile a insert query into SQL
      *
      * @param Builder $query
@@ -120,7 +132,10 @@ class Grammar
         $columns = [];
 
         foreach ($values as $key => $value) {
-            $columns[] = $this->wrap($key).' = '.$this->parameter($value);
+            $param = $this->parameter($value);
+            $param = is_string($param) ? "'".$param."'" : $param;
+
+            $columns[] = $this->wrap($key)." = ".$param;
         }
 
         $columns = implode(', ', $columns);
