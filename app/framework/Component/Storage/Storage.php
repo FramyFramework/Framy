@@ -26,11 +26,7 @@ class Storage
 
     function __construct($diskName)
     {
-        try {
-            $this->disk = new Disk($diskName);
-        } catch (StorageException $e) {
-            handle($e);
-        }
+        $this->disk = new Disk($diskName);
     }
 
     public function keyExists($key)
@@ -63,6 +59,7 @@ class Storage
      * @param string $key
      *
      * @return string|bool if cannot read content
+     * @throws StorageException
      */
     public function getContents($key)
     {
@@ -75,9 +72,10 @@ class Storage
      * @param string $key
      * @param string $contents
      *
-     * @param bool   $append
+     * @param bool $append
      *
      * @return bool|int The number of bytes that were written into the file
+     * @throws StorageException
      */
     public function setContents($key, $contents, $append = false)
     {
@@ -103,13 +101,15 @@ class Storage
      *
      * @param string $key
      *
-     * @param bool   $asDateTimeObject (Optional) Return as DateTimeObject if true
+     * @param bool $asDateTimeObject (Optional) Return as DateTimeObject if true
      *
-     * @return UNIX Timestamp or DateTimeObject
+     * @return bool|int|DateTimeObject
+     * @throws StorageException
      */
     public function getTimeModified($key, $asDateTimeObject = false)
     {
         $time = $this->getDriver()->getTimeModified($key);
+
         if ($asDateTimeObject) {
             $datetime = new DateTimeObject();
 
@@ -125,6 +125,7 @@ class Storage
      * @param string $key
      *
      * @return bool
+     * @throws StorageException
      */
     public function deleteKey($key)
     {
@@ -138,6 +139,7 @@ class Storage
      * @param string $targetKey New key
      *
      * @return bool
+     * @throws StorageException
      */
     public function renameKey($sourceKey, $targetKey)
     {
@@ -145,19 +147,17 @@ class Storage
     }
 
     /**
-     * TODO: write actual method
-     * Check if key is a directory<br />
-     * Requires '\app\framework\Component\Storage\Driver\DirectoryAwareInterface' to be implemented by a Driver class
+     * Check if key is a directory
      *
      * @param string $key
      *
-     * @throws StorageException
      * @return bool
+     * @throws StorageException
      */
-    public function isDirectory($key)
+    public function isDirectory(string $key):bool
     {
-        if($this->supportsDirectories()){
-            return true;
+        if ($this->supportsDirectories()) {
+            return ($this->getDriver()->isDirectory($key));
         }
 
         return false;
@@ -168,13 +168,12 @@ class Storage
      * Requires '\app\framework\Component\Storage\Driver\TouchableInterface' to be implemented by a Driver class
      *
      * @param string $key
-     *
+     * @return mixed|void
      * @throws StorageException
-     * @return mixed
      */
     public function touchKey($key)
     {
-        if($this->supportsTouching()){
+        if ($this->supportsTouching()) {
             return $this->getDriver()->touchKey($key);
         }
     }
@@ -184,15 +183,19 @@ class Storage
      * Requires '\app\framework\Component\Storage\Driver\SizeAwareInterface' to be implemented by a Driver class
      *
      * @param string $key
-     *
      * @return int|bool The size of the file in bytes or false
+     * @throws StorageException
      */
     public function getSize($key)
     {
         if ($this->supportsSize()) {
             return $this->getDriver()->getSize($key);
         }
-        handle(new StorageException(StorageException::DRIVER_CAN_NOT_ACCESS_SIZE, [get_class($this->getDriver())]));
+
+        throw new StorageException(
+            StorageException::DRIVER_CAN_NOT_ACCESS_SIZE,
+            [get_class($this->getDriver())]
+        );
     }
 
     /**
@@ -200,19 +203,19 @@ class Storage
      * Requires '\app\framework\Component\Storage\Driver\AbsolutePathInterface' to be implemented by a Driver class
      *
      * @param $key
-     *
      * @return mixed
+     * @throws StorageException
      */
     public function getAbsolutePath($key = '')
     {
         if ($this->supportsAbsolutePaths()) {
             return $this->getDriver()->getAbsolutePath($key);
         }
-        handle(new StorageException(StorageException::DRIVER_DOES_NOT_SUPPORT_ABSOLUTE_PATHS, [
-                get_class($this->getDriver()
-                )
+
+        throw new StorageException(StorageException::DRIVER_DOES_NOT_SUPPORT_ABSOLUTE_PATHS, [
+                get_class($this->getDriver())
             ]
-        ));
+        );
     }
 
     public function getRecentKey()

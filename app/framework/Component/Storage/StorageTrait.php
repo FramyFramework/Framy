@@ -8,6 +8,9 @@
 
  namespace app\framework\Component\Storage;
 
+ use app\framework\Component\Storage\Directory\Directory;
+ use app\framework\Component\Storage\File\File;
+
  /**
   * A library of Storage functions
   *
@@ -23,10 +26,16 @@
       */
      protected static function storage($storageName)
      {
-         try {
-             return new Storage($storageName);
-         } catch(StorageException $e) {
-             handle($e);
-         }
+         return new Storage($storageName);
+     }
+
+     protected function file($key, $storageName)
+     {
+         return new File($key, self::storage($storageName));
+     }
+
+     protected function directory($key, $storageName, $recursive = false, $filter = null)
+     {
+         return new Directory($key, self::storage($storageName), $recursive, $filter);
      }
  }

@@ -40,8 +40,9 @@ class Disk implements DiskInterface
             }
         }
 
-        if($this->isNull($this->disk['driver']))
+        if($this->isNull($this->disk['driver'])) {
             $this->disk['driver'] = Config::getInstance()->get("default", "filesystem");
+        }
 
         if($this->disk['driver'] == 'local') {
             $this->Driver = new LocalStorageDriver($this->disk);
@@ -88,11 +89,13 @@ class Disk implements DiskInterface
 
     private function validateDisk($conf)
     {
-        if(!array_key_exists('driver', $conf))
+        if(!array_key_exists('driver', $conf)) {
             $conf['driver'] = null;
+        }
 
-        if(!array_key_exists('root', $conf))
+        if(!array_key_exists('root', $conf)) {
             $conf['root'] = null;
+        }
 
         return $conf;
     }
