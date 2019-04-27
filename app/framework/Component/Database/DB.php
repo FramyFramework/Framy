@@ -16,6 +16,11 @@ namespace app\framework\Component\Database;
  */
 class DB
 {
+    public static function table(string $name)
+    {
+        return (new Manager)->table($name);
+    }
+
     /**
      * To run a select query against the database
      *
@@ -23,23 +28,22 @@ class DB
      * @param array $bindings
      * @return array
      */
-    static function select(string $query, array $bindings = [])
+    public static function select(string $query, array $bindings = [])
     {
         return (new Manager)->selectRaw($query, $bindings);
     }
 
-    static function insert(string $query, array $bindings = [])
+    public static function insert(string $query, array $bindings = [])
     {
         return (new Manager)->insertRaw($query, $bindings);
     }
 
-    static function update(string $query, array $bindings = [])
+    public static function update(string $query, array $bindings = [])
     {
         return (new Manager)->updateRaw($query, $bindings);
     }
 
-
-    static function delete(string $query, array $bindings = [])
+    public static function delete(string $query, array $bindings = [])
     {
         return (new Manager)->deleteRaw($query, $bindings);
     }
