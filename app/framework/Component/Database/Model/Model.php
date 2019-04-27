@@ -331,6 +331,23 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Remove an selection of Models
+     *
+     * @param $id array|int
+     * @return int Number of effected rows
+     */
+    public static function remove($id)
+    {
+        $instance = new static();
+
+        if (! is_array($id)) {
+            $id = [$id];
+        }
+
+        return $instance->newQuery()->remove($id);
+    }
+
+    /**
      * @param $column
      * @param string $operator
      * @param null $value

@@ -90,9 +90,14 @@ class Builder
             ->from($this->model->getTable());
     }
 
+    /**
+     * @param $id
+     * @return Model|array|null
+     * @throws StringObjectException
+     */
     public function find($id)
     {
-        $builder  = $this->toBase()
+        $builder = $this->toBase()
             ->from($this->model->getTable());
 
         if (!is_array($id)) {
@@ -124,6 +129,12 @@ class Builder
         return $this->fromTable()->Where($this->model->getPrimaryKey(), "=", $value);
     }
 
+    /**
+     * @param $id
+     * @return Model|array|null
+     * @throws ModelNotFoundException
+     * @throws StringObjectException
+     */
     public function findOrFail($id)
     {
         if (!is_null($res = $this->find($id))) {
@@ -131,6 +142,25 @@ class Builder
         }
 
         throw new ModelNotFoundException("Model `".$this->model->getTable()."` not found.");
+    }
+
+    /**
+     * Remove an selection of Models
+     *
+     * @param array $ids
+     * @return int Number of effected rows
+     * @throws StringObjectException
+     */
+    public function remove(array $ids)
+    {
+        $builder = $this->toBase()
+            ->from($this->model->getTable());
+
+        foreach ($ids as $item) {
+            $builder->orWhere($this->model->getPrimaryKey(), "=", $item);
+        }
+
+        return $builder->delete();
     }
 
     /**
