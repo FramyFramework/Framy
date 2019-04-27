@@ -10,6 +10,7 @@ namespace app\framework\Component\Database;
 
 use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Connection\ConnectionFactory;
+use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Query\Builder;
 
 /**
@@ -29,36 +30,33 @@ class Manager
     private $connectionToUse;
 
     /**
-     * @var ConnectionFactory
-     */
-    private $ConnectionFactory;
-
-    /**
      * @var Builder
      */
     private $QueryBuilder;
 
     /**
      * Manager constructor.
+     * @throws ConnectionNotConfiguredException
      */
     public function __construct()
     {
-        $this->ConnectionFactory = new ConnectionFactory();
-
         // use default connection
-        if($this->connectionToUse == null)
+        if($this->connectionToUse == null) {
             $this->connection();
             $this->useConnection();
+        }
     }
 
     /**
      * Set up connection.
      * @param string $name
      * @return Manager
+     * @throws ConnectionNotConfiguredException
      */
     public function connection(string $name = null): Manager
     {
-        $connection = $this->ConnectionFactory->make($name);
+        $connection = ConnectionFactory::getInstance()->get($name);
+
         $this->connections[$connection->getName()] = $connection;
 
         return $this;

@@ -13,40 +13,68 @@ use app\framework\Component\StdLib\StdLibTrait;
 use app\framework\Component\Storage\File\File;
 use app\framework\Component\Storage\Storage;
 use app\framework\Component\Storage\StorageException;
+use ArrayIterator;
+use IteratorAggregate;
+use Traversable;
 
-class Directory implements DirectoryInterface, \IteratorAggregate
+class Directory implements DirectoryInterface, IteratorAggregate
 {
     use StdLibTrait,EventManagerTrait;
 
+    /**
+     * @var string
+     */
     protected $key;
+
+    /**
+     * @var Storage
+     */
     protected $storage;
+
+    /**
+     * @var bool
+     */
     protected $recursive;
+
+    /**
+     * @var array
+     */
     protected $items;
+
+    /**
+     * used when reading directory items
+     * @var string
+     */
     protected $regex;
 
     /**
      * Constructor
      *
-     * @param string      $key               File key
-     * @param Storage     $storage           Storage to use
-     * @param bool        $recursive         (Optional) By default, Directory will only read the first level if items.
-     *                                       If set to true, Directory will read all children items and list them as one-dimensional array.
-     * @param null|string $filter            (Optional) Filter to use when reading directory items
+     * @param string      $key       File key
+     * @param Storage     $storage   Storage to use
+     * @param bool        $recursive (Optional) By default, Directory will only read the first level if items.
+     *                               If set to true, Directory will read all children items and list them as one-dimensional array.
+     * @param null|string $filter    (Optional) Filter to use when reading directory items
      *
+     * @throws
      */
     public function __construct($key, Storage $storage, $recursive = false, $filter = null)
     {
-        if(!$storage->supportsDirectories()){
+        if (! $storage->supportsDirectories()) {
             $driver = get_class($storage->getDriver());
-            handle(new StorageException(StorageException::DRIVER_CAN_NOT_WORK_WITH_DIRECTORIES, [$driver]));
+            throw new StorageException(StorageException::DRIVER_CAN_NOT_WORK_WITH_DIRECTORIES, [$driver]);
         }
 
-        $this->key = $key;
+        $this->key       = $key;
         $this->recursive = $recursive;
-        $this->storage = $storage;
+        $this->storage   = $storage;
 
-        if ($this->storage->keyExists($key) && !$this->storage->isDirectory($key)) {
-            handle(new StorageException(StorageException::DIRECTORY_OBJECT_CAN_NOT_READ_FILE_PATHS, [$key]));
+        if (!$this->storage->keyExists($key)) {
+            throw new StorageException(StorageException::DIRECTORY_DOES_NOT_EXIST, [$key]);
+        }
+
+        if (!$this->storage->isDirectory($key)) {
+            throw new StorageException(StorageException::DIRECTORY_OBJECT_CAN_NOT_READ_FILE_PATHS, [$key]);
         }
 
         $this->parseFilter($filter);
@@ -57,6 +85,7 @@ class Directory implements DirectoryInterface, \IteratorAggregate
      *
      * WARNING! This is a very intensive operation especially on deep directory structures!
      * It is performed by recursively walking through directory structure and getting each file's size.
+     * @throws StorageException
      */
     public function getSize()
     {
@@ -79,6 +108,13 @@ class Directory implements DirectoryInterface, \IteratorAggregate
         return $this->key;
     }
 
+    public function getKeys()
+    {
+        $this->loadItems();
+
+        return $this->items;
+    }
+
     /**
      * Get Storage used by the DirectoryInterface instance
      *
@@ -93,6 +129,7 @@ class Directory implements DirectoryInterface, \IteratorAggregate
      * Get absolute folder path
      *
      * @return string
+     * @throws StorageException
      */
     public function getAbsolutePath()
     {
@@ -104,14 +141,15 @@ class Directory implements DirectoryInterface, \IteratorAggregate
      * Retrieve an external iterator
      *
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return \Traversable An instance of an object implementing <b>Iterator</b> or
+     * @return Traversable An instance of an object implementing <b>Iterator</b> or
      *       <b>Traversable</b>
+     * @throws StorageException
      */
     public function getIterator()
     {
         $this->loadItems();
 
-        return new \ArrayIterator($this->items);
+        return new ArrayIterator($this->items);
     }
 
     /**
@@ -126,6 +164,7 @@ class Directory implements DirectoryInterface, \IteratorAggregate
      * @param $condition
      *
      * @return $this DirectoryInterface object containing only filtered values
+     * @throws
      */
     public function filter($condition)
     {
@@ -136,6 +175,7 @@ class Directory implements DirectoryInterface, \IteratorAggregate
      * Count number of items in a directory
      *
      * @return int Number of items in the directory
+     * @throws StorageException
      */
     public function count()
     {
@@ -149,7 +189,7 @@ class Directory implements DirectoryInterface, \IteratorAggregate
      *
      * @return bool
      */
-    public static function isDirectory()
+    public function isDirectory()
     {
         return true;
     }
@@ -160,6 +200,7 @@ class Directory implements DirectoryInterface, \IteratorAggregate
      * @param bool $fireStorageEvents (Optional) If you don't want to fire StorageEvent::FILE_DELETED set this to false
      *
      * @return bool
+     * @throws StorageException
      */
     public function delete($fireStorageEvents = true)
     {
@@ -188,12 +229,28 @@ class Directory implements DirectoryInterface, \IteratorAggregate
         return $this->storage->deleteKey($this->key);
     }
 
+    /**
+     * To delete a key within the dir
+     * @param string $key
+     * @return bool
+     * @throws StorageException
+     */
+    public function deleteKey(string $key): bool
+    {
+        return $this->storage->deleteKey($key);
+    }
+
+    /**
+     * @param $filter
+     */
     protected function parseFilter($filter)
     {
         if (empty($filter)) {
             return;
         }
+
         $filter = $this->str($filter);
+
         if ($filter->startsWith('*')) {
             $filter->replace('.', '\.');
             $this->regex = '/(\S+)' . $filter . '/';
@@ -205,6 +262,9 @@ class Directory implements DirectoryInterface, \IteratorAggregate
         }
     }
 
+    /**
+     * @throws StorageException
+     */
     protected function loadItems()
     {
         if ($this->items === null) {
@@ -218,6 +278,7 @@ class Directory implements DirectoryInterface, \IteratorAggregate
                     }
                 }
             }
+
             // Instantiate files/directories
             $this->items = [];
             foreach ($keys as $key) {

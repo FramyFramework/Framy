@@ -10,6 +10,7 @@ namespace app\framework\Component\Storage\File;
 
 use app\framework\Component\EventManager\EventManagerTrait;
 use app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use app\framework\Component\Storage\Storage;
 use app\framework\Component\Storage\StorageEvent;
 use app\framework\Component\Storage\StorageException;
@@ -27,7 +28,7 @@ class File implements FileInterface
      *
      * @param string  $key     File key
      * @param Storage $storage Storage to use
-     *
+     * @throws StorageException
      */
     function __construct($key, Storage $storage)
     {
@@ -35,8 +36,8 @@ class File implements FileInterface
         $this->key     = $key;
 
         //make sure a file path is given
-        if($this->storage->keyExists($this->key) && $this->getStorage()->isDirectory($this->key)){
-            handle(new StorageException(StorageException::FILE_NOT_FOUND, [$key]));
+        if (! $this->storage->keyExists($this->key)) {
+            throw new StorageException(StorageException::FILE_NOT_FOUND, [$key]);
         }
     }
 
@@ -66,6 +67,7 @@ class File implements FileInterface
      * @param bool $asDateTimeObject
      *
      * @return int|DateTimeObject UNIX timestamp or DateTimeObject
+     * @throws StorageException
      */
     public function getTimeModified($asDateTimeObject = false)
     {
@@ -85,10 +87,10 @@ class File implements FileInterface
      * Fires an event StorageEvent::FILE_SAVED after the file content was written.
      *
      * @param mixed $contents
-     *
-     * @param bool  $append
-     *
+     * @param bool $append
      * @return bool | int
+     * @throws StorageException
+     * @throws StringObjectException
      */
     public function setContents($contents, $append = false)
     {
@@ -100,6 +102,7 @@ class File implements FileInterface
      * Get file size in bytes
      *
      * @return int|null Number of bytes or null
+     * @throws StorageException
      */
     public function getSize()
     {
@@ -110,6 +113,7 @@ class File implements FileInterface
      * Touch a file (change time modified)
      *
      * @return $this
+     * @throws StorageException
      */
     public function touch()
     {
@@ -117,7 +121,9 @@ class File implements FileInterface
     }
 
     /**
-     * @return mixed
+     * Reads the contents of the file
+     * @return bool|string
+     * @throws StorageException
      */
     public function getContent()
     {
@@ -128,9 +134,11 @@ class File implements FileInterface
      * Cpt. Obviously approves that this method renames the File.
      *
      * @param $newName
-     * @return mixed
+     * @return bool
+     * @throws StringObjectException
+     * @throws StorageException
      */
-    public function rename($newName)
+    public function rename($newName): bool
     {
         if ($this->storage->renameKey($this->key, $newName)) {
             $event = new StorageEvent($this);
@@ -147,9 +155,11 @@ class File implements FileInterface
     /**
      * Deletes the File.
      *
-     * @return mixed
+     * @return bool
+     * @throws StorageException
+     * @throws StringObjectException
      */
-    public function delete()
+    public function delete(): bool
     {
         if ($this->storage->deleteKey($this->key)) {
             $this->eventManager()->fire(StorageEvent::FILE_DELETED, new StorageEvent($this));
@@ -162,9 +172,20 @@ class File implements FileInterface
 
     /**
      * @return mixed
+     * @throws StorageException
      */
     public function getAbsolutePath()
     {
         return $this->storage->getAbsolutePath($this->key);
+    }
+
+    /**
+     * check if is directory
+     * @return bool
+     * @throws StorageException
+     */
+    public function isDirectory(): bool
+    {
+        return $this->getStorage()->isDirectory($this->getKey());
     }
 }

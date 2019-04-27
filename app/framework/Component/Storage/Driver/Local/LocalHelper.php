@@ -58,13 +58,15 @@ class LocalHelper
      *
      * @param $directory
      * @param $create <br> StorageException If directory doesn't exist
+     * @throws StorageException
      */
     public function ensureDirectoryExists($directory, $create)
     {
-        if (!is_dir($directory)) {
-            if (!$create) {
-                handle(new StorageException(StorageException::DIRECTORY_DOES_NOT_EXIST, [$directory]));
+        if (! is_dir($directory)) {
+            if (! $create) {
+                throw new StorageException(StorageException::DIRECTORY_DOES_NOT_EXIST, [$directory]);
             }
+
             $this->createDirectory($directory);
         }
     }
@@ -149,6 +151,7 @@ class LocalHelper
      * @param $create
      *
      * @return mixed
+     * @throws StorageException
      */
     public function buildPath($key, $directory, $create)
     {

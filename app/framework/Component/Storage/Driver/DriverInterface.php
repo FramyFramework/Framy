@@ -8,6 +8,8 @@
 
 namespace app\framework\Component\Storage\Driver;
 
+use app\framework\Component\Storage\StorageException;
+
 /**
  * Interface DriverInterface
  *
@@ -83,7 +85,7 @@ interface DriverInterface
      * @param string $targetKey
      *
      * @return bool
-     * @throws \app\framework\Component\Storage\StorageException
+     * @throws StorageException
      */
     public function renameKey($sourceKey, $targetKey);
 

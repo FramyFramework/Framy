@@ -9,10 +9,14 @@
 namespace app\framework\Component\Database\Connection;
 
 use app\framework\Component\Database\Model\Model;
+use app\framework\Component\Database\Query\Builder;
+use app\framework\Component\Database\Query\Expression;
 use app\framework\Component\EventManager\EventManagerTrait;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use app\framework\Component\Stopwatch\Stopwatch;
 use app\framework\Component\Stopwatch\StopwatchEvent;
+use Closure;
+use Exception;
 use PDO;
 use PDOStatement;
 
@@ -159,9 +163,9 @@ class Connection
         return $this->config['driver'];
     }
 
-    public function select(string $query, array $bindings = [])
+    public function select(string $query, array $bindings = [], $table = "")
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
+        return $this->run($query, $bindings, function ($me, $query, $bindings) use ($table) {
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
@@ -170,7 +174,7 @@ class Connection
 
             $statement->execute($bindings);
 
-            return $statement->fetchAll(PDO::FETCH_CLASS, Model::class);
+            return arr($statement->fetchAll(PDO::FETCH_CLASS, $this->getNeededModel($table)));
         });
     }
 
@@ -252,11 +256,11 @@ class Connection
      *
      * @param string $query
      * @param array $bindings
-     * @param \Closure $callback
+     * @param Closure $callback
      * @throws
      * @return mixed
      */
-    protected function run(string $query, array $bindings, \Closure $callback)
+    protected function run(string $query, array $bindings, Closure $callback)
     {
         $stopwatch = new Stopwatch();
         $result    = null;
@@ -264,7 +268,7 @@ class Connection
 
         try {
             $result = $this->runQueryCallback($query, $bindings, $callback);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             handle($e);
         }
 
@@ -277,12 +281,12 @@ class Connection
      *
      * @param  string    $query
      * @param  array     $bindings
-     * @param  \Closure  $callback
+     * @param  Closure  $callback
      * @return mixed
      *
-     * @throws
+     * @throws Exception
      */
-    protected function runQueryCallback($query, $bindings, \Closure $callback)
+    protected function runQueryCallback($query, $bindings, Closure $callback)
     {
         // To execute the statement, we'll simply call the callback, which will actually
         // run the SQL against the PDO connection. Then we can calculate the time it
@@ -294,9 +298,9 @@ class Connection
         // If an exception occurs when attempting to run a query, we'll format the error
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
-        catch (\Exception $e) {
-            throw new \Exception(
-                $query, $bindings, $e
+        catch (Exception $e) {
+            throw new Exception(
+                $query, $e->getCode(), $e
             );
         }
 
@@ -325,6 +329,7 @@ class Connection
 
     /**
      * Fetch PDO Result and return and array of Models
+     *
      * @param PDOStatement $statement
      * @return Model[]|Model
      */
@@ -339,5 +344,49 @@ class Connection
         }
 
         return $result;
+    }
+
+    /**
+     * Returns the fully qualified class name of the model,
+     * if it doesn't exist or is not where it should be the
+     * base model is returned.
+     *
+     * @param $table
+     * @return string
+     */
+    private function getNeededModel($table)
+    {
+        $model = "app\custom\Models\\".str($table)->charFirstUpper()->singularize();
+
+        return class_exists($model)
+            ? $model
+            : Model::class;
+    }
+
+    /**
+     * Get a new raw query expression.
+     *
+     * @param $value
+     * @return Expression
+     */
+    public function raw($value)
+    {
+        return new Expression($value);
+    }
+
+    /**
+     * Process an  "insert get ID" query
+     *
+     * @param string $sql
+     * @param array $values
+     * @return int|string
+     */
+    public function processInsertGetId(string $sql, array $values)
+    {
+        $this->insert($sql, $values);
+
+        $id = $this->pdo->lastInsertId();
+
+        return is_numeric($id) ? (int) $id : $id;
     }
 }
