@@ -89,6 +89,11 @@ trait AuthenticatesUsers
     public function login(Request $request)
     {
         $credentials = $request->paramsPost()->all();
+
+        // gets passed from register flow. So we need to
+        // remove it to successfully login. I dont understand
+        // why but that is how we do it
+        unset($credentials['name']);
         unset($credentials['remember']);
 
         $remember = $request->param("remember") ?: false;

@@ -69,6 +69,9 @@ trait RegistersUsers
         // call create function
         $this->create($params);
 
+        // login
+        $this->login($request);
+
         // redirect
         header("Location: ".$this->redirectTo);
         exit;
