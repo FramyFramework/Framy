@@ -166,12 +166,10 @@ trait AuthenticatesUsers
         }
 
         // now everything is fine and the password can be set
-
-        DB::update("UPDATE users SET password=:newPassword, reset_password_token=:token WHERE id=:id", [
-            'newPassword' => Hash::make($password),
-            'token' => null,
-            'id' => Auth::user()->id
-        ]);
+        $user = Auth::user();
+        $user->password = Hash::make($password);
+        $user->reset_password_token = '';
+        $user->save();
 
         header("Location: ".$this->redirectTo);
         exit;

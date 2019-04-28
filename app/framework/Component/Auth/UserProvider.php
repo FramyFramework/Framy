@@ -8,6 +8,7 @@
 
 namespace app\framework\Component\Auth;
 
+use app\custom\Models\User;
 use app\framework\Component\Database\DB;
 use app\framework\Component\Database\Model\Model;
 use app\framework\Component\StdLib\StdObject\StdObjectException;
@@ -27,7 +28,7 @@ class UserProvider
      */
     public function retrieveById($identifier)
     {
-        return DB::select("SELECT * FROM users WHERE id=".$identifier)[0];
+        return User::find($identifier);
     }
 
     /**
