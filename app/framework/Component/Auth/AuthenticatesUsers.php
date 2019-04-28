@@ -15,6 +15,7 @@ use app\framework\Component\Hashing\Hash;
 use app\framework\Component\Routing\Request;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 
 /**
  * Trait AuthenticatesUsers
@@ -55,6 +56,7 @@ trait AuthenticatesUsers
      *
      * @param Request $request
      * @return mixed
+     * @throws StringObjectException
      */
     public function postLogin(Request $request)
     {
@@ -72,10 +74,9 @@ trait AuthenticatesUsers
         // create reset token
         $token = StringObject::random(100);
 
-        DB::update("UPDATE users SET reset_password_token=:token WHERE id=:id", [
-            "id" => Auth::user()->id,
-            "token" => $token
-        ]);
+        $user = Auth::user();
+        $user->reset_password_token = $token;
+        $user->save();
 
         //TODO send mail with token link to user email
     }
@@ -85,6 +86,7 @@ trait AuthenticatesUsers
      *
      * @param Request $request
      * @return mixed
+     * @throws StringObjectException
      */
     public function login(Request $request)
     {

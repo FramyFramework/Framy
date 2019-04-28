@@ -40,7 +40,7 @@ class UserProvider
      */
     public function retrieveByToken($identifier, $token)
     {
-
+        // TODO
     }
 
     /**
@@ -52,7 +52,7 @@ class UserProvider
      */
     public function updateRememberToken(Model $user, $token)
     {
-
+        // TODO
     }
 
     /**
@@ -97,6 +97,6 @@ class UserProvider
      */
     public function validateCredentials(Model $user, array $credentials)
     {
-
+        // TODO
     }
 }

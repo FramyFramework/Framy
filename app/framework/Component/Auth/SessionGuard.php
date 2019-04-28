@@ -59,7 +59,6 @@ class SessionGuard
      */
     protected $tokenRetrievalAttempted = false;
 
-
     /**
      *
      */
@@ -104,6 +103,8 @@ class SessionGuard
         if ($this->user()) {
             return $this->user()->id;
         }
+
+        return null;
     }
 
     /**
@@ -191,7 +192,7 @@ class SessionGuard
     }
 
     /**
-     *
+     * @throws Exception
      */
     protected function createRememberTokenIfDoesntExist()
     {
@@ -233,6 +234,7 @@ class SessionGuard
      * @param $user
      * @param $remember
      * @throws StringObjectException
+     * @throws Exception
      */
     public function login($user, $remember)
     {
@@ -249,12 +251,12 @@ class SessionGuard
     }
 
     /**
+     * Logout authenticated user
+     *
      * @throws Exception
      */
     public function logout()
     {
-        $user = $this->user();
-
         // If we have an event dispatcher instance, we can fire off the logout event
         // so any further processing can be done. This allows the developer to be
         // listening for anytime a user signs out of this application manually.
@@ -318,6 +320,8 @@ class SessionGuard
 
             return $user;
         }
+
+        return null;
     }
 
     /**
