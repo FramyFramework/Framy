@@ -8,11 +8,16 @@
 
 namespace app\framework\Component\Auth;
 
+use app\framework\Component\Database\Model\Model;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
+
 class Auth
 {
     /**
      * Get the logged in user model
-     * @return \app\framework\Component\Database\Model\Model|null
+     *
+     * @return Model|null
+     * @throws StringObjectException
      */
     public static function user()
     {
@@ -21,7 +26,9 @@ class Auth
 
     /**
      * Check if someone is logged in
+     *
      * @return bool
+     * @throws StringObjectException
      */
     public static function check(): bool
     {
@@ -30,7 +37,9 @@ class Auth
 
     /**
      * Get the currently authenticated user's ID...
+     *
      * @return int
+     * @throws StringObjectException
      */
     public static function id():int
     {

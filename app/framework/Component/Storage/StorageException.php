@@ -24,6 +24,7 @@ class StorageException extends AbstractException
     const DIRECTORY_OBJECT_CAN_NOT_READ_FILE_PATHS = 110;
     const PATH_IS_OUT_OF_STORAGE_ROOT = 111;
     const DISK_NOT_FOUND = 112;
+    const COULD_NOT_CREATE_FILE = 113;
 
     protected static $messages = [
         101 => 'File not found!',
@@ -37,6 +38,7 @@ class StorageException extends AbstractException
         109 => 'Storage directory `%s` could not be created!',
         110 => 'Directory object can not read file paths (attempting to read `%s`)!',
         111 => 'The path `%s` is out of storage root `%s`.',
-        112 => 'Disk not found'
+        112 => 'Disk not found',
+        113 => 'Could not create file: %s'
     ];
 }

@@ -65,7 +65,7 @@ class Encrypter
      */
     public function generateKey($cipher)
     {
-        return random_bytes($cipher === Ciphers::AES_128_CBC ? 16 : 32);
+        return utf8_encode(random_bytes($cipher === Ciphers::AES_128_CBC ? 16 : 32));
     }
 
     /**

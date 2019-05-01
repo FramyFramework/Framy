@@ -9,6 +9,7 @@
 namespace app\framework\Component\Database\Model;
 
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
+use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 
 /**
@@ -18,7 +19,9 @@ use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
  * providing useful stuff.
  *
  * @method QueryBuilder where($column, $operator = "=", $value = null, $boolean = 'and')
- * @method int insertGetId()
+ * @method int insertGetId(array $values)
+ * @method int count(string $columns = '*')
+ * @method ArrayObject|null get(array $columns = ['*'])
  * @package app\framework\Component\Database\Model
  */
 class Builder
@@ -93,7 +96,7 @@ class Builder
 
     /**
      * @param $id
-     * @return Model|array|null
+     * @return Model|ArrayObject|null
      * @throws StringObjectException
      */
     public function find($id)

@@ -59,6 +59,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * LocalStorageDriver constructor.
      *
      * @param $config
+     * @throws StorageException
      */
     function __construct($config)
     {
@@ -67,7 +68,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
         }
 
         if(!$config instanceof ArrayObject){
-            handle(new StorageException('Storage driver config must be an array or ArrayObject!'));
+            throw new StorageException('Storage driver config must be an array or ArrayObject!');
         }
 
         $this->helper = LocalHelper::getInstance();
@@ -97,7 +98,6 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      */
     private function buildPath($key)
     {
-        //$path = $this->helper->buildPath($key, $this->directory, $this->create);
         $path = $this->helper->buildPath($key, $this->directory, true);
         if (strpos($path, $this->directory) !== 0) {
             throw (new StorageException(StorageException::PATH_IS_OUT_OF_STORAGE_ROOT, [
@@ -152,7 +152,6 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      *
      * @param      $key
      * @param      $contents
-     *
      * @param bool $append
      *
      * @return bool|int The number of bytes that were written into the file
@@ -294,6 +293,23 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
         }
 
         throw new StorageException(StorageException::FILE_NOT_FOUND);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function crateKey($key)
+    {
+        $file = fopen($this->buildPath($key), "w");
+
+        if (! $file) {
+            throw new StorageException(StorageException::COULD_NOT_CREATE_FILE, $key);
+        }
+
+        fwrite($file,"");
+        fclose($file);
+
+        return true;
     }
 
     /**

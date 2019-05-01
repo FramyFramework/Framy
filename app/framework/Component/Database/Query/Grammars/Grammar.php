@@ -487,7 +487,8 @@ class Grammar
     {
         $queryValues = [];
 
-        for ($i = 0; $i < count($values); $i++) {
+        $count = count($values);
+        for ($i = 0; $i < $count; $i++) {
             $queryValues[] = $columns[$i]."=".$this->quoteString(array_values($values)[$i]);
         }
 

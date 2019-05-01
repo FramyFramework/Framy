@@ -90,6 +90,14 @@ interface DriverInterface
     public function renameKey($sourceKey, $targetKey);
 
     /**
+     * Create file with empty content
+     *
+     * @param $key
+     * @return true on success
+     */
+    public function crateKey($key);
+
+    /**
      * Returns most recent file key that was used by a storage
      *
      * @return string|null

@@ -97,6 +97,18 @@ class Storage
     }
 
     /**
+     * Create file with empty content
+     *
+     * @param $key
+     * @return true on success
+     * @throws StorageException
+     */
+    public function createKey($key)
+    {
+        return $this->getDriver()->crateKey($key);
+    }
+
+    /**
      * Returns the last modified time
      *
      * @param string $key
