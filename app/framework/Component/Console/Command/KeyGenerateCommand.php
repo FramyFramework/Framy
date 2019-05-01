@@ -8,7 +8,6 @@
 
 namespace app\framework\Component\Console\Command;
 
-
 use app\framework\Component\Config\Config;
 use app\framework\Component\Encryption\Ciphers;
 use app\framework\Component\Encryption\Encrypter;
