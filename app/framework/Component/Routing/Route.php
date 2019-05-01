@@ -11,7 +11,10 @@
 
 namespace app\framework\Component\Routing;
 
+use app\framework\Component\Config\Config;
+use app\framework\Component\Routing\Exceptions\MiddlewareNotFoundException;
 use InvalidArgumentException;
+use Exception;
 
 /**
  * Route
@@ -78,6 +81,13 @@ class Route
      * @type string
      */
     protected $name;
+
+    /**
+     *
+     *
+     * @var array
+     */
+    protected $middleware = [];
 
 
     /**
@@ -236,6 +246,52 @@ class Route
         return $this;
     }
 
+    /**
+     * Getter for middleware
+     *
+     * @return array
+     */
+    public function getMiddleware()
+    {
+        return $this->middleware;
+    }
+
+    /**
+     * Set middleware attr. and instantiate classes
+     * to just call the handle method later
+     *
+     * @param string $name
+     * @throws MiddlewareNotFoundException
+     */
+    public function middleware(string $name)
+    {
+        $obj = $this->getFromConfig("global")[$name];
+
+        if (is_null($obj)) {
+            $obj = $this->getFromConfig("groups")[$name];
+        }
+
+        $obj = [$obj];
+
+        foreach ($obj as $class) {
+            if (class_exists($class)) {
+                $this->middleware[] = new $class;
+            } else {
+                throw new MiddlewareNotFoundException("Middleware `%s` not found", $name);
+            }
+        }
+    }
+
+    /**
+     * Little helper to load from middleware config
+     *
+     * @param $config
+     * @return mixed
+     */
+    private function getFromConfig($config)
+    {
+        return Config::getInstance()->get($config, 'middleware');
+    }
 
     /**
      * Magic "__invoke" method
