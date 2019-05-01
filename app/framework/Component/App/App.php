@@ -8,6 +8,8 @@
 
 namespace app\framework\Component\App;
 
+use Exception;
+
 class App
 {
     private $defaultNamespaces = [
@@ -30,8 +32,8 @@ class App
         $this->registerNewClass($classMethod, $method);
         try {
             if($method == null)
-                throw new \Exception("You have to specify an method to call");
-        } catch (\Exception $e) {
+                throw new Exception("You have to specify an method to call");
+        } catch (Exception $e) {
             handle($e);
         } finally {
             return $this->callMethod($classMethod, $method, $param);
@@ -63,8 +65,8 @@ class App
 
         try {
             if(! is_object($t_class = new $class))
-                throw new \Exception("Could not instantiate class");
-        } catch (\Exception $e) {
+                throw new Exception("Could not instantiate class");
+        } catch (Exception $e) {
             handle($e);
         } finally {
             if(! self::checkIfClassIsRegistered($class)){
@@ -89,8 +91,8 @@ class App
                     return $class;
                 }
             }
-            throw new \Exception("Class not found. Maybe changing '/' to '\' helps.");
-        } catch (\Exception $e) {
+            throw new Exception("Class not found. Maybe changing '/' to '\' helps.");
+        } catch (Exception $e) {
             handle($e);
         }
     }

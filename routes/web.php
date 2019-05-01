@@ -13,6 +13,7 @@ use app\framework\Component\Routing\Router;
 Router::get("/", function() {
     view("welcome", ["version" => version()]);
 });
+
 Router::get("/home", function() {
     view("home");
 });
