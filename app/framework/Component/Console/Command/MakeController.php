@@ -20,7 +20,6 @@ class MakeController extends Command
     private $controllerTemplate =
         <<<'EOD'
 <?php
-
 namespace app\custom\Http\Controller;
 
 class §NAME§
@@ -42,7 +41,7 @@ EOD;
     {
         $newControllerName = $input->getArgument("name");
 
-        $File = new File($newControllerName.".php", new Storage("controller"));
+        $File = new File($newControllerName.".php", new Storage("controller"), true);
         fopen($File->getAbsolutePath(), "w");
 
         $tempDefaultCommand = str_replace("§NAME§", $newControllerName, $this->controllerTemplate);

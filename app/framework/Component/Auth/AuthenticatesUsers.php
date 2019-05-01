@@ -15,6 +15,7 @@ use app\framework\Component\Hashing\Hash;
 use app\framework\Component\Routing\Request;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 
 /**
  * Trait AuthenticatesUsers
@@ -55,6 +56,7 @@ trait AuthenticatesUsers
      *
      * @param Request $request
      * @return mixed
+     * @throws StringObjectException
      */
     public function postLogin(Request $request)
     {
@@ -72,10 +74,9 @@ trait AuthenticatesUsers
         // create reset token
         $token = StringObject::random(100);
 
-        DB::update("UPDATE users SET reset_password_token=:token WHERE id=:id", [
-            "id" => Auth::user()->id,
-            "token" => $token
-        ]);
+        $user = Auth::user();
+        $user->reset_password_token = $token;
+        $user->save();
 
         //TODO send mail with token link to user email
     }
@@ -85,10 +86,16 @@ trait AuthenticatesUsers
      *
      * @param Request $request
      * @return mixed
+     * @throws StringObjectException
      */
     public function login(Request $request)
     {
         $credentials = $request->paramsPost()->all();
+
+        // gets passed from register flow. So we need to
+        // remove it to successfully login. I dont understand
+        // why but that is how we do it
+        unset($credentials['name']);
         unset($credentials['remember']);
 
         $remember = $request->param("remember") ?: false;
@@ -161,12 +168,10 @@ trait AuthenticatesUsers
         }
 
         // now everything is fine and the password can be set
-
-        DB::update("UPDATE users SET password=:newPassword, reset_password_token=:token WHERE id=:id", [
-            'newPassword' => Hash::make($password),
-            'token' => null,
-            'id' => Auth::user()->id
-        ]);
+        $user = Auth::user();
+        $user->password = Hash::make($password);
+        $user->reset_password_token = '';
+        $user->save();
 
         header("Location: ".$this->redirectTo);
         exit;

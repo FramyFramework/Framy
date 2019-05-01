@@ -208,7 +208,7 @@ class Model implements ArrayAccess, JsonSerializable
     /**
      * Save the model to the database.
      *
-     * @return void
+     * @return bool
      * @throws ConnectionNotConfiguredException
      */
     public function save()
@@ -244,7 +244,6 @@ class Model implements ArrayAccess, JsonSerializable
     {
         $instance       = new static();
         $result         = $instance->newQuery()->count();
-        $result->exists = true;
 
         return $result;
     }
@@ -348,10 +347,10 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @param $column
-     * @param string $operator
-     * @param null $value
-     * @param string $boolean
+     * @param               $column
+     * @param  string       $operator
+     * @param               $value
+     * @param  string       $boolean
      * @return QueryBuilder
      */
     public static function where($column, $operator = "=", $value = null, $boolean = 'and')
@@ -384,7 +383,7 @@ class Model implements ArrayAccess, JsonSerializable
     /**
      * Get connection
      *
-     * @return Connection
+     * @return string
      */
     public function getConnection()
     {
@@ -504,7 +503,8 @@ class Model implements ArrayAccess, JsonSerializable
     /**
      * Performing an model update operation.
      *
-     * @param Builder $query
+     * @param  Builder $query
+     * @return bool
      */
     protected function performUpdate(Builder $query)
     {
@@ -516,13 +516,17 @@ class Model implements ArrayAccess, JsonSerializable
         // Get the changed attributes which shall then be updated
         $attributes = array_diff($this->getAttributes(), $this->original);
 
-        $query->where(
+        // casting to bool because if it performed an action
+        // we will have $result = true and false otherwise
+        $result = (bool) $query->where(
             $this->getPrimaryKey(),
             '=',
             $this->offsetGet($this->getPrimaryKey())
         )->update($attributes);
 
         $this->syncOriginal();
+
+        return $result;
     }
     
     /**

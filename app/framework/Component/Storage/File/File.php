@@ -26,18 +26,23 @@ class File implements FileInterface
     /**
      * Construct a File instance
      *
-     * @param string  $key     File key
-     * @param Storage $storage Storage to use
+     * @param string  $key                  File key
+     * @param Storage $storage              Storage to use
+     * @param bool    $createIfDoesntExist Set true to create the given key if he doesn't exist
      * @throws StorageException
      */
-    function __construct($key, Storage $storage)
+    function __construct($key, Storage $storage, bool $createIfDoesntExist = false)
     {
         $this->storage = $storage;
         $this->key     = $key;
 
         //make sure a file path is given
-        if (! $this->storage->keyExists($this->key)) {
+        if (! $this->storage->keyExists($this->key) && ! $createIfDoesntExist) {
             throw new StorageException(StorageException::FILE_NOT_FOUND, [$key]);
+        }
+
+        if ($createIfDoesntExist) {
+            $this->create();
         }
     }
 
@@ -122,6 +127,7 @@ class File implements FileInterface
 
     /**
      * Reads the contents of the file
+     *
      * @return bool|string
      * @throws StorageException
      */
@@ -171,6 +177,17 @@ class File implements FileInterface
     }
 
     /**
+     * Create file with empty content
+     *
+     * @return true on success
+     * @throws StorageException
+     */
+    public function create()
+    {
+        return $this->getStorage()->createKey($this->getKey());
+    }
+
+    /**
      * @return mixed
      * @throws StorageException
      */
@@ -181,6 +198,7 @@ class File implements FileInterface
 
     /**
      * check if is directory
+     *
      * @return bool
      * @throws StorageException
      */

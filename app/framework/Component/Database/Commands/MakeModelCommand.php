@@ -61,7 +61,7 @@ EOD;
         else
             $template = str_replace("§TABLE§", '', $template);
 
-        $File = new File($migrationName.".php", new Storage("model"));
+        $File = new File($migrationName.".php", new Storage("model"), true);
         //$File->setContents($template);
         file_put_contents($File->getAbsolutePath(), $template);
 

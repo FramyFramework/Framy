@@ -75,7 +75,7 @@ abstract class AbstractException extends \Exception
         }
 
         if(!$this->isNull($params)) {
-//                $message = $this->str($message)->format($params)->val();
+            $message = str($message)->format($params)->val();
         }
 
         parent::__construct($message, $code);
