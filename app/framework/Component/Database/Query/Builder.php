@@ -8,6 +8,7 @@
 
 namespace app\framework\Component\Database\Query;
 
+use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use Closure;
 use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Model\Model;
@@ -888,7 +889,7 @@ class Builder
      * Execute the query as a "select" statement.
      *
      * @param array $columns
-     * @return array|null
+     * @return ArrayObject|null
      */
     public function get(array $columns = ['*'])
     {

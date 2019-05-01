@@ -329,6 +329,7 @@ class Connection
 
     /**
      * Fetch PDO Result and return and array of Models
+     * TODO: consider removing this
      *
      * @param PDOStatement $statement
      * @return Model[]|Model
