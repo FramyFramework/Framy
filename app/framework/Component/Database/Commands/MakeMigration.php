@@ -70,7 +70,7 @@ EOD;
         $output->writeln("<info>creating migration: ".$newMigrationName."</info>", ConsoleOutput::OUTPUT_PLAIN);
 
         try {
-            $File = new File($newMigrationName.".php", new Storage("migrations"));
+            $File = new File($newMigrationName.".php", new Storage("migrations"), true);
 
             if(fopen($File->getAbsolutePath(), "w")) {
                 $tempDefaultCommand = str_replace("§NAME§", $newMigrationName, $this->template);
