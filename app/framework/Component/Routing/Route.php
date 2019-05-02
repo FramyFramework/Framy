@@ -253,6 +253,9 @@ class Route
      */
     public function getMiddleware()
     {
+        $this->createInstances($this->getFromConfig("global"));
+        $this->createInstances($this->middleware);
+
         return $this->middleware;
     }
 
@@ -265,21 +268,13 @@ class Route
      */
     public function middleware(string $name)
     {
-        $obj = $this->getFromConfig("global")[$name];
+        $obj = $this->getFromConfig("middleware")[$name];
 
         if (is_null($obj)) {
             $obj = $this->getFromConfig("groups")[$name];
         }
 
-        $obj = [$obj];
-
-        foreach ($obj as $class) {
-            if (class_exists($class)) {
-                $this->middleware[] = new $class;
-            } else {
-                throw new MiddlewareNotFoundException("Middleware `%s` not found", $name);
-            }
-        }
+        $this->middleware[$name] = $obj;
     }
 
     /**
@@ -291,6 +286,31 @@ class Route
     private function getFromConfig($config)
     {
         return Config::getInstance()->get($config, 'middleware');
+    }
+
+    /**
+     * Create instances from Configured class names <br>
+     * <code>
+     * $middlename = [
+     *      $middlewareName => $fullClassName
+     * ]
+     * </code>
+     * @param array $middleware
+     * @throws MiddlewareNotFoundException
+     */
+    private function createInstances(array $middleware)
+    {
+        foreach ($middleware as $name => $class) {
+            if (class_exists($class)) {
+                $this->middleware[$name] = new $class;
+            } else {
+                // if $class is object we dont throw an
+                // exception because middleware was already created.
+                if (! is_object($class)) {
+                    throw new MiddlewareNotFoundException("Middleware `%s` not found", $name);
+                }
+            }
+        }
     }
 
     /**
