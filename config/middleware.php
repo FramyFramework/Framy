@@ -24,6 +24,8 @@ return [
      | The application's route middleware groups.
      |--------------------------------------------------------------------------
      |
+     | Sometimes you may want to group several middleware under a
+     | single key to make them easier to assign to routes.
      */
     'groups' => []
 ];
