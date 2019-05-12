@@ -17,6 +17,7 @@ return [
      | These have to be assigned to a route
      */
     'middleware' => [
+        'auth' => \app\framework\Component\Auth\Authenticate::class
     ],
 
     /*-------------------------------------------------------------------------
