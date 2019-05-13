@@ -7,8 +7,7 @@ return [
      |
      | These middleware are run during every request to your application.
      */
-    'global' => [
-    ],
+    'global' => [],
 
     /*-------------------------------------------------------------------------
      | The application's middleware

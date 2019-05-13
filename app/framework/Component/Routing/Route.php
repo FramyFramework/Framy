@@ -14,7 +14,6 @@ namespace app\framework\Component\Routing;
 use app\framework\Component\Config\Config;
 use app\framework\Component\Routing\Exceptions\MiddlewareNotFoundException;
 use InvalidArgumentException;
-use Exception;
 
 /**
  * Route
@@ -24,7 +23,6 @@ use Exception;
  */
 class Route
 {
-
     /**
      * Properties
      */
@@ -89,7 +87,6 @@ class Route
      */
     protected $middleware = [];
 
-
     /**
      * Methods
      */
@@ -101,6 +98,7 @@ class Route
      * @param string $path
      * @param string|array $method
      * @param boolean $count_match
+     * @param null $name
      */
     public function __construct($callback, $path = null, $method = null, $count_match = true, $name = null)
     {
@@ -250,6 +248,7 @@ class Route
      * Getter for middleware
      *
      * @return array
+     * @throws MiddlewareNotFoundException
      */
     public function getMiddleware()
     {
@@ -264,7 +263,6 @@ class Route
      * to just call the handle method later
      *
      * @param string $name
-     * @throws MiddlewareNotFoundException
      */
     public function middleware(string $name)
     {
