@@ -11,6 +11,7 @@ namespace app\framework\Component\Database\Model;
 use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Connection\ConnectionFactory;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
+use app\framework\Component\Database\Model\Concerns\HasRelationships;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject;
@@ -24,6 +25,8 @@ use JsonSerializable;
  */
 class Model implements ArrayAccess, JsonSerializable
 {
+    use HasRelationships;
+
     /**
      * The connection name for the model.
      *
