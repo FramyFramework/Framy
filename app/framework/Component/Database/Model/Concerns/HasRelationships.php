@@ -10,8 +10,9 @@ namespace app\framework\Component\Database\Model\Concerns;
 
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Model\Model;
+use app\framework\Component\Database\Model\Relations\BelongsTo;
 use app\framework\Component\Database\Model\Relations\HasOne;
-use app\framework\Component\Database\Query\Builder;
+use app\framework\Component\Database\Model\Builder;
 
 /**
  * Trait HasRelationships
@@ -31,8 +32,8 @@ trait HasRelationships
     /**
      * Define a one-to-one relation
      *
-     * @param string $related
-     * @param string $foreignKey
+     * @param string $related    The Model it shall relate to
+     * @param string $foreignKey The
      * @param string $localKey
      * @return HasOne
      * @throws ConnectionNotConfiguredException
@@ -43,8 +44,8 @@ trait HasRelationships
         /** @var Model $instance*/
         $instance = new $related;
 
-        // get foreignKey
-        // ger localKey
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $localKey   = $localKey   ?: $this->getPrimaryKey();
 
         // create new HasOne instance and return
         return $this->newHasOne($instance->newQuery(), $this, $foreignKey, $localKey);
@@ -56,5 +57,38 @@ trait HasRelationships
     protected function newHasOne(Builder $builder, $parent, $foreignKey, $localKey)
     {
         return new HasOne($builder, $parent, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define an inverse one-to-one or many relationship.
+     *
+     * @param string $related
+     * @param string $foreignKey
+     * @param string $ownerKey
+     * @return BelongsTo
+     * @throws ConnectionNotConfiguredException
+     */
+    public function belongsTo($related, $foreignKey = null, $ownerKey = null)
+    {
+        /** @var Model $related */
+        $related = new $related;
+
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $ownerKey   = $ownerKey   ?: $this->getPrimaryKey();
+
+        return $this->newBelongsTo($related->newQuery(), $this, $foreignKey, $ownerKey, $related);
+    }
+
+    /**
+     * @param Builder $query
+     * @param Model $child
+     * @param $foreignKey
+     * @param $ownerKey
+     * @param $relation
+     * @return BelongsTo
+     */
+    protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
+    {
+        return new BelongsTo($query, $child, $foreignKey, $ownerKey, $relation);
     }
 }
