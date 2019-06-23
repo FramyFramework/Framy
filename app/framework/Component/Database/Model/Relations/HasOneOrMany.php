@@ -8,9 +8,8 @@
 
 namespace app\framework\Component\Database\Model\Relations;
 
-
 use app\framework\Component\Database\Model\Model;
-use app\framework\Component\Database\Query\Builder;
+use app\framework\Component\Database\Model\Builder;
 
 abstract class HasOneOrMany extends Relation
 {
@@ -39,9 +38,37 @@ abstract class HasOneOrMany extends Relation
      */
     public function __construct(Builder $query, Model $parent, $foreignKey, $localKey)
     {
-        $this->localKey = $localKey;
+        $this->localKey   = $localKey;
         $this->foreignKey = $foreignKey;
 
         parent::__construct($query, $parent);
+    }
+
+    /**
+     * Set the base constraints on the relation query.
+     *
+     * @return void
+     */
+    public function addConstraints()
+    {
+        if (static::$constraints) {
+            $this->query->where($this->foreignKey, '=', $this->getParentKey());
+            $this->query->whereNotNull($this->foreignKey);
+        }
+    }
+
+    /**
+     * Get the key value of the parent's local key.
+     *
+     * @return mixed
+     */
+    public function getParentKey()
+    {
+        return $this->parent->getAttribute($this->localKey);
+    }
+
+    public function get(array $columns = ['*'])
+    {
+        return $this->query->get($columns);
     }
 }
