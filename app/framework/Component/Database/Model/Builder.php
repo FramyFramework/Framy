@@ -22,6 +22,7 @@ use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
  * @method int insertGetId(array $values)
  * @method int count(string $columns = '*')
  * @method ArrayObject|null get(array $columns = ['*'])
+ * @method Builder whereNotNull($column, $boolean = 'and')
  * @package app\framework\Component\Database\Model
  */
 class Builder
@@ -46,7 +47,7 @@ class Builder
      * @var array
      */
     protected $passThru = [
-        'get', 'where',
+        'get', 'where', 'whereNotNull',
         'insert', 'insertGetId', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
         'first'
@@ -72,6 +73,16 @@ class Builder
     public function getQuery()
     {
         return $this->queryBuilder;
+    }
+
+    /**
+     * Getter for model
+     *
+     * @return Model
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 
     /**

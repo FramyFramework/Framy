@@ -8,7 +8,6 @@
 
 namespace app\framework\Component\Database\Model;
 
-use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Connection\ConnectionFactory;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Model\Concerns\HasRelationships;
@@ -30,7 +29,7 @@ class Model implements ArrayAccess, JsonSerializable
     /**
      * The connection name for the model.
      *
-     * @var $connection
+     * @var string $connection
      */
     protected $connection;
 
@@ -190,6 +189,16 @@ class Model implements ArrayAccess, JsonSerializable
     public function setPrimaryKey(string $primaryKey): void
     {
         $this->primaryKey = $primaryKey;
+    }
+
+    /**
+     * Get the default foreign key name for the model.
+     *
+     * @return string
+     */
+    public function getForeignKey()
+    {
+        return str(class_basename($this).'_'.$this->getPrimaryKey())->snakeCase()->val();
     }
 
     /**
@@ -381,6 +390,27 @@ class Model implements ArrayAccess, JsonSerializable
     public function getAttributes()
     {
         return $this->attributes;
+    }
+
+    /**
+     * Get an attribute from the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getAttribute($key)
+    {
+        if (! $key) {
+            return;
+        }
+
+        $attr = $this->getAttributes()[$key];
+
+        if (isset($attr)) {
+            return $attr;
+        }
+
+        return;
     }
 
     /**
