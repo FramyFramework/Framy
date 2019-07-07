@@ -11,6 +11,7 @@ namespace app\framework\Component\Database\Model\Concerns;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Model\Model;
 use app\framework\Component\Database\Model\Relations\BelongsTo;
+use app\framework\Component\Database\Model\Relations\HasMany;
 use app\framework\Component\Database\Model\Relations\HasOne;
 use app\framework\Component\Database\Model\Builder;
 
@@ -53,10 +54,50 @@ trait HasRelationships
 
     /**
      * Instantiate a new HasOne relationship.
+     *
+     * @param Builder $builder
+     * @param $parent
+     * @param $foreignKey
+     * @param $localKey
+     * @return HasOne
      */
     protected function newHasOne(Builder $builder, $parent, $foreignKey, $localKey)
     {
         return new HasOne($builder, $parent, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define a one-to-many relationship.
+     *
+     * @param  string  $related
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @return HasMany
+     */
+    public function hasMany($related, $foreignKey = null, $localKey = null)
+    {
+        $instance = new $related;
+
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $localKey   = $localKey   ?: $this->getPrimaryKey();
+
+        return $this->newHasMany(
+            $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
+        );
+    }
+
+    /**
+     * Instantiate a new HasMany relationship.
+     *
+     * @param  Builder  $query
+     * @param  Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @return HasMany
+     */
+    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey)
+    {
+        return new HasMany($query, $parent, $foreignKey, $localKey);
     }
 
     /**

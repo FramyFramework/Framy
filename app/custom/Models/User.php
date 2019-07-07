@@ -24,4 +24,14 @@ class User extends Model
 
         $user->save();
     }
+
+    public function comments()
+    {
+        return $this->belongsTo(Comment::class, 'id', 'byUser');
+    }
+
+    public function roles()
+    {
+        return "Funky stuff";
+    }
 }

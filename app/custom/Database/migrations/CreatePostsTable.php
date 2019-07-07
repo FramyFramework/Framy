@@ -5,7 +5,7 @@ use app\framework\Component\Database\Migrations\Migration;
 use app\framework\Component\Database\Schema\Blueprint;
 use app\framework\Component\Database\Schema\Schema;
 
-class CreateCommentsTable extends Migration
+class CreatePostsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,12 +14,10 @@ class CreateCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::create("comments", function(Blueprint $table) {
+        Schema::create("posts", function(Blueprint $table) {
             $table->increments();
-            $table->integer("byUser");
-            $table->integer("post_id");
-            $table->string("text");
-            $table->integer("votes");
+            $table->string("content");
+            $table->integer("user_id");
             $table->timestamps();
         }, "mysql");
     }
@@ -31,6 +29,6 @@ class CreateCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::drop("comments", "mysql");
+        Schema::drop("posts", "mysql");
     }
 }
