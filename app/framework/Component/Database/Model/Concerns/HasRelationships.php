@@ -11,9 +11,11 @@ namespace app\framework\Component\Database\Model\Concerns;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Model\Model;
 use app\framework\Component\Database\Model\Relations\BelongsTo;
+use app\framework\Component\Database\Model\Relations\BelongsToMany;
 use app\framework\Component\Database\Model\Relations\HasMany;
 use app\framework\Component\Database\Model\Relations\HasOne;
 use app\framework\Component\Database\Model\Builder;
+use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 
 /**
  * Trait HasRelationships
@@ -42,8 +44,7 @@ trait HasRelationships
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
         // create a instance of $related
-        /** @var Model $instance*/
-        $instance = new $related;
+        $instance = $this->instantiateRelated($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $localKey   = $localKey   ?: $this->getPrimaryKey();
@@ -69,14 +70,16 @@ trait HasRelationships
     /**
      * Define a one-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string  $foreignKey
-     * @param  string  $localKey
+     * @param string $related
+     * @param string $foreignKey
+     * @param string $localKey
      * @return HasMany
+     * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
-        $instance = new $related;
+        $instance = $this->instantiateRelated($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $localKey   = $localKey   ?: $this->getPrimaryKey();
@@ -111,8 +114,7 @@ trait HasRelationships
      */
     public function belongsTo($related, $foreignKey = null, $ownerKey = null)
     {
-        /** @var Model $related */
-        $related = new $related;
+        $related = $this->instantiateRelated($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $ownerKey   = $ownerKey   ?: $this->getPrimaryKey();
@@ -131,5 +133,109 @@ trait HasRelationships
     protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
     {
         return new BelongsTo($query, $child, $foreignKey, $ownerKey, $relation);
+    }
+
+    /**
+     * @param $related
+     * @param null $table
+     * @param null $foreignPivotKey
+     * @param null $relatedPivotKey
+     * @param null $parentKey
+     * @param null $relatedKey
+     * @param null $relation
+     * @return BelongsToMany
+     * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
+     */
+    public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
+                                  $parentKey = null, $relatedKey = null, $relation = null)
+    {
+        /** @var Model $related */
+        $related = $this->instantiateRelated($related);
+
+
+        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
+        $relatedPivotKey = $relatedPivotKey ?: $related->getForeignKey();
+
+        // If no table name was provided, we can guess it by concatenating the two
+        // models using underscores in alphabetical order. The two model names
+        // are transformed to snake case from their default CamelCase also.
+        if (is_null($table)) {
+            $table = $this->joiningTable($related);
+        }
+
+        return $this->newBelongsToMany(
+            $related->newQuery(), $this, $table, $foreignPivotKey,
+            $relatedPivotKey, $parentKey ?: $this->getPrimaryKey(),
+            $relatedKey ?: $related->getPrimaryKey(), $relation
+        );
+
+    }
+
+    /**
+     * Instantiate a new BelongsToMany relationship.
+     *
+     * @param Builder $query
+     * @param Model $parent
+     * @param string $table
+     * @param string $foreignPivotKey
+     * @param string $relatedPivotKey
+     * @param string $parentKey
+     * @param string $relatedKey
+     * @param string $relationName
+     * @return BelongsToMany
+     * @throws StringObjectException
+     */
+    protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
+                                        $parentKey, $relatedKey, $relationName = null)
+    {
+        return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+    }
+
+    /**
+     * Creates an instance of $related
+     *
+     * @param $related
+     * @return Model
+     */
+    private function instantiateRelated($related)
+    {
+        return new $related;
+    }
+
+
+    /**
+     * Get the joining table name for a many-to-many relation.
+     *
+     * @param  Model $related
+     * @return string
+     */
+    public function joiningTable($related)
+    {
+        // The joining table name, by convention, is simply the snake cased models
+        // sorted alphabetically and concatenated with an underscore, so we can
+        // just sort the models and join them together to get the table name.
+        $segments = [
+            $related ? $related->joiningTableSegment()
+                : Str(class_basename($related))->snakeCase()->val(),
+            $this->joiningTableSegment(),
+        ];
+
+        // Now that we have the model names in an array we can just sort them and
+        // use the implode function to join them together with an underscores,
+        // which is typically used by convention within the database system.
+        sort($segments);
+
+        return strtolower(implode('_', $segments));
+    }
+
+    /**
+     * Get this model's half of the intermediate table name for belongsToMany relationships.
+     *
+     * @return string
+     */
+    public function joiningTableSegment()
+    {
+        return Str(class_basename($this))->snakeCase()->val();
     }
 }

@@ -14,7 +14,7 @@ class createUsersRolesTable extends Migration
      */
     public function up()
     {
-        Schema::create("users_roles", function(Blueprint $table) {
+        Schema::create("role_user", function(Blueprint $table) {
             $table->integer("users_id");
             $table->integer("roles_id");
         }, "mysql");
@@ -27,6 +27,6 @@ class createUsersRolesTable extends Migration
      */
     public function down()
     {
-        Schema::drop("users_roles", "mysql");
+        Schema::drop("role_user", "mysql");
     }
 }

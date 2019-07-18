@@ -32,6 +32,6 @@ class User extends Model
 
     public function roles()
     {
-        return "Funky stuff";
+        return $this->belongsToMany(Role::class);
     }
 }
