@@ -114,6 +114,14 @@ class BelongsToMany extends Relation
      */
     public function addConstraints()
     {
+        // select
+        //     *
+        // from
+        //     role, role_user
+        // where
+        //     role.id = role_user.role_id
+        //     and
+        //     role_user.user_id = user.id
         if (self::$constraints) {
             $related_table = $this->related->getTable();
             $related_key   = $related_table.".".$this->relatedKey;
@@ -127,14 +135,5 @@ class BelongsToMany extends Relation
                 ->where($related_key, "=", $pivot_key_rel)
                 ->andWhere($pivot_key_fgn, "=", $parent_key);
         }
-
-        // select
-        //     *
-        // from
-        //     role, role_user
-        // where
-        //     role.id = role_user.role_id
-        //     and
-        //     role_user.user_id = user.id
     }
 }
