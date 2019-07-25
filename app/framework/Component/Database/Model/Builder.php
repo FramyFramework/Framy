@@ -47,7 +47,7 @@ class Builder
      * @var array
      */
     protected $passThru = [
-        'get', 'where', 'whereNotNull',
+        'get', 'where', 'whereNotNull', 'from',
         'insert', 'insertGetId', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
         'first'

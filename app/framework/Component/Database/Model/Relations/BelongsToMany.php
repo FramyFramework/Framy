@@ -109,9 +109,23 @@ class BelongsToMany extends Relation
         return $model->getTable();
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public function addConstraints()
     {
-        // TODO: Implement addConstraints() method.
+        if (self::$constraints) {
+            $this->query->from($this->related->getTable()."`, `".$this->table)
+                ->where("role.id", "=", "user_role.role_id")
+                ->andWhere("user_role.user_id", "=", 1);
+        }
+        // select
+        //     *
+        // from
+        //     role, role_user
+        // where
+        //     role.id = role_user.role_id
+        //     and
+        //     role_user.user_id = user.id
     }
 }
