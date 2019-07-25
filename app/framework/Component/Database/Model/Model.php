@@ -661,7 +661,6 @@ class Model implements ArrayAccess, JsonSerializable
     public function newQuery()
     {
         return new Builder(
-            $this->newBaseQueryBuilder(),
             $this
         );
     }

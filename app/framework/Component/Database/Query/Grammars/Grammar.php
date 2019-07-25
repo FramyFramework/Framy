@@ -331,6 +331,7 @@ class Grammar
 
     /**
      * Compile a basic where clause.
+     * TODO: probably only temporarily so figure out if this is fine
      *
      * @param  Builder  $query
      * @param  array  $where
@@ -338,9 +339,8 @@ class Grammar
      */
     protected function whereBasic(Builder $query, $where)
     {
-        $value = $this->parameter($where['value']);
-
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+//        $value = $this->parameter($where['value']);
+        return $this->wrap($where['column']).' '.$where['operator'].' ?'; //.$value;
     }
 
     /**
