@@ -189,7 +189,8 @@ trait HasRelationships
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
                                         $parentKey, $relatedKey, $relationName = null)
     {
-        return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+        return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey,
+            $parentKey, $relatedKey, $relationName);
     }
 
     /**
@@ -202,7 +203,6 @@ trait HasRelationships
     {
         return new $related;
     }
-
 
     /**
      * Get the joining table name for a many-to-many relation.
@@ -217,7 +217,7 @@ trait HasRelationships
         // just sort the models and join them together to get the table name.
         $segments = [
             $related ? $related->joiningTableSegment()
-                : Str(class_basename($related))->snakeCase()->val(),
+                : $this->joiningTableSegment(),
             $this->joiningTableSegment(),
         ];
 

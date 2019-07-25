@@ -124,7 +124,7 @@ class Grammar
      */
     public function compileUpdate(Builder $query, array $values): string
     {
-        $table      = $this->wrapTable($query->from);
+        $table = $this->wrapTable($query->from);
 
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
