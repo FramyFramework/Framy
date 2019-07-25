@@ -115,10 +115,19 @@ class BelongsToMany extends Relation
     public function addConstraints()
     {
         if (self::$constraints) {
-            $this->query->from($this->related->getTable()."`, `".$this->table)
-                ->where("role.id", "=", "user_role.role_id")
-                ->andWhere("user_role.user_id", "=", 1);
+            $related_table = $this->related->getTable();
+            $related_key   = $related_table.".".$this->relatedKey;
+
+            $pivot_key_rel = $this->table.".".$this->relatedPivotKey;
+            $pivot_key_fgn = $this->table.".".$this->foreignPivotKey;
+
+            $parent_key    = $this->parent->{$this->parent->getPrimaryKey()};
+
+            $this->query->from($related_table."`, `".$this->table)
+                ->where($related_key, "=", $pivot_key_rel)
+                ->andWhere($pivot_key_fgn, "=", $parent_key);
         }
+
         // select
         //     *
         // from
