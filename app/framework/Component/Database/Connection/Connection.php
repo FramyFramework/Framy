@@ -15,6 +15,7 @@ use app\framework\Component\EventManager\EventManagerTrait;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use app\framework\Component\Stopwatch\Stopwatch;
 use app\framework\Component\Stopwatch\StopwatchEvent;
+use app\framework\Component\VarDumper\VarDumper;
 use Closure;
 use Exception;
 use PDO;
@@ -272,7 +273,7 @@ class Connection
             handle($e);
         }
 
-        $this->logQuery($query, $stopwatch->stop('queryRun'));
+        $this->logQuery($query, $stopwatch->stop('queryRun'), $bindings);
         return $result;
     }
 
@@ -312,15 +313,17 @@ class Connection
      *
      * @param string $query
      * @param StopwatchEvent $stopwatchEvent
+     * @param array $bindings
      * @throws StringObjectException
      */
-    public function logQuery(string $query, StopwatchEvent $stopwatchEvent)
+    public function logQuery(string $query, StopwatchEvent $stopwatchEvent, array $bindings)
     {
         $this->eventManager()->fire("ff.database.query_execution");
 
         if($this->loggingQueries) {
             $logEntry['startTime']     = $stopwatchEvent->getStartTime();
             $logEntry['query']         = $query;
+            $logEntry['bindings']      = $bindings;
             $logEntry['executionTime'] = $stopwatchEvent->getDuration();
 
             $this->queryLog[] = $logEntry;
