@@ -181,4 +181,3 @@ function get_connection_log()
 {
     dd(\app\framework\Component\Database\Connection\ConnectionFactory::getInstance()->get()->getQueryLog());
 }
->>>>>>> Stashed changes
