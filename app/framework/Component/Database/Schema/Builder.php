@@ -34,33 +34,44 @@ class Builder
 
             $query .= $Column->type;
 
-            if(isset($Column->length))
+            if(isset($Column->length)) {
                 $query .= "(".$Column->length;
+            }
 
             if(isset($Column->scale) && isset($Column->length)) {
                 $query .= ", ".$Column->scale.")";
             } else {
-                if(isset($Column->length))
+                if(isset($Column->length)) {
                     $query .= ")";
+                }
             }
 
-            if($Column->isUnsigned)
+            if($Column->isUnsigned) {
                 $query .= " UNSIGNED";
+            }
 
-            if($Column->isNull)
+            if($Column->notNull) {
                 $query .= " NOT NULL";
+            }
 
-            if($Column->isAutoIncrement)
+            if($Column->isAutoIncrement) {
                 $query .= " AUTO_INCREMENT";
+            }
 
-            if($Column->isPrimaryKey)
+            if($Column->primaryKey) {
                 $query .= " PRIMARY KEY";
+            }
+
+            if($Column->foreignKey) {
+                $query .= " FOREIGN KEY";
+            }
 
             if(count($table->getColumns())-1 != $key)
                 $query .= ", ";
         }
         $query .= ");";
 
+        dd($query);
         return $query;
     }
 

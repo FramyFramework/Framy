@@ -72,8 +72,7 @@ class Blueprint
      */
     public function boolean($name)
     {
-        $tempColumn = new Column($name, 'BOOLEAN');
-        $this->columns[] = $tempColumn;
+        $this->columns[] = $column = new Column($name, 'BOOLEAN');
     }
 
     /**
@@ -81,13 +80,16 @@ class Blueprint
      * @param string $name
      * @param int $precision
      * @param int $scale
+     * @return Column
      */
-    public function decimal(string $name, int $precision, int $scale)
+    public function decimal(string $name, int $precision, int $scale = 0)
     {
         $tempColumn = new Column($name, 'DECIMAL');
         $tempColumn->length = $precision;
         $tempColumn->scale = $scale;
         $this->columns[] = $tempColumn;
+
+        return $tempColumn;
     }
 
     /**
@@ -122,11 +124,13 @@ class Blueprint
      * INTEGER equivalent column.
      *
      * @param string $name
+     * @return Column
      */
     public function integer($name)
     {
         $tempColumn = new Column($name, 'INTEGER');
         $this->columns[] = $tempColumn;
+        return $tempColumn;
     }
 
     /**
@@ -160,7 +164,7 @@ class Blueprint
     {
         $tempColumn = new Column($name, 'INT');
         $tempColumn->isAutoIncrement = true;
-        $tempColumn->isPrimaryKey    = true;
+        $tempColumn->primaryKey    = true;
         $tempColumn->isUnsigned      = true;
         $this->columns[] = $tempColumn;
     }
@@ -174,7 +178,7 @@ class Blueprint
     {
         $tempColumn = new Column($name, 'BIGINT');
         $tempColumn->isAutoIncrement = true;
-        $tempColumn->isPrimaryKey    = true;
+        $tempColumn->primaryKey    = true;
         $tempColumn->isUnsigned      = true;
         $this->columns[] = $tempColumn;
     }
@@ -229,12 +233,12 @@ class Blueprint
      * TIMESTAMP equivalent column.
      *
      * @param string $name
-     * @param bool   $isNullable
+     * @param bool $notNull
      */
-    public function timestamp($name, $isNullable = false)
+    public function timestamp($name, $notNull = false)
     {
         $tempColumn = new Column($name, 'TIMESTAMP');
-        $tempColumn->isNull = $isNullable;
+        $tempColumn->notNull = $notNull;
         $this->columns[] = $tempColumn;
     }
 
