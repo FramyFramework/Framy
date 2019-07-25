@@ -160,3 +160,25 @@ if(! function_exists("isDebug")) {
         return \app\framework\Component\Config\Config::getInstance()->get("debug", "app");
     }
 }
+<<<<<<< Updated upstream
+=======
+
+if(! function_exists("class_basename")) {
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    function class_basename($class)
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+        return basename(str_replace('\\', '/', $class));
+    }
+}
+
+function get_connection_log()
+{
+    dd(\app\framework\Component\Database\Connection\ConnectionFactory::getInstance()->get()->getQueryLog());
+}
+>>>>>>> Stashed changes
