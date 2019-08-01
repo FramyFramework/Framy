@@ -66,6 +66,14 @@ class Builder
                 $query .= " FOREIGN KEY";
             }
 
+            if($Column->default != null) {
+                $default = $Column->default;
+                if (is_string($default))
+                    $default = "'".$default."'";
+
+                $query .= " DEFAULT ".$default;
+            }
+
             if(count($table->getColumns())-1 != $key)
                 $query .= ", ";
         }
