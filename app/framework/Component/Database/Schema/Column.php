@@ -82,7 +82,7 @@ class Column
     /**
      * Sets a default value for a column when no value is specified
      *
-     * @var
+     * @var Mixed
      */
     public $default;
 
@@ -125,14 +125,38 @@ class Column
         $this->type = $type;
     }
 
+    /**
+     * Specify a "default" value for the column
+     *
+     * @param $value
+     * @return Column
+     */
+    public function default($value)
+    {
+        $this->default = $value;
+
+        return $this;
+    }
+
     public function unsigned()
     {
         $this->isUnsigned = true;
     }
 
+    /**
+     * Allows (by default) NULL values to be inserted into the column
+     *
+     * @return $this
+     */
     public function nullable()
     {
-        $this->notNull = true;
+        $this->notNull = false;
+        return $this;
+    }
+
+    public function notNull($notNull = true)
+    {
+        $this->notNull = $notNull;
         return $this;
     }
 
@@ -142,9 +166,39 @@ class Column
         return $this;
     }
 
+    /**
+     * Set INTEGER columns as auto-increment (primary key)
+     *
+     * @return $this
+     */
     public function autoIncrement()
     {
         $this->isAutoIncrement = true;
         return $this;
+    }
+
+    public function primaryKey()
+    {
+        $this->primaryKey = true;
+        return $this;
+    }
+
+    /**
+     * Add a comment to a column
+     *
+     * @param string $text
+     * @return $this
+     */
+    public function comment(string $text)
+    {
+        $this->comment = $text;
+        return $this;
+    }
+
+    /**
+     * Set TIMESTAMP columns to use CURRENT_TIMESTAMP as default value
+     */
+    public function useCurrent()
+    {
     }
 }
