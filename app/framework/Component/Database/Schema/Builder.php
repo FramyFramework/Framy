@@ -79,7 +79,6 @@ class Builder
         }
         $query .= ");";
 
-        dd($query);
         return $query;
     }
 
