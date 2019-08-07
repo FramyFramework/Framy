@@ -10,7 +10,7 @@
 */
 use app\framework\Component\Routing\Router;
 
-Router::get("/", function() {
+Router::get("/",  function() {
     view("welcome", ["version" => version()]);
 });
 

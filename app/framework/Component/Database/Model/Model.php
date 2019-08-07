@@ -8,9 +8,9 @@
 
 namespace app\framework\Component\Database\Model;
 
-use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Connection\ConnectionFactory;
 use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
+use app\framework\Component\Database\Model\Concerns\HasRelationships;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject;
@@ -24,10 +24,12 @@ use JsonSerializable;
  */
 class Model implements ArrayAccess, JsonSerializable
 {
+    use HasRelationships;
+
     /**
      * The connection name for the model.
      *
-     * @var $connection
+     * @var string $connection
      */
     protected $connection;
 
@@ -187,6 +189,16 @@ class Model implements ArrayAccess, JsonSerializable
     public function setPrimaryKey(string $primaryKey): void
     {
         $this->primaryKey = $primaryKey;
+    }
+
+    /**
+     * Get the default foreign key name for the model.
+     *
+     * @return string
+     */
+    public function getForeignKey()
+    {
+        return str(class_basename($this).'s_'.$this->getPrimaryKey())->snakeCase()->val();
     }
 
     /**
@@ -381,6 +393,27 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Get an attribute from the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getAttribute($key)
+    {
+        if (! $key) {
+            return;
+        }
+
+        $attr = $this->getAttributes()[$key];
+
+        if (isset($attr)) {
+            return $attr;
+        }
+
+        return;
+    }
+
+    /**
      * Get connection
      *
      * @return string
@@ -528,7 +561,7 @@ class Model implements ArrayAccess, JsonSerializable
 
         return $result;
     }
-    
+
     /**
      * Whether a offset exists
      * @link https://php.net/manual/en/arrayaccess.offsetexists.php
@@ -628,7 +661,6 @@ class Model implements ArrayAccess, JsonSerializable
     public function newQuery()
     {
         return new Builder(
-            $this->newBaseQueryBuilder(),
             $this
         );
     }

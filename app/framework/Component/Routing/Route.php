@@ -11,6 +11,8 @@
 
 namespace app\framework\Component\Routing;
 
+use app\framework\Component\Config\Config;
+use app\framework\Component\Routing\Exceptions\MiddlewareNotFoundException;
 use InvalidArgumentException;
 
 /**
@@ -21,7 +23,6 @@ use InvalidArgumentException;
  */
 class Route
 {
-
     /**
      * Properties
      */
@@ -79,6 +80,12 @@ class Route
      */
     protected $name;
 
+    /**
+     *
+     *
+     * @var array
+     */
+    protected $middleware = [];
 
     /**
      * Methods
@@ -91,6 +98,7 @@ class Route
      * @param string $path
      * @param string|array $method
      * @param boolean $count_match
+     * @param null $name
      */
     public function __construct($callback, $path = null, $method = null, $count_match = true, $name = null)
     {
@@ -236,6 +244,72 @@ class Route
         return $this;
     }
 
+    /**
+     * Getter for middleware
+     *
+     * @return array
+     * @throws MiddlewareNotFoundException
+     */
+    public function getMiddleware()
+    {
+        $this->createInstances($this->getFromConfig("global"));
+        $this->createInstances($this->middleware);
+
+        return $this->middleware;
+    }
+
+    /**
+     * Set middleware attr. and instantiate classes
+     * to just call the handle method later
+     *
+     * @param string $name
+     */
+    public function middleware(string $name)
+    {
+        $obj = $this->getFromConfig("middleware")[$name];
+
+        if (is_null($obj)) {
+            $obj = $this->getFromConfig("groups")[$name];
+        }
+
+        $this->middleware[$name] = $obj;
+    }
+
+    /**
+     * Little helper to load from middleware config
+     *
+     * @param $config
+     * @return mixed
+     */
+    private function getFromConfig($config)
+    {
+        return Config::getInstance()->get($config, 'middleware');
+    }
+
+    /**
+     * Create instances from Configured class names <br>
+     * <code>
+     * $middlename = [
+     *      $middlewareName => $fullClassName
+     * ]
+     * </code>
+     * @param array $middleware
+     * @throws MiddlewareNotFoundException
+     */
+    private function createInstances(array $middleware)
+    {
+        foreach ($middleware as $name => $class) {
+            if (class_exists($class)) {
+                $this->middleware[$name] = new $class;
+            } else {
+                // if $class is object we dont throw an
+                // exception because middleware was already created.
+                if (! is_object($class)) {
+                    throw new MiddlewareNotFoundException("Middleware `%s` not found", $name);
+                }
+            }
+        }
+    }
 
     /**
      * Magic "__invoke" method

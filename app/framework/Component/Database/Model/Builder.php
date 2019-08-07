@@ -8,6 +8,8 @@
 
 namespace app\framework\Component\Database\Model;
 
+use app\framework\Component\Database\Connection\ConnectionFactory;
+use app\framework\Component\Database\Connection\ConnectionNotConfiguredException;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
@@ -18,21 +20,10 @@ use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
  * It is another layer between the Model and The QueryBuilder
  * providing useful stuff.
  *
- * @method QueryBuilder where($column, $operator = "=", $value = null, $boolean = 'and')
- * @method int insertGetId(array $values)
- * @method int count(string $columns = '*')
- * @method ArrayObject|null get(array $columns = ['*'])
  * @package app\framework\Component\Database\Model
  */
-class Builder
+class Builder extends QueryBuilder
 {
-    /**
-     * The base query builder instance.
-     *
-     * @var QueryBuilder
-     */
-    protected $queryBuilder;
-
     /**
      * The Model being queried.
      *
@@ -41,47 +32,33 @@ class Builder
     protected $model;
 
     /**
-     * The methods that should be returned from query builder.
-     *
-     * @var array
-     */
-    protected $passThru = [
-        'get', 'where',
-        'insert', 'insertGetId', 'getBindings', 'toSql',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
-        'first'
-    ];
-
-    /**
      * Builder constructor.
      *
-     * @param QueryBuilder $queryBuilder
      * @param $model
+     * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
-    public function __construct(QueryBuilder $queryBuilder, $model)
+    public function __construct(Model $model)
     {
-        $this->queryBuilder = $queryBuilder;
-        $this->model        = $model;
+        $this->model = $model;
+
+        parent::__construct(
+            ConnectionFactory::getInstance()->get(
+                $model->getConnection()
+            )
+        );
+
+        $this->fromTable();
     }
 
     /**
-     * QueryBuilder getter
+     * Getter for model
      *
-     * @return QueryBuilder
+     * @return Model
      */
-    public function getQuery()
+    public function getModel()
     {
-        return $this->queryBuilder;
-    }
-
-    /**
-     * Get a base query builder instance.
-     *
-     * @return QueryBuilder
-     */
-    public function toBase()
-    {
-        return $this->getQuery();
+        return $this->model;
     }
 
     /**
@@ -90,8 +67,7 @@ class Builder
      */
     private function fromTable()
     {
-        return $this->toBase()
-            ->from($this->model->getTable());
+        return $this->from($this->model->getTable());
     }
 
     /**
@@ -101,8 +77,7 @@ class Builder
      */
     public function find($id)
     {
-        $builder = $this->toBase()
-            ->from($this->model->getTable());
+        $builder = $this->from($this->model->getTable());
 
         if (!is_array($id)) {
             $id = [$id];
@@ -157,28 +132,12 @@ class Builder
      */
     public function remove(array $ids)
     {
-        $builder = $this->toBase()
-            ->from($this->model->getTable());
+        $builder = $this->from($this->model->getTable());
 
         foreach ($ids as $item) {
             $builder->orWhere($this->model->getPrimaryKey(), "=", $item);
         }
 
         return $builder->delete();
-    }
-
-    /**
-     * Dynamically handle calls into the query instance.
-     *
-     * @param $name
-     * @param $arguments
-     * @return Builder|mixed
-     * @throws StringObjectException
-     */
-    public function __call($name, $arguments)
-    {
-        if(in_array($name, $this->passThru)) {
-            return call_user_func_array([$this->fromTable(), $name], $arguments);
-        }
     }
 }

@@ -124,7 +124,7 @@ class Grammar
      */
     public function compileUpdate(Builder $query, array $values): string
     {
-        $table      = $this->wrapTable($query->from);
+        $table = $this->wrapTable($query->from);
 
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
@@ -331,6 +331,7 @@ class Grammar
 
     /**
      * Compile a basic where clause.
+     * TODO: probably only temporarily so figure out if this is fine
      *
      * @param  Builder  $query
      * @param  array  $where
@@ -338,9 +339,8 @@ class Grammar
      */
     protected function whereBasic(Builder $query, $where)
     {
-        $value = $this->parameter($where['value']);
-
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+//        $value = $this->parameter($where['value']);
+        return $this->wrap($where['column']).' '.$where['operator'].' ?'; //.$value;
     }
 
     /**
