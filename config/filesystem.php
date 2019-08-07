@@ -63,6 +63,10 @@
                 'root' => pathTo("/app/custom/Database/migrations/")
             ],
 
+            'middleware' => [
+                'root' => pathTo("/app/custom/Http/Middleware/")
+            ],
+
             'model' => [
                 'root' => pathTo("app/custom/Models")
             ]

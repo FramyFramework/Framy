@@ -9,10 +9,10 @@
 namespace app\framework\Component\Database\Query;
 
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-use Closure;
 use app\framework\Component\Database\Connection\Connection;
 use app\framework\Component\Database\Model\Model;
 use app\framework\Component\Database\Query\Grammars\Grammar;
+use Closure;
 use Exception;
 use InvalidArgumentException;
 
@@ -891,12 +891,16 @@ class Builder
      * @param array $columns
      * @return ArrayObject|null
      */
-    public function get(array $columns = ['*'])
+    public function get(array $columns = ['*'], $executeSQLWithoutSeprateBindings = false)
     {
         $this->columns = $columns;
 
+        $sql = $executeSQLWithoutSeprateBindings
+            ? $this->prepareRawQuery($this->toSql(), $this->getBindings())
+            : $this->toSql();
+
         return $this->connection->select(
-            $this->toSql(),
+            $sql,
             $this->getBindings(),
             $this->from
         );
@@ -1177,6 +1181,11 @@ class Builder
             } else {
                 handle(new Exception("Could not find fitting value '$value' in bindings for query: '$query'"));
             }
+        }
+
+        // to handle "?" markers in query
+        foreach ($bindings as $binding) {
+            $query = str_replace("?", $binding, $query);
         }
 
         return $query;
