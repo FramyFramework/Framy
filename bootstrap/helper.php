@@ -174,3 +174,17 @@ if(! function_exists("class_basename")) {
         return basename(str_replace('\\', '/', $class));
     }
 }
+
+if (! function_exists("get_connection_log"))
+{
+    /**
+     * returns query log from Connection as array
+     *
+     * @return array
+     * @throws \app\framework\Component\Database\Connection\ConnectionNotConfiguredException
+     */
+    function get_connection_log()
+    {
+        return \app\framework\Component\Database\Connection\ConnectionFactory::getInstance()->get()->getQueryLog();
+    }
+}
