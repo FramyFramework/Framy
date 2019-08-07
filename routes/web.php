@@ -10,7 +10,9 @@
 */
 use app\framework\Component\Routing\Router;
 
-Router::get("/", "MainController@index");
+Router::get("/",  function() {
+    view("welcome", ["version" => version()]);
+});
 
 Router::get("/home", function() {
     view("home");
