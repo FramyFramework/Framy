@@ -35,7 +35,7 @@ class Connection
      * The active pdo connection
      * @var PDO
      */
-    protected $pdo;
+    public $pdo;
 
     /**
      * The name of the connection.

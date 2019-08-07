@@ -136,4 +136,9 @@ class BelongsToMany extends Relation
                 ->andWhere($pivot_key_fgn, "=", $parent_key);
         }
     }
+
+    public function get(array $columns = ['*'])
+    {
+        return parent::get($columns, true);
+    }
 }

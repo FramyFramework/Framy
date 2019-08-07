@@ -236,6 +236,6 @@ trait HasRelationships
      */
     public function joiningTableSegment()
     {
-        return Str(class_basename($this))->snakeCase()->val();
+        return Str(class_basename($this))->snakeCase()->append("s")->val();
     }
 }

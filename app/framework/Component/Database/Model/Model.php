@@ -198,7 +198,7 @@ class Model implements ArrayAccess, JsonSerializable
      */
     public function getForeignKey()
     {
-        return str(class_basename($this).'_'.$this->getPrimaryKey())->snakeCase()->val();
+        return str(class_basename($this).'s_'.$this->getPrimaryKey())->snakeCase()->val();
     }
 
     /**
@@ -561,7 +561,7 @@ class Model implements ArrayAccess, JsonSerializable
 
         return $result;
     }
-    
+
     /**
      * Whether a offset exists
      * @link https://php.net/manual/en/arrayaccess.offsetexists.php
