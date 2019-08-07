@@ -66,10 +66,18 @@ class Builder
                 $query .= " FOREIGN KEY";
             }
 
+            if($Column->unique) {
+                $query .= " UNIQUE";
+            }
+
             if($Column->default != null) {
                 $default = $Column->default;
-                if (is_string($default))
-                    $default = "'".$default."'";
+                if (is_string($default)) {
+                    if (str($default)->startsWith("%"))
+                        $default = str($default)->explode("%")->last();
+                    else
+                        $default = "'".$default."'";
+                }
 
                 $query .= " DEFAULT ".$default;
             }

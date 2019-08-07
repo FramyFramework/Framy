@@ -200,5 +200,13 @@ class Column
      */
     public function useCurrent()
     {
+        $this->default("%CURRENT_TIMESTAMP");
+        return $this;
+    }
+
+    public function unique()
+    {
+        $this->unique = true;
+        return $this;
     }
 }

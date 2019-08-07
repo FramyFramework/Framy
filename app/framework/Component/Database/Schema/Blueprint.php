@@ -253,7 +253,7 @@ class Blueprint
      */
     public function timestamps()
     {
-        $this->timestamp("created_at", true);
+        $this->timestamp("created_at", true)->useCurrent();
         $this->timestamp("updated_at", true);
     }
 
@@ -267,7 +267,6 @@ class Blueprint
     public function timestamp($name, $notNull = false)
     {
         $tempColumn = new Column($name, 'TIMESTAMP');
-        $tempColumn->notNull($notNull);
         $this->columns[] = $tempColumn;
 
         return $tempColumn;
