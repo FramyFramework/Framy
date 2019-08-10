@@ -1185,7 +1185,7 @@ class Builder
 
         // to handle "?" markers in query
         foreach ($bindings as $binding) {
-            $query = str_replace("?", $binding, $query);
+            $query = (preg_replace('/'.preg_quote("?", '/').'/', $binding, $query, 1));
         }
 
         return $query;
