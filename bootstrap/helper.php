@@ -99,8 +99,12 @@ if(! function_exists("arr")) {
      * @param array $arr
      * @return \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject
      */
-    function arr(array $arr) {
-        return new \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject($arr);
+    function arr(array $arr = null) {
+        if (is_null($arr)) {
+            return new \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObjectFacade();
+        } else {
+            return new \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject($arr);
+        }
     }
 }
 
