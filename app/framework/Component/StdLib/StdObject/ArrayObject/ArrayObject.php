@@ -10,10 +10,13 @@ namespace app\framework\Component\StdLib\StdObject\ArrayObject;
 
 use app\framework\Component\StdLib\StdObject\AbstractStdObject;
 use app\framework\Component\StdLib\StdObject\StdObjectTrait;
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
 
-class ArrayObject extends AbstractStdObject implements \ArrayAccess, \Countable, \IteratorAggregate
+class ArrayObject extends AbstractStdObject implements ArrayAccess, Countable, IteratorAggregate
 {
-    use ValidatorTrait,ManipulationTrait,StdObjectTrait;
+    use ValidatorTrait,ManipulationTrait,StdObjectTrait,FacadeTrait;
 
     protected $value;
 
@@ -23,7 +26,7 @@ class ArrayObject extends AbstractStdObject implements \ArrayAccess, \Countable,
      */
     public function __construct($value, $makeArrayObj = false)
     {
-        if(is_array($value)){
+        if($this->isAccessible($value)){
             $this->val($value);
         } else {
             handle(new \Exception("Your value must be an array."));
