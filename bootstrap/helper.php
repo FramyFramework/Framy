@@ -52,17 +52,12 @@ if(! function_exists("app")) {
 
 if(! function_exists("url")) {
     /**
-     * Basically completes just the the url
-     * e.g. /test to yourexample.site/test
+     * Returns UrlObject with current url
      *
-     * Simple, very simple.
-     *
-     * @param $path
-     *
-     * @return string
+     * @return \app\framework\Component\StdLib\StdObject\UrlObject\UrlObject
      */
-    function url($path) {
-        return $_SERVER['HTTP_HOST'].$path;
+    function url() {
+        return new \app\framework\Component\StdLib\StdObject\UrlObject\UrlObject($_SERVER['HTTP_HOST']);
     }
 }
 
