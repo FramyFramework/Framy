@@ -16,7 +16,7 @@ use IteratorAggregate;
 
 class ArrayObject extends AbstractStdObject implements ArrayAccess, Countable, IteratorAggregate
 {
-    use ValidatorTrait,ManipulationTrait,StdObjectTrait,FacadeTrait;
+    use ValidatorTrait,ManipulationTrait,StdObjectTrait;
 
     protected $value;
 
