@@ -184,3 +184,15 @@ if (! function_exists("get_connection_log"))
         return \app\framework\Component\Database\Connection\ConnectionFactory::getInstance()->get()->getQueryLog();
     }
 }
+
+if (! function_exists("datetime")) {
+    /**
+     * @param string $time
+     * @param null $timezone
+     * @return \app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject
+     */
+    function datetime($time = "now", $timezone = null)
+    {
+        return new \app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject($time, $timezone);
+    }
+}
