@@ -17,7 +17,7 @@ use app\framework\Component\StdLib\StdObject\AbstractStdObject;
  * Url standard object.
  * If you want to extract parameters from a url, or to build/change its parts, this is a class for that.
  *
- * @package         Webiny\Component\StdLib\StdObject\UrlObject
+ * @package app\framework\Component\StdLib\StdObject\UrlObject
  */
 class UrlObject extends AbstractStdObject
 {
@@ -29,16 +29,13 @@ class UrlObject extends AbstractStdObject
     private $host = false;
     private $port = '';
     private $path = '';
-    private $query = array();
-
+    private $query = [];
 
     /**
      * Constructor.
      * Set standard object value.
      *
      * @param string $value
-     *
-     * @throws UrlObjectException
      */
     public function __construct($value)
     {
@@ -64,7 +61,7 @@ class UrlObject extends AbstractStdObject
      * @throws UrlObjectException
      * @return UrlObject
      */
-    static function buildUrl($parts)
+    public static function buildUrl($parts)
     {
         $parts = new ArrayObject($parts);
 
@@ -143,6 +140,7 @@ class UrlObject extends AbstractStdObject
      * Builds url from current url elements.
      *
      * @return $this
+     * @throws UrlObjectException
      */
     private function rebuildUrl()
     {
@@ -234,6 +232,7 @@ class UrlObject extends AbstractStdObject
      * @param null|string $url
      *
      * @return mixed
+     * @throws UrlObjectException
      */
     public function val($url = null)
     {
@@ -251,6 +250,7 @@ class UrlObject extends AbstractStdObject
      * To string implementation.
      *
      * @return string
+     * @throws UrlObjectException
      */
     public function __toString()
     {
