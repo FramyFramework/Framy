@@ -20,7 +20,6 @@ class MakeCommand extends Command
     private $commandTemplate =
 <<<'EOD'
 <?php
-
 namespace app\custom\Commands;
 
 use app\framework\Component\Console\Command\Command;
@@ -55,7 +54,7 @@ EOD;
     {
         $newCommandName = $input->getArgument("name");
 
-        $File = new File($newCommandName.".php", new Storage("commands"));
+        $File = new File($newCommandName.".php", new Storage("commands"), true);
         fopen($File->getAbsolutePath(), "w");
 
         $tempDefaultCommand = str_replace("§NAME§", $newCommandName, $this->commandTemplate);

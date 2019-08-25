@@ -17,6 +17,7 @@ use app\framework\Component\Routing\Request;
 use app\framework\Component\StdLib\SingletonTrait;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
+use Exception;
 
 class SessionGuard
 {
@@ -58,7 +59,9 @@ class SessionGuard
      */
     protected $tokenRetrievalAttempted = false;
 
-
+    /**
+     *
+     */
     public function init()
     {
         $this->session  = new Session();
@@ -71,6 +74,7 @@ class SessionGuard
      * Determine if the current user is authenticated.
      *
      * @return bool
+     * @throws StringObjectException
      */
     public function check()
     {
@@ -81,6 +85,7 @@ class SessionGuard
      * Determine if the current user is a guest.
      *
      * @return bool
+     * @throws StringObjectException
      */
     public function guest()
     {
@@ -91,12 +96,15 @@ class SessionGuard
      * Get the ID for the currently authenticated user.
      *
      * @return int|null
+     * @throws StringObjectException
      */
     public function id()
     {
         if ($this->user()) {
             return $this->user()->id;
         }
+
+        return null;
     }
 
     /**
@@ -113,6 +121,7 @@ class SessionGuard
     /**
      * Get the currently authenticated user.
      * @return Model|null
+     * @throws StringObjectException
      */
     public function user()
     {
@@ -163,6 +172,7 @@ class SessionGuard
      * @param bool $remember
      * @param bool $login
      * @return bool
+     * @throws StringObjectException
      */
     public function attempt(array $credentials = [], bool $remember = false, $login = true): bool
     {
@@ -181,6 +191,9 @@ class SessionGuard
         return false;
     }
 
+    /**
+     * @throws Exception
+     */
     protected function createRememberTokenIfDoesntExist()
     {
         if (! isset($this->user->remember_token)) {
@@ -204,6 +217,9 @@ class SessionGuard
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function refreshRememberToken()
     {
         $this->user->rember_token = $token = StringObject::random(60);
@@ -214,6 +230,12 @@ class SessionGuard
         ]);
     }
 
+    /**
+     * @param $user
+     * @param $remember
+     * @throws StringObjectException
+     * @throws Exception
+     */
     public function login($user, $remember)
     {
         $this->session->set($this->getName(), $user->id);
@@ -228,10 +250,13 @@ class SessionGuard
         $this->fireLoginEvent($user, $remember);
     }
 
+    /**
+     * Logout authenticated user
+     *
+     * @throws Exception
+     */
     public function logout()
     {
-        $user = $this->user();
-
         // If we have an event dispatcher instance, we can fire off the logout event
         // so any further processing can be done. This allows the developer to be
         // listening for anytime a user signs out of this application manually.
@@ -251,6 +276,12 @@ class SessionGuard
         $this->loggedOut = true;
     }
 
+    /**
+     * @param array $credentials
+     * @param bool $remember
+     * @param bool $login
+     * @throws StringObjectException
+     */
     protected function fireAttemptingEvent(array $credentials = [], bool $remember = false, $login = true)
     {
         $this->eventManager()->fire("auth.attempting", [
@@ -260,6 +291,11 @@ class SessionGuard
         ]);
     }
 
+    /**
+     * @param $user
+     * @param $remember
+     * @throws StringObjectException
+     */
     protected function fireLoginEvent($user, $remember)
     {
         $this->eventManager()->fire("auth.login", [
@@ -268,6 +304,11 @@ class SessionGuard
         ]);
     }
 
+    /**
+     * @param $recaller
+     * @return Model|null
+     * @throws StringObjectException
+     */
     public function getUserByRecaller($recaller)
     {
         if ($this->validRecaller($recaller) && ! $this->tokenRetrievalAttempted) {
@@ -279,6 +320,8 @@ class SessionGuard
 
             return $user;
         }
+
+        return null;
     }
 
     /**
@@ -291,6 +334,9 @@ class SessionGuard
         return 'login_session_'.sha1(get_class($this));
     }
 
+    /**
+     * @return mixed
+     */
     public function getRecaller()
     {
         return $this->request->cookies()->get($this->getRecallerName());
@@ -306,6 +352,13 @@ class SessionGuard
         return 'remember_session_'.sha1(get_class($this));
     }
 
+    /**
+     * Check if user credentials are valid
+     *
+     * @param $user
+     * @param $credentials
+     * @return bool
+     */
     protected function hasValidCredentials($user, $credentials)
     {
         return !is_null($user) && Hash::check($credentials['password'], $user->password);

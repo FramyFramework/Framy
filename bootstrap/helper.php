@@ -5,7 +5,7 @@ if(! function_exists("dd")) {
      * @param $val
      */
     function dd($val) {
-        var_dump($val);die;
+        \app\framework\Component\VarDumper\VarDumper::dump($val);die;
     }
 }
 
@@ -30,6 +30,7 @@ if(! function_exists("view")) {
      * @return \app\framework\Component\View\View|string
      */
     function view($view = null, $data = []) {
+        $data['auth'] = new \app\framework\Component\Auth\Auth;
         $View = new \app\framework\Component\View\View($view, $data);
         return $View->render();
     }
@@ -103,6 +104,12 @@ if(! function_exists("arr")) {
     }
 }
 
+if(! function_exists("str")) {
+    function str($str) {
+        return new \app\framework\Component\StdLib\StdObject\StringObject\StringObject($str);
+    }
+}
+
 if(! function_exists("encrypt")) {
     /**
      * Encrypt the given value.
@@ -151,5 +158,33 @@ if(! function_exists("version")) {
 if(! function_exists("isDebug")) {
     function isDebug() {
         return \app\framework\Component\Config\Config::getInstance()->get("debug", "app");
+    }
+}
+
+if(! function_exists("class_basename")) {
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    function class_basename($class)
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+        return basename(str_replace('\\', '/', $class));
+    }
+}
+
+if (! function_exists("get_connection_log"))
+{
+    /**
+     * returns query log from Connection as array
+     *
+     * @return array
+     * @throws \app\framework\Component\Database\Connection\ConnectionNotConfiguredException
+     */
+    function get_connection_log()
+    {
+        return \app\framework\Component\Database\Connection\ConnectionFactory::getInstance()->get()->getQueryLog();
     }
 }

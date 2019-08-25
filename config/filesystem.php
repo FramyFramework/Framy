@@ -39,7 +39,11 @@
 
             'viewCompiled' => [
                 'driver' => 'local',
-                'root' => pathTo('/resource/templates/templates_c')
+                'root' => pathTo('/storage/framework/cache/templates/')
+            ],
+
+            'lang' => [
+                'root' => pathTo('/resource/lang/')
             ],
 
             'language' => [
@@ -57,6 +61,10 @@
 
             'migrations' => [
                 'root' => pathTo("/app/custom/Database/migrations/")
+            ],
+
+            'middleware' => [
+                'root' => pathTo("/app/custom/Http/Middleware/")
             ],
 
             'model' => [

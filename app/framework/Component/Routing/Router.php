@@ -11,6 +11,7 @@
 
 namespace app\framework\Component\Routing;
 
+use app\framework\Component\Http\MiddlewareInterface;
 use Exception;
 use app\framework\Component\StdLib\SingletonTrait;
 use app\framework\Component\Routing\DataCollection\RouteCollection;
@@ -115,7 +116,7 @@ class Router
         's'  => '[0-9A-Za-z-_]++',
         '*'  => '.+?',
         '**' => '.++',
-        ''   => '[^/]+?'
+        ''   => '[^/]+?',
     ];
 
     /**
@@ -571,10 +572,12 @@ class Router
                             $this->request->paramsNamed()->merge($params);
                         }
 
+                        // Execute middleware before route Callback
+                        $this->doMiddleware($route);
+
                         // Handle our response callback
                         try {
                             $this->handleRouteCallback($route, $matched, $methods_matched);
-
                         } catch (DispatchHaltedException $e) {
                             switch ($e->getCode()) {
                                 case DispatchHaltedException::SKIP_THIS:
@@ -692,6 +695,19 @@ class Router
 
         if ($send_response && !$this->response->isSent()) {
             $this->response->send();
+        }
+    }
+
+    /**
+     * Execute middleware handle method
+     *
+     * @param Route $route
+     */
+    protected function doMiddleware(Route $route)
+    {
+        /** @var MiddlewareInterface $middleware */
+        foreach($route->getMiddleware() as $middleware) {
+            $middleware->handle($this->request());
         }
     }
 
@@ -872,7 +888,7 @@ class Router
             // Pass the Klein instance
             $this,
             $matched,
-            $methods_matched
+            $methods_matched,
         ];
 
         if (is_string($callback)) {

@@ -8,6 +8,7 @@
 
 namespace app\framework\Component\Auth;
 
+use app\custom\Models\User;
 use app\framework\Component\Database\DB;
 use app\framework\Component\Database\Model\Model;
 use app\framework\Component\StdLib\StdObject\StdObjectException;
@@ -27,7 +28,7 @@ class UserProvider
      */
     public function retrieveById($identifier)
     {
-        return DB::select("SELECT * FROM users WHERE id=".$identifier)[0];
+        return User::find($identifier);
     }
 
     /**
@@ -39,7 +40,7 @@ class UserProvider
      */
     public function retrieveByToken($identifier, $token)
     {
-
+        // TODO
     }
 
     /**
@@ -51,7 +52,7 @@ class UserProvider
      */
     public function updateRememberToken(Model $user, $token)
     {
-
+        // TODO
     }
 
     /**
@@ -96,6 +97,6 @@ class UserProvider
      */
     public function validateCredentials(Model $user, array $credentials)
     {
-
+        // TODO
     }
 }

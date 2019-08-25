@@ -23,14 +23,21 @@ class StorageEvent extends Event
      * You can use it if you need to know what file was renamed.
      */
     const FILE_RENAMED = "ff.storage.file_renamed";
+
     /**
      * This event is fired after the file content was written to storage.
      */
     const FILE_SAVED = "ff.storage.file_saved";
+
     /**
      * This event is fired after the file was deleted from the storage.
      */
     const FILE_DELETED = "ff.storage.file_deleted";
+
+    /**
+     * This event is fired after the file was successfully created
+     */
+    const FILE_CREATED = "ff.storage.file_created";
 
     /**
      * @var File

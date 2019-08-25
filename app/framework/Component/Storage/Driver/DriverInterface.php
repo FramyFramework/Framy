@@ -8,6 +8,8 @@
 
 namespace app\framework\Component\Storage\Driver;
 
+use app\framework\Component\Storage\StorageException;
+
 /**
  * Interface DriverInterface
  *
@@ -83,9 +85,17 @@ interface DriverInterface
      * @param string $targetKey
      *
      * @return bool
-     * @throws \app\framework\Component\Storage\StorageException
+     * @throws StorageException
      */
     public function renameKey($sourceKey, $targetKey);
+
+    /**
+     * Create file with empty content
+     *
+     * @param $key
+     * @return true on success
+     */
+    public function crateKey($key);
 
     /**
      * Returns most recent file key that was used by a storage

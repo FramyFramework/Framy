@@ -15,6 +15,12 @@ use app\framework\Component\Storage\Driver\DriverInterface;
 use app\framework\Component\Storage\Driver\DirectoryAwareInterface;
 use app\framework\Component\Storage\Driver\AbsolutePathInterface;
 use app\framework\Component\Storage\Driver\TouchableInterface;
+use DirectoryIterator;
+use EmptyIterator;
+use Exception;
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Class LocalStorageDriver v1.0
@@ -53,6 +59,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * LocalStorageDriver constructor.
      *
      * @param $config
+     * @throws StorageException
      */
     function __construct($config)
     {
@@ -61,7 +68,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
         }
 
         if(!$config instanceof ArrayObject){
-            handle(new StorageException('Storage driver config must be an array or ArrayObject!'));
+            throw new StorageException('Storage driver config must be an array or ArrayObject!');
         }
 
         $this->helper = LocalHelper::getInstance();
@@ -73,12 +80,13 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      *
      * @param string $key
      * @return bool
+     * @throws StorageException
      */
     public function keyExists($key)
     {
         $this->recentKey = $key;
 
-        return file_exists($this->buildPath($key));
+        return $this->isDirectory($key) ?: file_exists($this->buildPath($key));
     }
 
     /**
@@ -86,13 +94,13 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      *
      * @param $key
      * @return mixed
+     * @throws
      */
     private function buildPath($key)
     {
-        //$path = $this->helper->buildPath($key, $this->directory, $this->create);
         $path = $this->helper->buildPath($key, $this->directory, true);
         if (strpos($path, $this->directory) !== 0) {
-            handle(new StorageException(StorageException::PATH_IS_OUT_OF_STORAGE_ROOT, [
+            throw (new StorageException(StorageException::PATH_IS_OUT_OF_STORAGE_ROOT, [
                 $path,
                 $this->directory
             ]));
@@ -107,6 +115,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param $key
      *
      * @return int
+     * @throws StorageException
      */
     public function getSize($key)
     {
@@ -125,6 +134,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param string $key
      *
      * @return string|boolean if cannot read content
+     * @throws StorageException
      */
     public function getContents($key)
     {
@@ -142,10 +152,10 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      *
      * @param      $key
      * @param      $contents
-     *
      * @param bool $append
      *
      * @return bool|int The number of bytes that were written into the file
+     * @throws StorageException
      */
     public function setContents($key, $contents, $append = false)
     {
@@ -172,9 +182,9 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
     public function getKeys($key = '', $recursive = false)
     {
         if ($key != '') {
-            $key = ltrim($key, DS);
-            $key = rtrim($key, DS);
-            $path = $this->directory . DS . $key;
+            $key = ltrim($key, DIRECTORY_SEPARATOR);
+            $key = rtrim($key, DIRECTORY_SEPARATOR);
+            $path = $this->directory . DIRECTORY_SEPARATOR . $key;
         } else {
             $path = $this->directory;
         }
@@ -185,36 +195,40 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
 
         if ($recursive) {
             try {
-                $config = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS;
-                $directoryIterator = new \RecursiveDirectoryIterator($path, $config);
-                $iterator = new \RecursiveIteratorIterator($directoryIterator);
+                $config   = FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS;
+                $directoryIterator = new RecursiveDirectoryIterator($path, $config);
+                $iterator = new RecursiveIteratorIterator($directoryIterator);
+
                 if (is_int($recursive) && $recursive > -1) {
                     $iterator->setMaxDepth($recursive);
                 }
-            } catch (\Exception $e) {
-                $iterator = new \EmptyIterator;
+            } catch (Exception $e) {
+                $iterator = new EmptyIterator;
             }
+
             $files = iterator_to_array($iterator);
         } else {
-            $files = [];
-            $iterator = new \DirectoryIterator($path);
-            foreach ($iterator as $fileinfo) {
-                $name = $fileinfo->getFilename();
+            $files    = [];
+            $iterator = new DirectoryIterator($path);
+
+            foreach ($iterator as $fileInfo) {
+                $name = $fileInfo->getFilename();
+
                 if ($name == '.' || $name == '..') {
                     continue;
                 }
-                $files[] = $fileinfo->getPathname();
+
+                $files[] = $fileInfo->getPathname();
             }
         }
 
         $keys = [];
 
-
         foreach ($files as $file) {
             $keys[] = $this->helper->getKey($file, $this->directory);
         }
-        sort($keys);
 
+        sort($keys);
 
         return $keys;
     }
@@ -225,6 +239,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param string $key
      *
      * @return integer|boolean A UNIX like timestamp or false
+     * @throws StorageException
      */
     public function getTimeModified($key)
     {
@@ -243,6 +258,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param string $key
      *
      * @return boolean
+     * @throws StorageException
      */
     public function deleteKey($key)
     {
@@ -263,18 +279,37 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param string $targetKey
      *
      * @return true if succeeds
+     * @throws StorageException
      */
     public function renameKey($sourceKey, $targetKey)
     {
         $this->recentKey = $sourceKey;
 
-        if($this->keyExists($sourceKey)){
+        if ($this->keyExists($sourceKey)) {
             $targetPath = $this->buildPath($targetKey);
             $this->helper->ensureDirectoryExists(dirname($targetPath), true);
 
             return rename($this->buildPath($sourceKey), $targetPath);
         }
-        handle(new StorageException(StorageException::FILE_NOT_FOUND));
+
+        throw new StorageException(StorageException::FILE_NOT_FOUND);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function crateKey($key)
+    {
+        $file = fopen($this->buildPath($key), "w");
+
+        if (! $file) {
+            throw new StorageException(StorageException::COULD_NOT_CREATE_FILE, $key);
+        }
+
+        fwrite($file,"");
+        fclose($file);
+
+        return true;
     }
 
     /**
@@ -318,6 +353,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param $key
      *
      * @return mixed
+     * @throws StorageException
      */
     public function getAbsolutePath($key)
     {
@@ -332,6 +368,7 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param $key
      *
      * @return mixed
+     * @throws StorageException
      */
     public function touchKey($key)
     {
@@ -346,16 +383,13 @@ class LocalStorageDriver implements SizeAwareInterface,DriverInterface,AbsoluteP
      * @param string $key
      *
      * @return boolean
+     * @throws StorageException
      */
     public function isDirectory($key)
     {
         $this->recentKey = $key;
         $path = $this->buildPath($key);
 
-        if ($this->isDirectory($key)) {
-            return @rmdir($path);
-        }
-
-        return @unlink($path);
+        return is_dir($path);
     }
 }
