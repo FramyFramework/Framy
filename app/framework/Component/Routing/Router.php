@@ -207,14 +207,14 @@ class Router
         RouteCollection $routes = null,
         AbstractRouteFactory $route_factory = null
     ) {
-        // Instanciate and fall back to defaults
+        // Instantiate and fall back to defaults
         $this->service       = $service       ?: new ServiceProvider();
         $this->app           = $app           ?: new App();
         $this->routes        = $routes        ?: new RouteCollection();
         $this->route_factory = $route_factory ?: new RouteFactory();
 
-        $this->error_callbacks = new SplStack();
-        $this->http_error_callbacks = new SplStack();
+        $this->error_callbacks        = new SplStack();
+        $this->http_error_callbacks   = new SplStack();
         $this->after_filter_callbacks = new SplQueue();
     }
 
@@ -391,17 +391,18 @@ class Router
      * Dispatch with optionally injected dependencies
      * This DI allows for easy testing, object mocking, or class extension
      *
-     * @param Request $request              The request object to give to each callback
-     * @param AbstractResponse $response    The response object to give to each callback
-     * @param boolean $send_response        Whether or not to "send" the response after the last route has been matched
-     * @param int $capture                  Specify a DISPATCH_* constant to change the output capturing behavior
+     * @param Request          $request       The request object to give to each callback
+     * @param AbstractResponse $response      The response object to give to each callback
+     * @param boolean          $send_response Whether or not to "send" the response after the last route has been matched
+     * @param int              $capture       Specify a DISPATCH_* constant to change the output capturing behavior
      * @return void|string
+     * @throws Throwable
      */
     public function dispatch(
-        Request $request = null,
-        AbstractResponse $response = null,
-        $send_response = true,
-        $capture = self::DISPATCH_NO_CAPTURE
+        Request          $request       = null,
+        AbstractResponse $response      = null,
+                         $send_response = true,
+                         $capture       = self::DISPATCH_NO_CAPTURE
     ) {
         // Set/Initialize our objects to be sent in each callback
         $this->request  = $request  ?: Request::createFromGlobals();
@@ -413,9 +414,8 @@ class Router
         // Prepare any named routes
         $this->routes->prepareNamed();
 
-
         // Grab some data from the request
-        $uri = $this->request->pathname();
+        $uri        = $this->request->pathname();
         $req_method = $this->request->method();
 
         // Set up some variables for matching
@@ -935,14 +935,12 @@ class Router
     /**
      * Routes an exception through the error callbacks
      *
-     * TODO: Change the `$err` parameter to type-hint against `Throwable` once
-     * PHP 5.x support is no longer necessary.
-     *
      * @param Exception|Throwable $err The exception that occurred
-     * @throws UnhandledException      If the error/exception isn't handled by an error callback
      * @return void
+     * @throws Throwable
+     * @throws UnhandledException      If the error/exception isn't handled by an error callback
      */
-    protected function error($err)
+    protected function error(Throwable $err)
     {
         $type = get_class($err);
         $msg = $err->getMessage();
@@ -974,16 +972,9 @@ class Router
                     ob_end_clean();
                 }
 
-                throw new UnhandledException($msg, $err->getCode(), $err);
+                throw $err;
             }
         } catch (Throwable $e) { // PHP 7 compatibility
-            // Make sure to clean the output buffer before bailing
-            while (ob_get_level() >= $this->output_buffer_level) {
-                ob_end_clean();
-            }
-
-            throw $e;
-        } catch (Exception $e) { // TODO: Remove this catch block once PHP 5.x support is no longer necessary.
             // Make sure to clean the output buffer before bailing
             while (ob_get_level() >= $this->output_buffer_level) {
                 ob_end_clean();
