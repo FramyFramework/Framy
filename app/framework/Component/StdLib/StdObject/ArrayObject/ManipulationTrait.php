@@ -15,6 +15,94 @@ use ErrorException;
 trait ManipulationTrait
 {
     /**
+     * Returns the difference between $attributes and $original
+     * If an value is different the element from $arr1 will be returned
+     *
+     * @param $arr
+     * @return array
+     */
+    public function difference($arr)
+    {
+        $attributes = [];
+        foreach ($this->val() as $attKey => $attribute) {
+            foreach ($arr as $oriKey => $original) {
+                if ($attKey == $oriKey) {
+                    if ($attribute !== $original) {
+                        $attributes[$attKey] = $attribute;
+                    }
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Convert the array into a query string.
+     *
+     * @return string
+     */
+    public function query()
+    {
+        return http_build_query($this->val(), null, '&', PHP_QUERY_RFC3986);
+    }
+
+    /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @param  array   $array
+     * @param  string  $prepend
+     * @return array
+     */
+    public function dot($array = null, $prepend = '')
+    {
+
+        if (is_null($array)) {
+            $array = $this->val();
+        }
+
+        $results = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value) && ! empty($value)) {
+                $results = array_merge($results, $this->dot($value, $prepend.$key.'.'));
+            } else {
+                $results[$prepend.$key] = $value;
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * Divide an array into two arrays. One with keys and the other with values.
+     *
+     * @return array
+     */
+    public function divide()
+    {
+        return [$this->getKeys(), $this->getOnlyValues()];
+    }
+
+    /**
+     * Returns a array of only the keys
+     *
+     * @return array
+     */
+    public function getKeys()
+    {
+        return array_keys($this->val());
+    }
+
+    /**
+     * Returns a array of only the values
+     *
+     * @return array
+     */
+    public function getOnlyValues()
+    {
+        return array_values($this->val());
+    }
+
+    /**
      * remove first element of given array
      *
      * @return $this
@@ -74,7 +162,6 @@ trait ManipulationTrait
      */
     public function implode(string $glue, string $key = null)
     {
-
         if (! function_exists(__NAMESPACE__.'\useGlue')) {
             // done this function to avoid writing redundant code
             function useGlue(&$i, &$length, &$glue) {

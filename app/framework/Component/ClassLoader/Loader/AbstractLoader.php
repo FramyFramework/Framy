@@ -15,8 +15,6 @@ require_once realpath(__DIR__."/../../StdLib/SingletonTrait.php");
 
 abstract class AbstractLoader
 {
-    use SingletonTrait;
-
     /**
      * Returns File path or false
      *
@@ -25,4 +23,19 @@ abstract class AbstractLoader
      * @return mixed
      */
     abstract public function findClass($name);
+
+    protected function getLastNamespacePosition(string $namespace): int
+    {
+        return strrpos($namespace, '\\');
+    }
+
+    protected function getNamespace(string $className):string
+    {
+        return substr($className, 0, $this->getLastNamespacePosition($className));
+    }
+
+    protected function getClass(string $className):string
+    {
+        return substr($className, $this->getLastNamespacePosition($className) + 1);
+    }
 }

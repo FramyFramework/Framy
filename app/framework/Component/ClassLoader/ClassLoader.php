@@ -32,7 +32,7 @@ class ClassLoader
 
     public function loadClass($class)
     {
-        $file = false; //Loader\Psr4::getInstance()->findClass($class);
+        $file = Loader\Psr4::getInstance()->findClass($class);
         if (!$file) {
             $file = Loader\Psr0::getInstance()->findClass($class);
         }
