@@ -547,7 +547,7 @@ class Model implements ArrayAccess, JsonSerializable
         }
 
         // Get the changed attributes which shall then be updated
-        $attributes = $this->getDifference();
+        $attributes = arr($this->getAttributes())->difference($this->original);
 
         // casting to bool because if it performed an action
         // we will have $result = true and false otherwise
@@ -740,26 +740,5 @@ class Model implements ArrayAccess, JsonSerializable
         // fire Event?
 
         $this->syncOriginal();
-    }
-
-    /**
-     * Returns the difference between $attributes and $original
-     *
-     * @return array
-     */
-    private function getDifference()
-    {
-        $attributes = [];
-        foreach ($this->getAttributes() as $attKey => $attribute) {
-            foreach ($this->original as $oriKey => $original) {
-                if ($attKey == $oriKey) {
-                    if ($attribute !== $original) {
-                        $attributes[$attKey] = $attribute;
-                    }
-                }
-            }
-        }
-
-        return $attributes;
     }
 }

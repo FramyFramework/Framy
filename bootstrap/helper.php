@@ -52,17 +52,12 @@ if(! function_exists("app")) {
 
 if(! function_exists("url")) {
     /**
-     * Basically completes just the the url
-     * e.g. /test to yourexample.site/test
+     * Returns UrlObject with current url
      *
-     * Simple, very simple.
-     *
-     * @param $path
-     *
-     * @return string
+     * @return \app\framework\Component\StdLib\StdObject\UrlObject\UrlObject
      */
-    function url($path) {
-        return $_SERVER['HTTP_HOST'].$path;
+    function url() {
+        return new \app\framework\Component\StdLib\StdObject\UrlObject\UrlObject($_SERVER['HTTP_HOST']);
     }
 }
 
@@ -96,10 +91,11 @@ if(! function_exists("handle")) {
 if(! function_exists("arr")) {
     /**
      * Create an ArrayObject from array
+     *
      * @param array $arr
      * @return \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject
      */
-    function arr(array $arr) {
+    function arr(array $arr = []) {
         return new \app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject($arr);
     }
 }
@@ -186,5 +182,17 @@ if (! function_exists("get_connection_log"))
     function get_connection_log()
     {
         return \app\framework\Component\Database\Connection\ConnectionFactory::getInstance()->get()->getQueryLog();
+    }
+}
+
+if (! function_exists("datetime")) {
+    /**
+     * @param string $time
+     * @param null $timezone
+     * @return \app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject
+     */
+    function datetime($time = "now", $timezone = null)
+    {
+        return new \app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject($time, $timezone);
     }
 }

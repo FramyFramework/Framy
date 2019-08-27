@@ -8,8 +8,21 @@
 
 namespace app\framework\Component\StdLib\StdObject\ArrayObject;
 
+use ArrayAccess;
+
 trait ValidatorTrait
 {
+    /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function isAccessible($value)
+    {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
+
     /**
      * Checks if a value exists in an array
      *
