@@ -126,7 +126,7 @@ class BelongsToMany extends Relation
             $related_table = $this->related->getTable();
             $related_key   = $related_table.".".$this->relatedKey;
 
-            $pivot_key_rel = $this->table.".".$this->relatedPivotKey;
+            $pivot_key_rel = "`".$this->table."`.`".$this->relatedPivotKey."`";
             $pivot_key_fgn = $this->table.".".$this->foreignPivotKey;
 
             $parent_key    = $this->parent->{$this->parent->getPrimaryKey()};
