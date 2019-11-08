@@ -1123,7 +1123,7 @@ class Builder
      * Check if the operator is in the list of valid operators.
      * Returns true if it is.
      *
-     * @internal might be removed if it's not needed.
+     * @deprecated Will be removed with next major
      * @param $operatorToCheck
      * @return bool
      */
