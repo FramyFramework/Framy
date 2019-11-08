@@ -13,8 +13,10 @@ use app\framework\Component\Console\Input\InputArgument;
 use app\framework\Component\Console\Input\InputDefinition;
 use app\framework\Component\Console\Input\InputInterface;
 use app\framework\Component\Console\Output\ConsoleOutput;
+use app\framework\Component\Database\Connection\ConnectionFactory;
 use app\framework\Component\Storage\File\File;
 use app\framework\Component\Storage\Storage;
+use Exception;
 
 class MakeMigration extends Command
 {
@@ -57,8 +59,16 @@ EOD;
     {
         $this->setName("make:migration")
             ->setDefinition(new InputDefinition([
-                new InputArgument("name", InputArgument::REQUIRED, "Name of migrations to create."),
-                new InputArgument("connection", InputArgument::REQUIRED, "What connection to use")
+                new InputArgument(
+                    "name",
+                    InputArgument::REQUIRED,
+                    "Name of migrations to create."
+                ),
+                new InputArgument(
+                    "connection",
+                    InputArgument::OPTIONAL,
+                    "What connection to use. (If not set uses default)"
+                )
             ]))
             ->setDescription("Creates a new migration");
     }
@@ -66,8 +76,14 @@ EOD;
     protected function execute(InputInterface $input, ConsoleOutput $output)
     {
         $newMigrationName = $input->getArgument("name");
-        $connection       = $input->getArgument("connection");
-        $output->writeln("<info>creating migration: ".$newMigrationName."</info>", ConsoleOutput::OUTPUT_PLAIN);
+        $connection       = ConnectionFactory::getInstance()
+            ->get($input->getArgument("connection"))
+            ->getName();
+
+        $output->writeln(
+            "<info>creating migration: ".$newMigrationName."</info>",
+            ConsoleOutput::OUTPUT_PLAIN
+        );
 
         try {
             $File = new File($newMigrationName.".php", new Storage("migrations"), true);
@@ -81,7 +97,7 @@ EOD;
             } else {
                 $output->writeln("<error>creating new migrations failed</error>");
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $output->writeln("<error>An error happened: ".$e->getMessage()."</error>");
         }
     }
