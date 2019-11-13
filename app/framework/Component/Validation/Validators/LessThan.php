@@ -8,7 +8,7 @@
 
 namespace app\framework\Component\Validation\Validators;
 
-use app\framework\Component\Route\Klein\Exceptions\ValidationException;
+use app\framework\Component\Validation\ValidationException;
 use app\framework\Component\Validation\ValidatorInterface;
 
 class LessThan implements ValidatorInterface
@@ -26,11 +26,12 @@ class LessThan implements ValidatorInterface
     /**
      * Validate given value, using optional parameters and either throw an exception or return a boolean
      *
-     * @param mixed     $value
-     * @param array     $params
+     * @param mixed $value
+     * @param array $params
      * @param bool|true $throw
      *
      * @return boolean|string
+     * @throws ValidationException
      */
     public function validate($value, $params = [], $throw = true)
     {
