@@ -899,11 +899,19 @@ class Builder
             ? $this->prepareRawQuery($this->toSql(), $this->getBindings())
             : $this->toSql();
 
-        return $this->connection->select(
+        $result = $this->connection->select(
             $sql,
             $this->getBindings(),
             $this->from
         );
+
+        // To fix issue #62
+        // @link https://github.com/FramyFramework/Framy/issues/62
+        $result->map(function ($item) {
+            $item->exists = true;
+        });
+
+        return $result;
     }
 
     /**
