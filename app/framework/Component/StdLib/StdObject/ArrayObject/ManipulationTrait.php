@@ -15,6 +15,14 @@ use ErrorException;
 trait ManipulationTrait
 {
     /**
+     * Return, or update, current standard objects value.
+     *
+     * @param null $value If $value is set, value is updated and ArrayObject is returned.
+     * @return mixed
+     */
+    abstract public function val($value = null);
+
+    /**
      * Returns the difference between $attributes and $original
      * If an value is different the element from $arr1 will be returned
      *
