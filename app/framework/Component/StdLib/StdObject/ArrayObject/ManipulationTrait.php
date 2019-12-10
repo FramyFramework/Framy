@@ -22,6 +22,48 @@ trait ManipulationTrait
      */
     abstract public function val($value = null);
 
+    abstract public function keyExists($key);
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Count elements of an object
+     *
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     *       </p>
+     *       <p>
+     *       The return value is cast to an integer.
+     */
+    abstract public function count();
+
+    /**
+     * Checks if given value is null.
+     *
+     * @param mixed $var Value to check
+     *
+     * @return bool
+     */
+    abstract protected static function isNull($var);
+
+    /**
+     * Check if $instance is of $type.
+     *
+     * @param mixed $instance
+     * @param string $type
+     *
+     * @return bool
+     */
+    abstract protected static function isInstanceOf($instance, $type);
+
+    /**
+     * Checks if given value is an array.
+     *
+     * @param $var
+     *
+     * @return bool
+     */
+    abstract protected static function isArray($var);
+
     /**
      * Returns the difference between $attributes and $original
      * If an value is different the element from $arr1 will be returned
