@@ -702,11 +702,17 @@ class Router
      * Execute middleware handle method
      *
      * @param Route $route
+     * @throws Exceptions\MiddlewareNotFoundException
      */
     protected function doMiddleware(Route $route)
     {
         /** @var MiddlewareInterface $middleware */
         foreach($route->getMiddleware() as $middleware) {
+            if (is_array($middleware)) {
+                foreach ($middleware as $group) {
+                    $group->handle($this->request());
+                }
+            }
             $middleware->handle($this->request());
         }
     }
@@ -743,12 +749,12 @@ class Router
 
                 // Older versions of PCRE require the 'P' in (?P<named>)
                 $pattern = '(?:'
-                         . ($pre !== '' ? $pre : null)
-                         . '('
-                         . ($param !== '' ? "?P<$param>" : null)
-                         . $type
-                         . '))'
-                         . ($optional !== '' ? '?' : null);
+                    . ($pre !== '' ? $pre : null)
+                    . '('
+                    . ($param !== '' ? "?P<$param>" : null)
+                    . $type
+                    . '))'
+                    . ($optional !== '' ? '?' : null);
 
                 return $pattern;
             },

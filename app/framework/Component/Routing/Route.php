@@ -12,6 +12,7 @@
 namespace app\framework\Component\Routing;
 
 use app\framework\Component\Config\Config;
+use app\framework\Component\Http\MiddlewareInterface;
 use app\framework\Component\Routing\Exceptions\MiddlewareNotFoundException;
 use InvalidArgumentException;
 
@@ -270,6 +271,8 @@ class Route
 
         if (is_null($obj)) {
             $obj = $this->getFromConfig("groups")[$name];
+
+            $this->doesMiddlewareExist($obj);
         }
 
         $this->middleware[$name] = $obj;
@@ -298,16 +301,43 @@ class Route
      */
     private function createInstances(array $middleware)
     {
+        // to handle the case where no global middleware is configured
+        if($middleware == []) {
+            return;
+        }
+
         foreach ($middleware as $name => $class) {
-            if (class_exists($class)) {
-                $this->middleware[$name] = new $class;
+            if (is_array($class)) {
+                foreach ($class as $key => $value) {
+                    if($this->doesMiddlewareExist($value)) {
+                        $this->middleware[$name][$key] = new $value;
+                    }
+                }
             } else {
-                // if $class is object we dont throw an
-                // exception because middleware was already created.
-                if (! is_object($class)) {
-                    throw new MiddlewareNotFoundException("Middleware `%s` not found", $name);
+                if($this->doesMiddlewareExist($class)) {
+                    $this->middleware[$name] = new $class;
                 }
             }
+        }
+    }
+
+    /**
+     * @param string|MiddlewareInterface $fullyQualifiedClassName
+     * @return bool
+     * @throws MiddlewareNotFoundException
+     */
+    private function doesMiddlewareExist($fullyQualifiedClassName):bool
+    {
+        if (class_exists($fullyQualifiedClassName)) {
+            return true;
+        } else {
+            // if $fullyQualifiedClassName is object we dont throw an
+            // exception because middleware was already created.
+            if (! is_object($fullyQualifiedClassName)) {
+                throw new MiddlewareNotFoundException("Middleware `%s` not found", $fullyQualifiedClassName);
+            }
+
+            return false;
         }
     }
 

@@ -26,11 +26,12 @@ class CreditCardNumber implements ValidatorInterface
     /**
      * Validate given value, using optional parameters and either throw an exception or return a boolean
      *
-     * @param mixed     $value
-     * @param array     $params
+     * @param mixed $value
+     * @param array $params
      * @param bool|true $throw
      *
      * @return boolean|string
+     * @throws ValidationException
      */
     public function validate($value, $params = [], $throw = false)
     {
@@ -82,7 +83,7 @@ class CreditCardNumber implements ValidatorInterface
         // Remove all non-digit characters from the number
         if (($number = preg_replace('/\D+/', '', $value)) === '') {
             if ($throw) {
-                throw (new ValidationException($message));
+                throw new ValidationException($message);
             }
 
             return $message;
@@ -98,7 +99,7 @@ class CreditCardNumber implements ValidatorInterface
 
         if (!isset($cards[$type])) {
             if ($throw) {
-                throw (new ValidationException($message));
+                throw new ValidationException($message);
             }
 
             return $message;
@@ -110,7 +111,7 @@ class CreditCardNumber implements ValidatorInterface
         // Validate the card length by the card type
         if (!in_array($length, preg_split('/\D+/', $cards[$type]['length']))) {
             if ($throw) {
-                throw (new ValidationException($message));
+                throw new ValidationException($message);
             }
 
             return $message;
@@ -119,7 +120,7 @@ class CreditCardNumber implements ValidatorInterface
         // Check card number prefix
         if (!preg_match('/^' . $cards[$type]['prefix'] . '/', $number)) {
             if ($throw) {
-                throw (new ValidationException($message));
+                throw new ValidationException($message);
             }
 
             return $message;
