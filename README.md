@@ -4,10 +4,6 @@
     <a href="https://codeclimate.com/github/FramyFramework/Framy/maintainability"><img src="https://api.codeclimate.com/v1/badges/a50384049347d1ab7bf7/maintainability" /></a>
 </p>
 
-# Install
-
-> npm i framy
-
 # About Framy
 
 Framy is an web application framework. Made to make web developing easier.
@@ -16,9 +12,13 @@ Framy is an web application framework. Made to make web developing easier.
 
 - Routing powered by Klein framework
 - Powerful Template-Engine - Smarty
-- Easy database interaction with Medoo
+- Easy database interaction with Database Component
 - Home made storage system to easily interact with files and directory's
 
 ## Learning Framy
 
 You can find the Documentary and API [here](https://framyframework.github.io/FramyDocumentation/)
+
+# Licence
+
+The Framy Framework is open-source licencenced under the [MIT-License](https://opensource.org/licenses/MIT)

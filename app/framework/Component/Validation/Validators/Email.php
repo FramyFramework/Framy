@@ -25,11 +25,12 @@ class Email implements ValidatorInterface{
     /**
      * Validate given value, using optional parameters and either throw an exception or return a boolean
      *
-     * @param mixed     $value
-     * @param array     $params
+     * @param mixed $value
+     * @param array $params
      * @param bool|true $throw
      *
      * @return boolean|string
+     * @throws ValidationException
      */
     public function validate($value, $params = [], $throw = true)
     {
@@ -39,7 +40,7 @@ class Email implements ValidatorInterface{
 
         $message = 'Invalid email';
         if ($throw) {
-            throw (new ValidationException($message));
+            throw new ValidationException($message);
         }
 
         return $message;

@@ -899,11 +899,19 @@ class Builder
             ? $this->prepareRawQuery($this->toSql(), $this->getBindings())
             : $this->toSql();
 
-        return $this->connection->select(
+        $result = $this->connection->select(
             $sql,
             $this->getBindings(),
             $this->from
         );
+
+        // To fix issue #62
+        // @link https://github.com/FramyFramework/Framy/issues/62
+        $result->map(function ($item) {
+            $item->exists = true;
+        });
+
+        return $result;
     }
 
     /**
@@ -1123,7 +1131,7 @@ class Builder
      * Check if the operator is in the list of valid operators.
      * Returns true if it is.
      *
-     * @internal might be removed if it's not needed.
+     * @deprecated Will be removed with next major
      * @param $operatorToCheck
      * @return bool
      */

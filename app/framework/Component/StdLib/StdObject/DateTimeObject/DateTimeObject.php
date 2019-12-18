@@ -10,22 +10,25 @@ namespace app\framework\Component\StdLib\StdObject\DateTimeObject;
 
 use app\framework\Component\StdLib\StdObject\AbstractStdObject;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-use \app\framework\Component\Config\Config;
+use app\framework\Component\Config\Config;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
+use DateTime;
+use DateTimeZone;
+use Exception;
 
 class DateTimeObject extends AbstractStdObject
 {
     use ValidatorTrait, ManipulatorTrait;
 
     /**
-     * @var null|\DateTime
+     * @var null|DateTime
      */
     protected $value = null;
 
     /**
      * This is the default timezone. It's set to the servers timezone.
      * This object is static because we don't want to detect the default timezone each time.
-     * @var null|\DateTimeZone
+     * @var null|DateTimeZone
      */
     private static $defaultTimezone = null;
 
@@ -36,7 +39,7 @@ class DateTimeObject extends AbstractStdObject
     private static $defaultFormat = 'Y-m-d H:i:s';
 
     /**
-     * @var Timezone of entry date timestamp.
+     * @var string Timezone of entry date timestamp.
      */
     private $timezone = null;
 
@@ -130,7 +133,7 @@ class DateTimeObject extends AbstractStdObject
             // get UTC offset and correct the date to UTC by calculating the offset
             $this->timestamp = $this->getDateObject()->getTimestamp();
         } catch (\Exception $e){
-            handle(new DateTimeObjectException($e->getMessage()));
+            throw (new DateTimeObjectException($e->getMessage()));
         }
     }
 
@@ -373,7 +376,9 @@ class DateTimeObject extends AbstractStdObject
      */
     private function getDateElement($dateElement, $format = null)
     {
-        $format = ($this->isNull($format)) ? $this->getFormatFor($dateElement) : $this->validateFormatFor($dateElement, $format);
+        $format = ($this->isNull($format))
+            ? $this->getFormatFor($dateElement)
+            : $this->validateFormatFor($dateElement, $format);
 
         return $this->getDateObject()->format($format);
     }
@@ -463,8 +468,10 @@ class DateTimeObject extends AbstractStdObject
                 }
             }
             $this->dateTimeFormat = new ArrayObject($this->dateTimeFormat);
-        } catch (\Exception $e) {
-            handle(new DateTimeObjectException(DateTimeObjectException::MSG_INVALID_DATE_FORMAT, [$this->format]));
+        } catch (Exception $e) {
+            throw new DateTimeObjectException(
+                DateTimeObjectException::MSG_INVALID_DATE_FORMAT, [$this->format]
+            );
         }
     }
 
@@ -485,7 +492,7 @@ class DateTimeObject extends AbstractStdObject
                     try {
                         $defaultTimezone = date_default_timezone_get();
 
-                        self::$defaultTimezone = new \DateTimeZone($defaultTimezone);
+                        self::$defaultTimezone = new DateTimeZone($defaultTimezone);
                     } catch (\Exception $e) {
                         throw new DateTimeObjectException(DateTimeObjectException::MSG_DEFAULT_TIMEZONE);
                     }

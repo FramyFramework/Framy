@@ -8,7 +8,6 @@
 
 namespace app\framework\Component\Validation\Validators;
 
-
 use app\framework\Component\Validation\ValidatorInterface;
 use app\framework\Component\Validation\ValidationException;
 
@@ -27,11 +26,12 @@ class URL implements ValidatorInterface
     /**
      * Validate given value, using optional parameters and either throw an exception or return a boolean
      *
-     * @param mixed     $value
-     * @param array     $params
+     * @param mixed $value
+     * @param array $params
      * @param bool|true $throw
      *
      * @return boolean|string
+     * @throws ValidationException
      */
     public function validate($value, $params = [], $throw = true)
     {

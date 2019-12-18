@@ -13,7 +13,6 @@ use app\framework\Component\Database\Connection\ConnectionNotConfiguredException
 use app\framework\Component\Database\Model\Concerns\HasRelationships;
 use app\framework\Component\Database\Query\Builder as QueryBuilder;
 use app\framework\Component\StdLib\StdObject\ArrayObject\ArrayObject;
-use app\framework\Component\StdLib\StdObject\DateTimeObject\DateTimeObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObject;
 use app\framework\Component\StdLib\StdObject\StringObject\StringObjectException;
 use ArrayAccess;
@@ -222,6 +221,7 @@ class Model implements ArrayAccess, JsonSerializable
      *
      * @return bool
      * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
     public function save()
     {
@@ -292,6 +292,8 @@ class Model implements ArrayAccess, JsonSerializable
      *
      * @param array $columns
      * @return mixed
+     * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
     public static function all(array $columns = ['*'])
     {
@@ -309,6 +311,8 @@ class Model implements ArrayAccess, JsonSerializable
     /**
      * @param array|int $id
      * @return ArrayObject|Model|null
+     * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
     public static function find($id)
     {
@@ -346,6 +350,8 @@ class Model implements ArrayAccess, JsonSerializable
      *
      * @param $id array|int
      * @return int Number of effected rows
+     * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
     public static function remove($id)
     {
@@ -360,10 +366,12 @@ class Model implements ArrayAccess, JsonSerializable
 
     /**
      * @param               $column
-     * @param  string       $operator
+     * @param string $operator
      * @param               $value
-     * @param  string       $boolean
+     * @param string $boolean
      * @return QueryBuilder
+     * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
     public static function where($column, $operator = "=", $value = null, $boolean = 'and')
     {
@@ -657,6 +665,7 @@ class Model implements ArrayAccess, JsonSerializable
      *
      * @return Builder
      * @throws ConnectionNotConfiguredException
+     * @throws StringObjectException
      */
     public function newQuery()
     {
@@ -729,7 +738,7 @@ class Model implements ArrayAccess, JsonSerializable
      */
     protected function freshTimestamp()
     {
-        return (new DateTimeObject())->val();
+        return datetime()->val();
     }
 
     /**
