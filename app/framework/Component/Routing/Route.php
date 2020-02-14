@@ -322,19 +322,39 @@ class Route
     }
 
     /**
+     * Checks if the middleware class exists
+     *
      * @param string|MiddlewareInterface $fullyQualifiedClassName
      * @return bool
      * @throws MiddlewareNotFoundException
      */
     private function doesMiddlewareExist($fullyQualifiedClassName):bool
     {
-        if (class_exists($fullyQualifiedClassName)) {
+        if(is_array($fullyQualifiedClassName)) {
+            foreach($fullyQualifiedClassName as $className) {
+                return $this->checkMiddlewareExists($className);
+            }
+        } else {
+            return $this->checkMiddlewareExists($fullyQualifiedClassName);
+        }
+    }
+
+    /**
+     * Actually checking if the middleware class exists
+     *
+     * @param $className
+     * @return bool
+     * @throws MiddlewareNotFoundException
+     */
+    private function checkMiddlewareExists($className)
+    {
+        if (class_exists($className)) {
             return true;
         } else {
             // if $fullyQualifiedClassName is object we dont throw an
             // exception because middleware was already created.
-            if (! is_object($fullyQualifiedClassName)) {
-                throw new MiddlewareNotFoundException("Middleware `%s` not found", $fullyQualifiedClassName);
+            if (! is_object($className)) {
+                throw new MiddlewareNotFoundException("Middleware `%s` not found", $className);
             }
 
             return false;
