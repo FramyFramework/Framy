@@ -712,8 +712,9 @@ class Router
                 foreach ($middleware as $group) {
                     $group->handle($this->request());
                 }
+            } else {
+                $middleware->handle($this->request());
             }
-            $middleware->handle($this->request());
         }
     }
 
